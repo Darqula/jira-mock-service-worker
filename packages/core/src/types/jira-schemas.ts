@@ -59,6 +59,9 @@ export interface IssueFields {
   versions?: Version[];
   fixVersions?: Version[];
   worklog?: WorklogPage;
+  comment?: CommentPage;
+  attachment?: Attachment[];
+  issuelinks?: IssueLink[];
   [key: string]: any;
 }
 
@@ -303,4 +306,134 @@ export interface CreateWorklogInput {
   started: string;
   timeSpent?: string;
   timeSpentSeconds: number;
+}
+
+// Comments
+export interface Comment {
+  self: string;
+  id: string;
+  author: User;
+  body: string;
+  updateAuthor: User;
+  created: string;
+  updated: string;
+  jsdPublic?: boolean;
+}
+
+export interface CommentPage {
+  startAt: number;
+  maxResults: number;
+  total: number;
+  comments: Comment[];
+}
+
+export interface CreateCommentInput {
+  body: string;
+  jsdPublic?: boolean;
+}
+
+export interface UpdateCommentInput {
+  body: string;
+}
+
+// Transitions
+export interface Transition {
+  id: string;
+  name: string;
+  to: Status;
+  hasScreen: boolean;
+  isGlobal: boolean;
+  isInitial: boolean;
+  isConditional: boolean;
+  fields?: Record<string, TransitionField>;
+}
+
+export interface TransitionField {
+  required: boolean;
+  schema: FieldSchema;
+  name: string;
+  key: string;
+  operations: string[];
+}
+
+export interface TransitionsResponse {
+  expand: string;
+  transitions: Transition[];
+}
+
+export interface DoTransitionInput {
+  transition: {
+    id: string;
+  };
+  fields?: Record<string, any>;
+}
+
+// Issue Links
+export interface IssueLink {
+  id: string;
+  self: string;
+  type: IssueLinkType;
+  inwardIssue?: LinkedIssue;
+  outwardIssue?: LinkedIssue;
+}
+
+export interface IssueLinkType {
+  id: string;
+  name: string;
+  inward: string;
+  outward: string;
+  self: string;
+}
+
+export interface LinkedIssue {
+  id: string;
+  key: string;
+  self: string;
+  fields: {
+    summary: string;
+    status: Status;
+    priority: Priority;
+    issuetype: IssueType;
+  };
+}
+
+export interface CreateIssueLinkInput {
+  type: {
+    id?: string;
+    name?: string;
+  };
+  inwardIssue: {
+    id?: string;
+    key?: string;
+  };
+  outwardIssue: {
+    id?: string;
+    key?: string;
+  };
+  comment?: {
+    body: string;
+  };
+}
+
+// Attachments
+export interface Attachment {
+  self: string;
+  id: string;
+  filename: string;
+  author: User;
+  created: string;
+  size: number;
+  mimeType: string;
+  content: string;
+  thumbnail?: string;
+}
+
+export interface CreateAttachmentResponse {
+  id: string;
+  self: string;
+  filename: string;
+  author: User;
+  created: string;
+  size: number;
+  mimeType: string;
 }

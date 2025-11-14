@@ -8,3 +8,8 @@ export { VersionGenerator } from './version.generator.js';
 export { FieldGenerator } from './field.generator.js';
 export { IssueGenerator } from './issue.generator.js';
 export { WorklogGenerator } from './worklog.generator.js';
+export { CommentGenerator } from './comment.generator.js';
+export { AttachmentGenerator } from './attachment.generator.js';
+export { IssueLinkGenerator } from './issue-link.generator.js';
+export { IssueLinkTypeGenerator } from './issue-link-type.generator.js';
+export { TransitionGenerator } from './transition.generator.js';

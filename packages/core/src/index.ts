@@ -16,6 +16,10 @@ import {
   FieldGenerator,
   IssueGenerator,
   WorklogGenerator,
+  CommentGenerator,
+  AttachmentGenerator,
+  IssueLinkGenerator,
+  IssueLinkTypeGenerator,
 } from './generators/index.js';
 
 export interface GenerateMockDataResult {
@@ -56,6 +60,10 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
   const fieldGenerator = new FieldGenerator();
   const issueGenerator = new IssueGenerator();
   const worklogGenerator = new WorklogGenerator();
+  const commentGenerator = new CommentGenerator();
+  const attachmentGenerator = new AttachmentGenerator();
+  const issueLinkGenerator = new IssueLinkGenerator();
+  const issueLinkTypeGenerator = new IssueLinkTypeGenerator();
 
   // Generate global metadata
   const statusCategories = statusGenerator.generateStatusCategories(context);
@@ -72,6 +80,10 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
 
   const fields = fieldGenerator.generateFields(context);
   fields.forEach((field) => dataStore.addField(field));
+
+  // Generate issue link types
+  const issueLinkTypes = issueLinkTypeGenerator.generateIssueLinkTypes(context);
+  issueLinkTypes.forEach((linkType) => dataStore.addIssueLinkType(linkType));
 
   // Generate users (10-20 users for all projects)
   const userCount = faker.number.int({ min: 10, max: 20 });
@@ -130,8 +142,28 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
       // Generate worklogs for this issue
       const worklogs = worklogGenerator.generateWorklogs(issue, users, context);
       worklogs.forEach((worklog) => dataStore.addWorklog(worklog));
+
+      // Generate comments for this issue
+      const comments = commentGenerator.generateComments(issue, users, context);
+      comments.forEach((comment) => dataStore.addComment(comment, issue.key));
+
+      // Generate attachments for this issue
+      const attachments = attachmentGenerator.generateAttachments(issue, users, context);
+      attachments.forEach((attachment) => dataStore.addAttachment(attachment, issue.key));
     });
   }
+
+  // Generate issue links (after all issues are created)
+  const allIssues = dataStore.getAllIssues();
+  allIssues.forEach((issue) => {
+    const links = issueLinkGenerator.generateIssueLinks(
+      issue,
+      allIssues,
+      issueLinkTypes,
+      context
+    );
+    links.forEach((link) => dataStore.addIssueLink(link));
+  });
 
   return {
     dataStore,
@@ -146,3 +178,8 @@ export { DataStore } from './store/data-store.js';
 export { QueryEngine } from './store/query-engine.js';
 export type * from './types/jira-schemas.js';
 export type * from './types/generator.types.js';
+
+// Re-export generators
+export { IdGenerator } from './generators/base/id-generator.js';
+export { DateGenerator } from './generators/base/date-generator.js';
+export * from './generators/index.js';
