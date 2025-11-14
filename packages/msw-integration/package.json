@@ -27,7 +27,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@jira-mock/core": "*",
+    "@jira-mock/core": "1.0.0",
     "@mswjs/interceptors": "^0.40.0",
     "msw": "^2.6.4"
   },
