@@ -13,3 +13,8 @@ export { AttachmentGenerator } from './attachment.generator.js';
 export { IssueLinkGenerator } from './issue-link.generator.js';
 export { IssueLinkTypeGenerator } from './issue-link-type.generator.js';
 export { TransitionGenerator } from './transition.generator.js';
+export { UserPropertyGenerator } from './user-property.generator.js';
+export { ProjectPropertyGenerator } from './project-property.generator.js';
+export { PermissionGenerator } from './permission.generator.js';
+export { CreateMetaGenerator } from './create-meta.generator.js';
+export { EditMetaGenerator } from './edit-meta.generator.js';
