@@ -91,6 +91,26 @@ const config = {
 };
 ```
 
+## Configuration UI
+
+A beautiful Next.js web interface is available for creating and managing configurations:
+
+```bash
+cd packages/config-ui
+npm install
+npm run dev
+```
+
+The UI provides:
+- 🎨 **Visual config editor** with real-time validation
+- 📊 **Live preview** showing what will be generated
+- 💾 **Export/Import** configurations as JSON
+- 📋 **LocalStorage persistence** for your settings
+- 🌙 **Dark mode** support
+- 📱 **Responsive design** for mobile and desktop
+
+Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
+
 ## Supported Endpoints
 
 ### Users & Permissions
