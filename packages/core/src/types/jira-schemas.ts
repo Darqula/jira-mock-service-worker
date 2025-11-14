@@ -437,3 +437,135 @@ export interface CreateAttachmentResponse {
   size: number;
   mimeType: string;
 }
+
+// Properties
+export interface UserProperty {
+  key: string;
+  value: any;
+}
+
+export interface ProjectProperty {
+  key: string;
+  value: any;
+}
+
+export interface IssueProperty {
+  key: string;
+  value: any;
+}
+
+export interface EntityProperty {
+  key: string;
+  value: any;
+}
+
+// Permissions
+export interface Permission {
+  id: string;
+  key: string;
+  name: string;
+  type: string;
+  description: string;
+  havePermission: boolean;
+}
+
+export interface MyPermissions {
+  permissions: Record<string, Permission>;
+}
+
+// Field Metadata
+export interface FieldMeta {
+  required: boolean;
+  schema: FieldSchema;
+  name: string;
+  key: string;
+  autoCompleteUrl?: string;
+  hasDefaultValue?: boolean;
+  operations: string[];
+  allowedValues?: any[];
+  defaultValue?: any;
+}
+
+export interface CreateMetaIssueType {
+  self: string;
+  id: string;
+  name: string;
+  description: string;
+  iconUrl: string;
+  subtask: boolean;
+  expand: string;
+  fields: Record<string, FieldMeta>;
+}
+
+export interface CreateMetaProject {
+  self: string;
+  id: string;
+  key: string;
+  name: string;
+  avatarUrls: AvatarUrls;
+  issuetypes: CreateMetaIssueType[];
+}
+
+export interface CreateMeta {
+  expand: string;
+  projects: CreateMetaProject[];
+}
+
+export interface EditMeta {
+  fields: Record<string, FieldMeta>;
+}
+
+// JQL Autocomplete
+export interface JQLAutocompleteData {
+  visibleFieldNames: JQLFieldSuggestion[];
+  visibleFunctionNames: JQLFunctionSuggestion[];
+  jqlReservedWords: string[];
+}
+
+export interface JQLFieldSuggestion {
+  value: string;
+  displayName: string;
+  auto?: string;
+  orderable?: string;
+  searchable?: string;
+  cfid?: string;
+  operators?: string[];
+  types?: string[];
+}
+
+export interface JQLFunctionSuggestion {
+  value: string;
+  displayName: string;
+  isList?: string;
+  types?: string[];
+}
+
+// Search
+export interface ApproximateCount {
+  count: number;
+  isApproximate: boolean;
+}
+
+export interface JQLMatch {
+  matchedIssues: string[];
+  errors: string[];
+}
+
+// Worklog Updates
+export interface WorklogUpdated {
+  values: Worklog[];
+  since: number;
+  until: number;
+  self: string;
+  nextPage?: string;
+  lastPage?: boolean;
+}
+
+export interface WorklogDeleted {
+  values: number[];
+  since: number;
+  until: number;
+  self: string;
+  nextPage?: string;
+  lastPage?: boolean;
+}
