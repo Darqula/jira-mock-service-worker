@@ -37,5 +37,16 @@ export function generateSelfUrls(baseUrl: string = DEFAULT_BASE_URL) {
     filter: (filterId: string) => `${baseUrl}/rest/api/2/filter/${filterId}`,
     avatar: (size: string) =>
       `${baseUrl}/secure/useravatar?size=${size}&avatarId=10338`,
+    comment: (issueIdOrKey: string, commentId: string) =>
+      `${baseUrl}/rest/api/2/issue/${issueIdOrKey}/comment/${commentId}`,
+    attachment: (attachmentId: string) =>
+      `${baseUrl}/rest/api/2/attachment/${attachmentId}`,
+    attachmentContent: (attachmentId: string, filename: string) =>
+      `${baseUrl}/secure/attachment/${attachmentId}/${filename}`,
+    attachmentThumbnail: (attachmentId: string) =>
+      `${baseUrl}/secure/thumbnail/${attachmentId}`,
+    issueLink: (linkId: string) => `${baseUrl}/rest/api/2/issueLink/${linkId}`,
+    issueLinkType: (linkTypeId: string) =>
+      `${baseUrl}/rest/api/2/issueLinkType/${linkTypeId}`,
   };
 }
