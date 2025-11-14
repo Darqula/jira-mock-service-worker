@@ -605,3 +605,291 @@ const server = setupServer(...handlers);
 - Multiple usage examples
 - Architecture explanation
 - Contribution guidelines
+
+---
+
+## 13. Iteration 3: Additional Endpoints from JiraCloudApiEndpoints.md
+
+Based on the actual API usage in the codebase (documented in JiraCloudApiEndpoints.md), the following endpoints need to be implemented to achieve complete coverage.
+
+### 13.1 Iteration 3 Scope (32 additional endpoints)
+
+#### Phase 3.1: User Properties & Advanced Search (8 endpoints)
+**Priority: High** - Used for user preferences and advanced search
+
+1. **User Search Extensions**:
+   - `GET /rest/api/2/user/assignable/multiProjectSearch` - Find assignable users across projects
+   - `GET /rest/api/2/user/search/query` - Advanced user search with query string
+
+2. **User Properties**:
+   - `GET /rest/api/2/user/properties/{propertyKey}` - Get user property
+   - `PUT /rest/api/2/user/properties/{propertyKey}` - Set user property
+   - `DELETE /rest/api/2/user/properties/{propertyKey}` - Delete user property
+
+3. **Permissions**:
+   - `GET /rest/api/2/mypermissions` - Get current user's permissions
+
+**Implementation Notes**:
+- Add `UserProperty` type to jira-schemas.ts
+- Extend DataStore with user properties storage
+- Create UserPropertyGenerator for default properties
+- Add permissions calculation based on user roles
+
+#### Phase 3.2: Project Properties & Search (6 endpoints)
+**Priority: High** - Used for project configuration and milestones
+
+1. **Project Search**:
+   - `GET /rest/api/2/project/search` - Search projects with pagination and filtering
+
+2. **Project Properties**:
+   - `GET /rest/api/2/project/{projectId}/properties` - List all project properties
+   - `GET /rest/api/2/project/{projectId}/properties/{propertyKey}` - Get specific property
+   - `PUT /rest/api/2/project/{projectId}/properties/{propertyKey}` - Set property
+   - `DELETE /rest/api/2/project/{projectId}/properties/{propertyKey}` - Delete property
+
+3. **Special Properties**:
+   - Project milestones using property key: `pwMilestone`
+
+**Implementation Notes**:
+- Add `ProjectProperty` type to jira-schemas.ts
+- Extend DataStore with project properties Map
+- Create handlers in projects.handlers.ts
+- Support milestone-specific property handling
+
+#### Phase 3.3: Component & Version Extensions (3 endpoints)
+**Priority: Medium** - Used for component/version listing
+
+1. **Component Listing**:
+   - `GET /rest/api/2/component` - Get all components (global)
+   - `GET /rest/api/2/component/page` - Paginated component listing
+
+2. **Version Management**:
+   - `POST /rest/api/2/version/{versionId}/removeAndSwap` - Remove version and swap issues
+
+**Implementation Notes**:
+- Add global component retrieval to DataStore
+- Implement pagination for components
+- Add version swap logic (move issues from one version to another)
+
+#### Phase 3.4: Issue Metadata & Create/Edit Meta (6 endpoints)
+**Priority: High** - Critical for issue creation/editing UIs
+
+1. **Issue Type Extensions**:
+   - `GET /rest/api/2/issuetype/project?projectId={id}` - Get issue types for project
+   - `GET /rest/api/2/issuetype/page?projectIds={ids}` - Paginated issue types for projects
+
+2. **Create Meta**:
+   - `GET /rest/api/2/issue/createmeta` - Get metadata for creating issues
+   - `GET /rest/api/2/issue/createmeta/{projectId}/issuetypes` - Get issue types for project creation
+   - `GET /rest/api/2/issue/createmeta/{projectId}/issuetypes/{issueTypeId}` - Get fields for issue type
+
+3. **Edit Meta**:
+   - `GET /rest/api/2/issue/{issueId}/editmeta` - Get metadata for editing issue
+
+**Implementation Notes**:
+- Create metadata.handlers.ts extensions
+- Generate field schemas with validation rules
+- Include required/optional field information
+- Support field dependencies and conditions
+
+#### Phase 3.5: Worklog Extensions (5 endpoints)
+**Priority: Medium** - Used for time tracking management
+
+1. **Worklog CRUD Completion**:
+   - `PUT /rest/api/2/issue/{issueId}/worklog/{worklogId}` - Update worklog
+   - `DELETE /rest/api/2/issue/{issueId}/worklog/{worklogId}` - Delete worklog
+
+2. **Global Worklog Endpoints**:
+   - `GET /rest/api/2/worklog/updated` - Get updated worklogs (with since parameter)
+   - `POST /rest/api/2/worklog/list` - Get worklogs by IDs (bulk)
+   - `GET /rest/api/2/worklog/deleted` - Get deleted worklog IDs
+
+**Implementation Notes**:
+- Add update/delete methods to DataStore for worklogs
+- Track worklog modification history
+- Track deleted worklog IDs with timestamps
+- Support bulk worklog retrieval
+
+#### Phase 3.6: Issue Properties (2 endpoints)
+**Priority: Medium** - Used for custom issue data storage
+
+1. **Issue Properties**:
+   - `PUT /rest/api/2/issue/{issueId}/properties/{propertyKey}` - Set issue property
+   - `POST /rest/api/2/issue/properties/multi` - Bulk set properties on multiple issues
+
+**Implementation Notes**:
+- Add `IssueProperty` type to jira-schemas.ts
+- Extend DataStore with issue properties Map
+- Support bulk property operations
+- Add property change tracking
+
+#### Phase 3.7: Search & JQL Extensions (3 endpoints)
+**Priority: High** - Used for search optimization and validation
+
+1. **Search Enhancements**:
+   - `POST /rest/api/2/search/approximate-count` - Get approximate count (fast)
+   - `POST /rest/api/2/jql/match` - Check if issues match JQL
+
+2. **JQL Autocomplete**:
+   - `GET /rest/api/2/jql/autocompletedata/suggestions` - Get JQL autocomplete suggestions
+
+**Implementation Notes**:
+- Implement fast count estimation (use sampling for large datasets)
+- Add JQL matching without full search
+- Generate autocomplete data from schema
+- Support field, function, and value suggestions
+
+#### Phase 3.8: Filter Details (1 endpoint)
+**Priority: Low** - Currently only search is implemented
+
+1. **Filter Retrieval**:
+   - `GET /rest/api/2/filter/{filterId}` - Get filter by ID
+
+**Implementation Notes**:
+- Add to existing filters.handlers.ts
+- Return complete filter object with permissions
+
+### 13.2 Implementation Order
+
+**Week 1**: High Priority User & Project Endpoints
+- Phase 3.1: User properties & search (days 1-2)
+- Phase 3.2: Project properties (days 3-4)
+- Phase 3.4: Issue metadata (days 5-7)
+
+**Week 2**: Search & Worklog Enhancements
+- Phase 3.7: Search & JQL extensions (days 1-3)
+- Phase 3.5: Worklog extensions (days 4-5)
+- Phase 3.6: Issue properties (days 6-7)
+
+**Week 3**: Remaining & Testing
+- Phase 3.3: Component/version extensions (days 1-2)
+- Phase 3.8: Filter details (day 3)
+- Comprehensive testing (days 4-7)
+
+### 13.3 Required Types & Generators
+
+**New Types** (add to jira-schemas.ts):
+```typescript
+interface UserProperty {
+  key: string;
+  value: any;
+}
+
+interface ProjectProperty {
+  key: string;
+  value: any;
+}
+
+interface IssueProperty {
+  key: string;
+  value: any;
+}
+
+interface CreateMetaIssueType {
+  id: string;
+  name: string;
+  fields: Record<string, FieldMeta>;
+}
+
+interface FieldMeta {
+  required: boolean;
+  schema: FieldSchema;
+  name: string;
+  operations: string[];
+  allowedValues?: any[];
+}
+
+interface Permission {
+  id: string;
+  key: string;
+  name: string;
+  type: string;
+  description: string;
+  havePermission: boolean;
+}
+```
+
+**New Generators**:
+- `UserPropertyGenerator` - Generate default user properties
+- `ProjectPropertyGenerator` - Generate project properties & milestones
+- `PermissionGenerator` - Generate user permissions based on role
+- `CreateMetaGenerator` - Generate field metadata for issue creation
+- `EditMetaGenerator` - Generate field metadata for issue editing
+
+### 13.4 DataStore Extensions
+
+**New Methods**:
+```typescript
+// User properties
+getUserProperty(accountId: string, key: string): UserProperty | undefined
+setUserProperty(accountId: string, key: string, value: any): void
+deleteUserProperty(accountId: string, key: string): boolean
+getAllUserProperties(accountId: string): UserProperty[]
+
+// Project properties
+getProjectProperty(projectId: string, key: string): ProjectProperty | undefined
+setProjectProperty(projectId: string, key: string, value: any): void
+deleteProjectProperty(projectId: string, key: string): boolean
+getAllProjectProperties(projectId: string): ProjectProperty[]
+
+// Issue properties
+getIssueProperty(issueId: string, key: string): IssueProperty | undefined
+setIssueProperty(issueId: string, key: string, value: any): void
+deleteIssueProperty(issueId: string, key: string): boolean
+getAllIssueProperties(issueId: string): IssueProperty[]
+
+// Worklog tracking
+updateWorklog(worklogId: string, updates: Partial<Worklog>): Worklog | undefined
+deleteWorklogById(worklogId: string): boolean
+getUpdatedWorklogs(since: number): Worklog[]
+getDeletedWorklogIds(since: number): string[]
+getWorklogsByIds(ids: string[]): Worklog[]
+
+// Version management
+swapVersionIssues(fromVersionId: string, toVersionId: string): void
+
+// Permissions
+getUserPermissions(accountId: string): Permission[]
+```
+
+### 13.5 Success Criteria for Iteration 3
+
+**Endpoint Coverage**:
+- All 32 endpoints from JiraCloudApiEndpoints.md implemented
+- Total endpoint count: 100+ endpoints
+
+**Properties Support**:
+- User, project, and issue properties fully functional
+- Bulk operations supported
+- Property change tracking
+
+**Metadata Support**:
+- Create/edit metadata accurate for all issue types
+- Field validation rules included
+- Autocomplete data generated
+
+**Testing**:
+- Unit tests for all new endpoints
+- Integration tests for property operations
+- Performance tests for bulk operations
+
+**Documentation**:
+- Update README with new endpoint count
+- Add examples for property usage
+- Document metadata structure
+
+### 13.6 Estimated Effort
+
+- **Development**: 3 weeks
+- **Testing**: 4-5 days
+- **Documentation**: 2-3 days
+- **Total**: ~4 weeks
+
+### 13.7 Dependencies
+
+No new external dependencies required. All implementation uses existing:
+- @faker-js/faker
+- msw
+- zod
+- TypeScript
+
