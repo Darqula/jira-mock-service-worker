@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@jira-mock/core": "*",
+    "@mswjs/interceptors": "^0.40.0",
     "msw": "^2.6.4"
   },
   "devDependencies": {
