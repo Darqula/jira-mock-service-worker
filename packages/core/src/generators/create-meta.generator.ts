@@ -62,10 +62,10 @@ export class CreateMetaGenerator {
     issueType: IssueType,
     project: Project,
     priorities: Priority[],
-    users: User[],
+    _users: User[],
     components: Component[],
     versions: Version[],
-    context: GenerationContext
+    _context: GenerationContext
   ): CreateMetaIssueType {
     const urls = generateSelfUrls();
 

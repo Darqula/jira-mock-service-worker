@@ -15,11 +15,11 @@ export class EditMetaGenerator {
   generateEditMeta(
     issue: IssueBean,
     priorities: Priority[],
-    users: User[],
+    _users: User[],
     components: Component[],
     versions: Version[],
-    statuses: Status[],
-    context: GenerationContext
+    _statuses: Status[],
+    _context: GenerationContext
   ): EditMeta {
     const urls = generateSelfUrls();
 

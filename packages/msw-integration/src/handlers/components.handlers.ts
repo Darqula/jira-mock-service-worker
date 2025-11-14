@@ -18,6 +18,59 @@ interface UpdateComponentInput {
 
 export function createComponentsHandlers(dataStore: DataStore, baseUrl: string) {
   return [
+    // GET /rest/api/2/component/page - Get all components with pagination
+    http.get(`${baseUrl}/rest/api/2/component/page`, ({ request }) => {
+      const url = new URL(request.url);
+      const startAt = parseInt(url.searchParams.get('startAt') || '0', 10);
+      const maxResults = parseInt(url.searchParams.get('maxResults') || '50', 10);
+      const query = url.searchParams.get('query') || '';
+
+      let allComponents = dataStore.getAllComponents();
+
+      // Filter by query if provided
+      if (query) {
+        const lowerQuery = query.toLowerCase();
+        allComponents = allComponents.filter(
+          (c) =>
+            c.name.toLowerCase().includes(lowerQuery) ||
+            (c.description && c.description.toLowerCase().includes(lowerQuery))
+        );
+      }
+
+      const total = allComponents.length;
+      const components = allComponents.slice(startAt, startAt + maxResults);
+      const isLast = startAt + components.length >= total;
+
+      return HttpResponse.json({
+        self: `${baseUrl}/rest/api/2/component/page`,
+        maxResults,
+        startAt,
+        total,
+        isLast,
+        values: components,
+      });
+    }),
+
+    // GET /rest/api/2/component - Get all components (simple list)
+    http.get(`${baseUrl}/rest/api/2/component`, ({ request }) => {
+      const url = new URL(request.url);
+      const query = url.searchParams.get('query') || '';
+
+      let allComponents = dataStore.getAllComponents();
+
+      // Filter by query if provided
+      if (query) {
+        const lowerQuery = query.toLowerCase();
+        allComponents = allComponents.filter(
+          (c) =>
+            c.name.toLowerCase().includes(lowerQuery) ||
+            (c.description && c.description.toLowerCase().includes(lowerQuery))
+        );
+      }
+
+      return HttpResponse.json(allComponents);
+    }),
+
     // GET /rest/api/2/project/:projectIdOrKey/components - Get project components
     http.get(`${baseUrl}/rest/api/2/project/:projectIdOrKey/components`, ({ params }) => {
       const { projectIdOrKey } = params;

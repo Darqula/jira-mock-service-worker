@@ -4,13 +4,16 @@ A comprehensive Mock Service Worker (MSW) integration for mocking Jira Cloud API
 
 ## Features
 
-- 🎯 **70+ Jira Cloud API endpoints** mocked and ready to use
+- 🎯 **100+ Jira Cloud API endpoints** mocked and ready to use
 - 🎲 **Realistic data generation** using faker.js with deterministic seeding
-- 🔍 **JQL query support** for searching issues
+- 🔍 **JQL query support** with advanced search, autocomplete, and match checking
 - 📦 **Full CRUD operations** for issues, projects, comments, worklogs, and more
 - 💬 **Comments & Attachments** - Full support for issue discussions and file attachments
 - 🔗 **Issue Links & Transitions** - Complete workflow and relationship management
-- 📋 **Components & Versions** - Project organization and release tracking
+- 📋 **Components & Versions** - Project organization, release tracking, and version swapping
+- 🔐 **User Properties & Permissions** - User preferences and role-based access control
+- 🏷️ **Entity Properties** - Custom properties for users, projects, and issues
+- 📊 **Field Metadata** - Complete create/edit metadata for dynamic form generation
 - 🧪 **100% TypeScript** with strict type safety
 - ✅ **Thoroughly tested** with comprehensive test coverage
 - 🚀 **Easy setup** - less than 5 lines of code
