@@ -14,7 +14,7 @@ export class UserPropertyGenerator {
   ];
 
   generateUserProperties(
-    user: User,
+    _user: User,
     context: GenerationContext
   ): UserProperty[] {
     const properties: UserProperty[] = [];

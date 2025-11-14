@@ -155,6 +155,7 @@ export interface Field {
 
 export interface FieldSchema {
   type: string;
+  items?: string;
   system?: string;
   custom?: string;
   customId?: number;

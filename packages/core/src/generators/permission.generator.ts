@@ -174,7 +174,7 @@ export class PermissionGenerator {
   ];
 
   generateUserPermissions(
-    user: User,
+    _user: User,
     context: GenerationContext
   ): Permission[] {
     const permissions: Permission[] = [];

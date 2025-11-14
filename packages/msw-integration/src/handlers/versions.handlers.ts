@@ -139,5 +139,50 @@ export function createVersionsHandlers(dataStore: DataStore, baseUrl: string) {
 
       return HttpResponse.json(null, { status: 204 });
     }),
+
+    // POST /rest/api/2/version/:id/removeAndSwap - Remove version and swap issues
+    http.post(`${baseUrl}/rest/api/2/version/:id/removeAndSwap`, async ({ params, request }) => {
+      const { id } = params;
+      const body = (await request.json()) as {
+        moveFixIssuesTo?: string;
+        moveAffectedIssuesTo?: string;
+      };
+
+      const version = dataStore.getVersion(id as string);
+      if (!version) {
+        return HttpResponse.json(
+          { errorMessages: ['Version not found'] },
+          { status: 404 }
+        );
+      }
+
+      // Validate target versions if provided
+      if (body.moveFixIssuesTo) {
+        const targetVersion = dataStore.getVersion(body.moveFixIssuesTo);
+        if (!targetVersion) {
+          return HttpResponse.json(
+            { errorMessages: ['Target fix version not found'] },
+            { status: 404 }
+          );
+        }
+        // Swap fix version issues
+        dataStore.swapVersionIssues(id as string, body.moveFixIssuesTo);
+      }
+
+      if (body.moveAffectedIssuesTo) {
+        const targetVersion = dataStore.getVersion(body.moveAffectedIssuesTo);
+        if (!targetVersion) {
+          return HttpResponse.json(
+            { errorMessages: ['Target affected version not found'] },
+            { status: 404 }
+          );
+        }
+        // Swap affected version issues
+        dataStore.swapVersionIssues(id as string, body.moveAffectedIssuesTo);
+      }
+
+      // Return success with empty body
+      return HttpResponse.json(null, { status: 204 });
+    }),
   ];
 }
