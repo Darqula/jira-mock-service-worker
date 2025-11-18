@@ -4,12 +4,18 @@ A comprehensive Mock Service Worker (MSW) integration for mocking Jira Cloud API
 
 ## Features
 
-- 🎯 **44 Jira Cloud API endpoints** mocked and ready to use
+- 🎯 **100+ Jira Cloud API endpoints** mocked and ready to use
 - 🎲 **Realistic data generation** using faker.js with deterministic seeding
-- 🔍 **JQL query support** for searching issues
-- 📦 **Full CRUD operations** for issues, projects, and worklogs
+- 🔍 **JQL query support** with advanced search, autocomplete, and match checking
+- 📦 **Full CRUD operations** for issues, projects, comments, worklogs, and more
+- 💬 **Comments & Attachments** - Full support for issue discussions and file attachments
+- 🔗 **Issue Links & Transitions** - Complete workflow and relationship management
+- 📋 **Components & Versions** - Project organization, release tracking, and version swapping
+- 🔐 **User Properties & Permissions** - User preferences and role-based access control
+- 🏷️ **Entity Properties** - Custom properties for users, projects, and issues
+- 📊 **Field Metadata** - Complete create/edit metadata for dynamic form generation
 - 🧪 **100% TypeScript** with strict type safety
-- ✅ **Thoroughly tested** with 41 passing tests
+- ✅ **Thoroughly tested** with comprehensive test coverage
 - 🚀 **Easy setup** - less than 5 lines of code
 - 🌐 **Works everywhere** - Node.js and browser support
 
@@ -122,6 +128,8 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 - `GET /rest/api/2/project` - Get all projects
 - `GET /rest/api/2/project/{projectIdOrKey}` - Get project by ID or key
 - `GET /rest/api/2/project/{projectIdOrKey}/statuses` - Get project statuses
+- `GET /rest/api/2/project/{projectIdOrKey}/components` - Get project components
+- `GET /rest/api/2/project/{projectIdOrKey}/versions` - Get project versions
 
 ### Issues
 - `GET /rest/api/2/issue/{issueIdOrKey}` - Get issue
@@ -129,6 +137,40 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 - `PUT /rest/api/2/issue/{issueIdOrKey}` - Update issue
 - `DELETE /rest/api/2/issue/{issueIdOrKey}` - Delete issue
 - `GET /rest/api/2/issue/picker` - Issue picker suggestions
+
+### Comments
+- `GET /rest/api/2/issue/{issueIdOrKey}/comment` - Get all comments
+- `POST /rest/api/2/issue/{issueIdOrKey}/comment` - Add comment
+- `GET /rest/api/2/issue/{issueIdOrKey}/comment/{id}` - Get comment
+- `PUT /rest/api/2/issue/{issueIdOrKey}/comment/{id}` - Update comment
+- `DELETE /rest/api/2/issue/{issueIdOrKey}/comment/{id}` - Delete comment
+
+### Transitions
+- `GET /rest/api/2/issue/{issueIdOrKey}/transitions` - Get available transitions
+- `POST /rest/api/2/issue/{issueIdOrKey}/transitions` - Perform transition
+
+### Issue Links
+- `GET /rest/api/2/issueLinkType` - Get all issue link types
+- `GET /rest/api/2/issueLink/{linkId}` - Get issue link
+- `POST /rest/api/2/issueLink` - Create issue link
+- `DELETE /rest/api/2/issueLink/{linkId}` - Delete issue link
+
+### Attachments
+- `GET /rest/api/2/attachment/{id}` - Get attachment metadata
+- `POST /rest/api/2/issue/{issueIdOrKey}/attachments` - Add attachments
+- `DELETE /rest/api/2/attachment/{id}` - Delete attachment
+
+### Components
+- `GET /rest/api/2/component/{id}` - Get component
+- `POST /rest/api/2/component` - Create component
+- `PUT /rest/api/2/component/{id}` - Update component
+- `DELETE /rest/api/2/component/{id}` - Delete component
+
+### Versions
+- `GET /rest/api/2/version/{id}` - Get version
+- `POST /rest/api/2/version` - Create version
+- `PUT /rest/api/2/version/{id}` - Update version
+- `DELETE /rest/api/2/version/{id}` - Delete version
 
 ### Search
 - `POST /rest/api/2/search/jql` - Search with JQL (POST)
@@ -330,22 +372,31 @@ MIT
 
 ## Roadmap
 
-### Iteration 1 (Current)
+### Iteration 1
 - ✅ Core data generation
-- ✅ 44 API endpoints
+- ✅ Basic API endpoints (44 endpoints)
 - ✅ Basic JQL support
 - ✅ CRUD operations
 - ✅ Comprehensive tests
+- ✅ Next.js configuration UI
+
+### Iteration 2 (Current)
+- ✅ Comments - Full CRUD operations
+- ✅ Issue transitions & workflows
+- ✅ Attachments metadata support
+- ✅ Issue links & link types
+- ✅ Components CRUD operations
+- ✅ Versions CRUD operations
+- ✅ 70+ API endpoints total
 
 ### Future Iterations
-- 🔄 Next.js configuration UI
-- 🔄 Advanced JQL support
-- 🔄 Issue transitions & workflows
-- 🔄 Attachments & comments
+- 🔄 Advanced JQL support (complex queries, functions)
 - 🔄 Custom fields configuration
-- 🔄 Issue relationships (links, subtasks)
-- 🔄 Real-time updates
+- 🔄 Subtasks support
+- 🔄 Boards & Sprints (Agile endpoints)
 - 🔄 Webhooks simulation
+- 🔄 Real-time updates
+- 🔄 Advanced workflow schemes
 
 ## Support
 

@@ -1,8 +1,62 @@
 import { http, HttpResponse } from 'msw';
 import type { DataStore } from '@jira-mock/core';
+import { CreateMetaGenerator, EditMetaGenerator } from '@jira-mock/core';
+import { createGenerationContext } from '../utils/generation-context.js';
 
 export function createMetadataHandlers(dataStore: DataStore, baseUrl: string) {
+  const createMetaGenerator = new CreateMetaGenerator();
+  const editMetaGenerator = new EditMetaGenerator();
+
   return [
+    // GET /rest/api/2/issuetype/page - Get issue types with pagination
+    http.get(`${baseUrl}/rest/api/2/issuetype/page`, ({ request }) => {
+      const url = new URL(request.url);
+      const startAt = parseInt(url.searchParams.get('startAt') || '0', 10);
+      const maxResults = parseInt(url.searchParams.get('maxResults') || '50', 10);
+      // const projectIds = url.searchParams.get('projectIds')?.split(',') || [];
+
+      let issueTypes = dataStore.getAllIssueTypes();
+
+      // Filter by project IDs if provided (for now, return all issue types for any project)
+      // In a real implementation, you'd filter based on project-specific issue types
+
+      const total = issueTypes.length;
+      const paginatedTypes = issueTypes.slice(startAt, startAt + maxResults);
+
+      return HttpResponse.json({
+        self: `${baseUrl}/rest/api/2/issuetype/page`,
+        maxResults,
+        startAt,
+        total,
+        isLast: startAt + paginatedTypes.length >= total,
+        values: paginatedTypes,
+      });
+    }),
+
+    // GET /rest/api/2/issuetype/project - Get issue types for a project
+    http.get(`${baseUrl}/rest/api/2/issuetype/project`, ({ request }) => {
+      const url = new URL(request.url);
+      const projectId = url.searchParams.get('projectId');
+
+      if (!projectId) {
+        return HttpResponse.json(
+          { errorMessages: ['projectId parameter is required'] },
+          { status: 400 }
+        );
+      }
+
+      const project = dataStore.getProject(projectId);
+      if (!project) {
+        return HttpResponse.json(
+          { errorMessages: ['Project not found'] },
+          { status: 404 }
+        );
+      }
+
+      const issueTypes = dataStore.getAllIssueTypes();
+      return HttpResponse.json(issueTypes);
+    }),
+
     // GET /rest/api/2/issuetype - Get all issue types
     http.get(`${baseUrl}/rest/api/2/issuetype`, () => {
       const issueTypes = dataStore.getAllIssueTypes();
@@ -58,6 +112,157 @@ export function createMetadataHandlers(dataStore: DataStore, baseUrl: string) {
         isLast: startAt + paginatedLabels.length >= total,
         values: paginatedLabels,
       });
+    }),
+
+    // GET /rest/api/2/issue/createmeta - Get create metadata
+    http.get(`${baseUrl}/rest/api/2/issue/createmeta`, ({ request }) => {
+      const url = new URL(request.url);
+      const projectIds = url.searchParams.get('projectIds')?.split(',');
+      const projectKeys = url.searchParams.get('projectKeys')?.split(',');
+      const issueTypeIds = url.searchParams.get('issuetypeIds')?.split(',');
+
+      let projects = dataStore.getAllProjects();
+
+      // Filter by project IDs or keys if provided
+      if (projectIds) {
+        projects = projects.filter((p) => projectIds.includes(p.id));
+      } else if (projectKeys) {
+        projects = projects.filter((p) => projectKeys.includes(p.key));
+      }
+
+      let issueTypes = dataStore.getAllIssueTypes();
+
+      // Filter by issue type IDs if provided
+      if (issueTypeIds) {
+        issueTypes = issueTypes.filter((it) => issueTypeIds.includes(it.id));
+      }
+
+      const priorities = dataStore.getAllPriorities();
+      const users = dataStore.getAllUsers();
+      const allComponents = dataStore.getAllComponents();
+      const allVersions = dataStore.getAllVersions();
+      const context = createGenerationContext();
+
+      const createMeta = createMetaGenerator.generateCreateMeta(
+        projects,
+        issueTypes,
+        priorities,
+        users,
+        allComponents,
+        allVersions,
+        context
+      );
+
+      return HttpResponse.json(createMeta);
+    }),
+
+    // GET /rest/api/2/issue/createmeta/:projectIdOrKey/issuetypes - Get create metadata for project
+    http.get(`${baseUrl}/rest/api/2/issue/createmeta/:projectIdOrKey/issuetypes`, ({ params }) => {
+      const { projectIdOrKey } = params;
+
+      const project = dataStore.getProject(projectIdOrKey as string);
+      if (!project) {
+        return HttpResponse.json(
+          { errorMessages: ['Project not found'] },
+          { status: 404 }
+        );
+      }
+
+      const issueTypes = dataStore.getAllIssueTypes();
+      const priorities = dataStore.getAllPriorities();
+      const users = dataStore.getAllUsers();
+      const components = dataStore.getComponentsByProject(project.id);
+      const versions = dataStore.getVersionsByProject(project.id);
+      const context = createGenerationContext();
+
+      const metaIssueTypes = issueTypes.map((issueType) =>
+        createMetaGenerator.generateIssueTypeFields(
+          issueType,
+          project,
+          priorities,
+          users,
+          components,
+          versions,
+          context
+        )
+      );
+
+      return HttpResponse.json({
+        maxResults: metaIssueTypes.length,
+        total: metaIssueTypes.length,
+        values: metaIssueTypes,
+      });
+    }),
+
+    // GET /rest/api/2/issue/createmeta/:projectIdOrKey/issuetypes/:issueTypeId - Get create metadata for specific issue type
+    http.get(`${baseUrl}/rest/api/2/issue/createmeta/:projectIdOrKey/issuetypes/:issueTypeId`, ({ params }) => {
+      const { projectIdOrKey, issueTypeId } = params;
+
+      const project = dataStore.getProject(projectIdOrKey as string);
+      if (!project) {
+        return HttpResponse.json(
+          { errorMessages: ['Project not found'] },
+          { status: 404 }
+        );
+      }
+
+      const issueType = dataStore.getAllIssueTypes().find((it) => it.id === issueTypeId);
+      if (!issueType) {
+        return HttpResponse.json(
+          { errorMessages: ['Issue type not found'] },
+          { status: 404 }
+        );
+      }
+
+      const priorities = dataStore.getAllPriorities();
+      const users = dataStore.getAllUsers();
+      const components = dataStore.getComponentsByProject(project.id);
+      const versions = dataStore.getVersionsByProject(project.id);
+      const context = createGenerationContext();
+
+      const metaIssueType = createMetaGenerator.generateIssueTypeFields(
+        issueType,
+        project,
+        priorities,
+        users,
+        components,
+        versions,
+        context
+      );
+
+      return HttpResponse.json(metaIssueType);
+    }),
+
+    // GET /rest/api/2/issue/:issueIdOrKey/editmeta - Get edit metadata
+    http.get(`${baseUrl}/rest/api/2/issue/:issueIdOrKey/editmeta`, ({ params }) => {
+      const { issueIdOrKey } = params;
+
+      const issue = dataStore.getIssue(issueIdOrKey as string);
+      if (!issue) {
+        return HttpResponse.json(
+          { errorMessages: ['Issue not found'] },
+          { status: 404 }
+        );
+      }
+
+      const priorities = dataStore.getAllPriorities();
+      const users = dataStore.getAllUsers();
+      const components = dataStore.getComponentsByProject(issue.fields.project.id);
+      const versions = dataStore.getVersionsByProject(issue.fields.project.id);
+      const statuses = dataStore.getAllStatuses();
+      const context = createGenerationContext();
+
+      const editMeta = editMetaGenerator.generateEditMeta(
+        issue,
+        priorities,
+        users,
+        components,
+        versions,
+        statuses,
+        context
+      );
+
+      return HttpResponse.json(editMeta);
     }),
   ];
 }

@@ -59,6 +59,9 @@ export interface IssueFields {
   versions?: Version[];
   fixVersions?: Version[];
   worklog?: WorklogPage;
+  comment?: CommentPage;
+  attachment?: Attachment[];
+  issuelinks?: IssueLink[];
   [key: string]: any;
 }
 
@@ -152,6 +155,7 @@ export interface Field {
 
 export interface FieldSchema {
   type: string;
+  items?: string;
   system?: string;
   custom?: string;
   customId?: number;
@@ -303,4 +307,266 @@ export interface CreateWorklogInput {
   started: string;
   timeSpent?: string;
   timeSpentSeconds: number;
+}
+
+// Comments
+export interface Comment {
+  self: string;
+  id: string;
+  author: User;
+  body: string;
+  updateAuthor: User;
+  created: string;
+  updated: string;
+  jsdPublic?: boolean;
+}
+
+export interface CommentPage {
+  startAt: number;
+  maxResults: number;
+  total: number;
+  comments: Comment[];
+}
+
+export interface CreateCommentInput {
+  body: string;
+  jsdPublic?: boolean;
+}
+
+export interface UpdateCommentInput {
+  body: string;
+}
+
+// Transitions
+export interface Transition {
+  id: string;
+  name: string;
+  to: Status;
+  hasScreen: boolean;
+  isGlobal: boolean;
+  isInitial: boolean;
+  isConditional: boolean;
+  fields?: Record<string, TransitionField>;
+}
+
+export interface TransitionField {
+  required: boolean;
+  schema: FieldSchema;
+  name: string;
+  key: string;
+  operations: string[];
+}
+
+export interface TransitionsResponse {
+  expand: string;
+  transitions: Transition[];
+}
+
+export interface DoTransitionInput {
+  transition: {
+    id: string;
+  };
+  fields?: Record<string, any>;
+}
+
+// Issue Links
+export interface IssueLink {
+  id: string;
+  self: string;
+  type: IssueLinkType;
+  inwardIssue?: LinkedIssue;
+  outwardIssue?: LinkedIssue;
+}
+
+export interface IssueLinkType {
+  id: string;
+  name: string;
+  inward: string;
+  outward: string;
+  self: string;
+}
+
+export interface LinkedIssue {
+  id: string;
+  key: string;
+  self: string;
+  fields: {
+    summary: string;
+    status: Status;
+    priority: Priority;
+    issuetype: IssueType;
+  };
+}
+
+export interface CreateIssueLinkInput {
+  type: {
+    id?: string;
+    name?: string;
+  };
+  inwardIssue: {
+    id?: string;
+    key?: string;
+  };
+  outwardIssue: {
+    id?: string;
+    key?: string;
+  };
+  comment?: {
+    body: string;
+  };
+}
+
+// Attachments
+export interface Attachment {
+  self: string;
+  id: string;
+  filename: string;
+  author: User;
+  created: string;
+  size: number;
+  mimeType: string;
+  content: string;
+  thumbnail?: string;
+}
+
+export interface CreateAttachmentResponse {
+  id: string;
+  self: string;
+  filename: string;
+  author: User;
+  created: string;
+  size: number;
+  mimeType: string;
+}
+
+// Properties
+export interface UserProperty {
+  key: string;
+  value: any;
+}
+
+export interface ProjectProperty {
+  key: string;
+  value: any;
+}
+
+export interface IssueProperty {
+  key: string;
+  value: any;
+}
+
+export interface EntityProperty {
+  key: string;
+  value: any;
+}
+
+// Permissions
+export interface Permission {
+  id: string;
+  key: string;
+  name: string;
+  type: string;
+  description: string;
+  havePermission: boolean;
+}
+
+export interface MyPermissions {
+  permissions: Record<string, Permission>;
+}
+
+// Field Metadata
+export interface FieldMeta {
+  required: boolean;
+  schema: FieldSchema;
+  name: string;
+  key: string;
+  autoCompleteUrl?: string;
+  hasDefaultValue?: boolean;
+  operations: string[];
+  allowedValues?: any[];
+  defaultValue?: any;
+}
+
+export interface CreateMetaIssueType {
+  self: string;
+  id: string;
+  name: string;
+  description: string;
+  iconUrl: string;
+  subtask: boolean;
+  expand: string;
+  fields: Record<string, FieldMeta>;
+}
+
+export interface CreateMetaProject {
+  self: string;
+  id: string;
+  key: string;
+  name: string;
+  avatarUrls: AvatarUrls;
+  issuetypes: CreateMetaIssueType[];
+}
+
+export interface CreateMeta {
+  expand: string;
+  projects: CreateMetaProject[];
+}
+
+export interface EditMeta {
+  fields: Record<string, FieldMeta>;
+}
+
+// JQL Autocomplete
+export interface JQLAutocompleteData {
+  visibleFieldNames: JQLFieldSuggestion[];
+  visibleFunctionNames: JQLFunctionSuggestion[];
+  jqlReservedWords: string[];
+}
+
+export interface JQLFieldSuggestion {
+  value: string;
+  displayName: string;
+  auto?: string;
+  orderable?: string;
+  searchable?: string;
+  cfid?: string;
+  operators?: string[];
+  types?: string[];
+}
+
+export interface JQLFunctionSuggestion {
+  value: string;
+  displayName: string;
+  isList?: string;
+  types?: string[];
+}
+
+// Search
+export interface ApproximateCount {
+  count: number;
+  isApproximate: boolean;
+}
+
+export interface JQLMatch {
+  matchedIssues: string[];
+  errors: string[];
+}
+
+// Worklog Updates
+export interface WorklogUpdated {
+  values: Worklog[];
+  since: number;
+  until: number;
+  self: string;
+  nextPage?: string;
+  lastPage?: boolean;
+}
+
+export interface WorklogDeleted {
+  values: number[];
+  since: number;
+  until: number;
+  self: string;
+  nextPage?: string;
+  lastPage?: boolean;
 }

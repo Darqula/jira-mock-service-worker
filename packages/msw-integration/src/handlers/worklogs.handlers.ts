@@ -84,6 +84,119 @@ export function createWorklogsHandlers(dataStore: DataStore, baseUrl: string) {
 
       return HttpResponse.json(newWorklog, { status: 201 });
     }),
+
+    // PUT /rest/api/2/issue/:issueIdOrKey/worklog/:worklogId - Update worklog
+    http.put(`${baseUrl}/rest/api/2/issue/:issueIdOrKey/worklog/:worklogId`, async ({ params, request }) => {
+      const { issueIdOrKey, worklogId } = params;
+      const body = (await request.json()) as Partial<CreateWorklogInput>;
+
+      const issue = dataStore.getIssue(issueIdOrKey as string);
+      if (!issue) {
+        return HttpResponse.json(
+          { errorMessages: ['Issue does not exist'] },
+          { status: 404 }
+        );
+      }
+
+      const currentUser = dataStore.getCurrentUser();
+      if (!currentUser) {
+        return HttpResponse.json(
+          { errorMessages: ['User not authenticated'] },
+          { status: 401 }
+        );
+      }
+
+      const updates: any = {
+        updated: new Date().toISOString(),
+        updateAuthor: currentUser,
+      };
+
+      if (body.timeSpentSeconds) updates.timeSpentSeconds = body.timeSpentSeconds;
+      if (body.timeSpent) updates.timeSpent = body.timeSpent;
+      if (body.comment !== undefined) updates.comment = body.comment;
+      if (body.started) updates.started = body.started;
+
+      const updatedWorklog = dataStore.updateWorklog(worklogId as string, updates);
+      if (!updatedWorklog) {
+        return HttpResponse.json(
+          { errorMessages: ['Worklog not found'] },
+          { status: 404 }
+        );
+      }
+
+      return HttpResponse.json(updatedWorklog);
+    }),
+
+    // DELETE /rest/api/2/issue/:issueIdOrKey/worklog/:worklogId - Delete worklog
+    http.delete(`${baseUrl}/rest/api/2/issue/:issueIdOrKey/worklog/:worklogId`, ({ params }) => {
+      const { issueIdOrKey, worklogId } = params;
+
+      const issue = dataStore.getIssue(issueIdOrKey as string);
+      if (!issue) {
+        return HttpResponse.json(
+          { errorMessages: ['Issue does not exist'] },
+          { status: 404 }
+        );
+      }
+
+      const deleted = dataStore.deleteWorklogById(worklogId as string);
+      if (!deleted) {
+        return HttpResponse.json(
+          { errorMessages: ['Worklog not found'] },
+          { status: 404 }
+        );
+      }
+
+      return HttpResponse.json(null, { status: 204 });
+    }),
+
+    // GET /rest/api/2/worklog/updated - Get updated worklogs since timestamp
+    http.get(`${baseUrl}/rest/api/2/worklog/updated`, ({ request }) => {
+      const url = new URL(request.url);
+      const since = parseInt(url.searchParams.get('since') || '0', 10);
+
+      const updatedWorklogs = dataStore.getUpdatedWorklogs(since);
+      const until = Date.now();
+
+      return HttpResponse.json({
+        values: updatedWorklogs,
+        since,
+        until,
+        isLast: true,
+      });
+    }),
+
+    // POST /rest/api/2/worklog/list - Get worklogs by IDs
+    http.post(`${baseUrl}/rest/api/2/worklog/list`, async ({ request }) => {
+      const body = (await request.json()) as { ids: string[] };
+
+      if (!body.ids || !Array.isArray(body.ids)) {
+        return HttpResponse.json(
+          { errorMessages: ['ids array is required'] },
+          { status: 400 }
+        );
+      }
+
+      const worklogs = dataStore.getWorklogsByIds(body.ids);
+
+      return HttpResponse.json(worklogs);
+    }),
+
+    // GET /rest/api/2/worklog/deleted - Get deleted worklog IDs since timestamp
+    http.get(`${baseUrl}/rest/api/2/worklog/deleted`, ({ request }) => {
+      const url = new URL(request.url);
+      const since = parseInt(url.searchParams.get('since') || '0', 10);
+
+      const deletedIds = dataStore.getDeletedWorklogIds(since);
+      const until = Date.now();
+
+      return HttpResponse.json({
+        values: deletedIds,
+        since,
+        until,
+        isLast: true,
+      });
+    }),
   ];
 }
 
