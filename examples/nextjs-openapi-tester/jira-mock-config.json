@@ -1,0 +1,8 @@
+{
+  "version": "1.0",
+  "seed": 42,
+  "projects": {
+    "count": 5,
+    "issuesPerProject": 20
+  }
+}
