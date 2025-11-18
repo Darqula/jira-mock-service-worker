@@ -3,6 +3,52 @@ import type { DataStore } from '@jira-mock/core';
 
 export function createProjectsHandlers(dataStore: DataStore, baseUrl: string) {
   return [
+    // GET /rest/api/2/project/search - Search projects with advanced filtering
+    http.get(`${baseUrl}/rest/api/2/project/search`, ({ request }) => {
+      const url = new URL(request.url);
+      const startAt = parseInt(url.searchParams.get('startAt') || '0', 10);
+      const maxResults = parseInt(url.searchParams.get('maxResults') || '50', 10);
+      const query = url.searchParams.get('query') || '';
+      const orderBy = url.searchParams.get('orderBy') || 'name';
+
+      let allProjects = dataStore.getAllProjects();
+
+      // Filter by query (search in name, key, or description)
+      if (query) {
+        const lowerQuery = query.toLowerCase();
+        allProjects = allProjects.filter(
+          (p) =>
+            p.name.toLowerCase().includes(lowerQuery) ||
+            p.key.toLowerCase().includes(lowerQuery) ||
+            (p.description && p.description.toLowerCase().includes(lowerQuery))
+        );
+      }
+
+      // Sort by orderBy parameter
+      if (orderBy === 'name') {
+        allProjects.sort((a, b) => a.name.localeCompare(b.name));
+      } else if (orderBy === 'key') {
+        allProjects.sort((a, b) => a.key.localeCompare(b.key));
+      } else if (orderBy === '-name') {
+        allProjects.sort((a, b) => b.name.localeCompare(a.name));
+      } else if (orderBy === '-key') {
+        allProjects.sort((a, b) => b.key.localeCompare(a.key));
+      }
+
+      const total = allProjects.length;
+      const projects = allProjects.slice(startAt, startAt + maxResults);
+      const isLast = startAt + projects.length >= total;
+
+      return HttpResponse.json({
+        self: `${baseUrl}/rest/api/2/project/search`,
+        maxResults,
+        startAt,
+        total,
+        isLast,
+        values: projects,
+      });
+    }),
+
     // GET /rest/api/2/project - Get all projects
     http.get(`${baseUrl}/rest/api/2/project`, ({ request }) => {
       const url = new URL(request.url);

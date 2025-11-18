@@ -11,6 +11,14 @@ import type {
   Worklog,
   Field,
   SearchResults,
+  Comment,
+  Attachment,
+  IssueLink,
+  IssueLinkType,
+  UserProperty,
+  ProjectProperty,
+  IssueProperty,
+  Permission,
 } from '../types/jira-schemas.js';
 
 export interface QueryOptions {
@@ -47,6 +55,26 @@ export class DataStore {
   private worklogs: Map<string, Worklog> = new Map();
   private worklogsByIssue: Map<string, Worklog[]> = new Map();
   private fields: Map<string, Field> = new Map();
+  private comments: Map<string, Comment> = new Map();
+  private commentsByIssue: Map<string, Comment[]> = new Map();
+  private attachments: Map<string, Attachment> = new Map();
+  private attachmentsByIssue: Map<string, Attachment[]> = new Map();
+  private issueLinks: Map<string, IssueLink> = new Map();
+  private issueLinksByIssue: Map<string, IssueLink[]> = new Map();
+  private issueLinkTypes: Map<string, IssueLinkType> = new Map();
+
+  // Properties
+  private userProperties: Map<string, Map<string, UserProperty>> = new Map();
+  private projectProperties: Map<string, Map<string, ProjectProperty>> = new Map();
+  private issueProperties: Map<string, Map<string, IssueProperty>> = new Map();
+
+  // Permissions
+  private userPermissions: Map<string, Permission[]> = new Map();
+
+  // Worklog tracking
+  private worklogUpdates: Map<string, { worklog: Worklog; timestamp: number }> = new Map();
+  private worklogDeletes: Map<string, number> = new Map();
+
   private currentUser: User | null = null;
 
   // Users
@@ -291,6 +319,10 @@ export class DataStore {
     );
   }
 
+  getAllComponents(): Component[] {
+    return Array.from(this.components.values());
+  }
+
   // Versions
   addVersion(version: Version): void {
     this.versions.set(version.id, version);
@@ -304,6 +336,10 @@ export class DataStore {
     return Array.from(this.versions.values()).filter(
       (v) => v.projectId.toString() === projectId
     );
+  }
+
+  getAllVersions(): Version[] {
+    return Array.from(this.versions.values());
   }
 
   // Worklogs
@@ -341,6 +377,395 @@ export class DataStore {
     return Array.from(this.fields.values());
   }
 
+  // Comments
+  addComment(comment: Comment, issueIdOrKey: string): void {
+    this.comments.set(comment.id, comment);
+
+    // Index by issue
+    const issue = this.getIssue(issueIdOrKey);
+    if (issue) {
+      const issueComments = this.commentsByIssue.get(issue.id) || [];
+      issueComments.push(comment);
+      this.commentsByIssue.set(issue.id, issueComments);
+    }
+  }
+
+  getComment(id: string): Comment | undefined {
+    return this.comments.get(id);
+  }
+
+  getCommentsByIssue(issueIdOrKey: string): Comment[] {
+    const issue = this.getIssue(issueIdOrKey);
+    if (!issue) {
+      return [];
+    }
+    return this.commentsByIssue.get(issue.id) || [];
+  }
+
+  updateComment(id: string, updates: Partial<Comment>): Comment | undefined {
+    const comment = this.comments.get(id);
+    if (!comment) {
+      return undefined;
+    }
+
+    const updated: Comment = {
+      ...comment,
+      ...updates,
+      updated: new Date().toISOString(),
+    };
+
+    this.comments.set(id, updated);
+    return updated;
+  }
+
+  deleteComment(id: string, issueIdOrKey: string): boolean {
+    const comment = this.comments.get(id);
+    if (!comment) {
+      return false;
+    }
+
+    this.comments.delete(id);
+
+    // Remove from issue index
+    const issue = this.getIssue(issueIdOrKey);
+    if (issue) {
+      const issueComments = this.commentsByIssue.get(issue.id) || [];
+      this.commentsByIssue.set(
+        issue.id,
+        issueComments.filter((c) => c.id !== id)
+      );
+    }
+
+    return true;
+  }
+
+  // Attachments
+  addAttachment(attachment: Attachment, issueIdOrKey: string): void {
+    this.attachments.set(attachment.id, attachment);
+
+    // Index by issue
+    const issue = this.getIssue(issueIdOrKey);
+    if (issue) {
+      const issueAttachments = this.attachmentsByIssue.get(issue.id) || [];
+      issueAttachments.push(attachment);
+      this.attachmentsByIssue.set(issue.id, issueAttachments);
+    }
+  }
+
+  getAttachment(id: string): Attachment | undefined {
+    return this.attachments.get(id);
+  }
+
+  getAttachmentsByIssue(issueIdOrKey: string): Attachment[] {
+    const issue = this.getIssue(issueIdOrKey);
+    if (!issue) {
+      return [];
+    }
+    return this.attachmentsByIssue.get(issue.id) || [];
+  }
+
+  deleteAttachment(id: string): boolean {
+    const attachment = this.attachments.get(id);
+    if (!attachment) {
+      return false;
+    }
+
+    this.attachments.delete(id);
+
+    // Remove from all issue indexes
+    for (const [issueId, attachments] of this.attachmentsByIssue.entries()) {
+      this.attachmentsByIssue.set(
+        issueId,
+        attachments.filter((a) => a.id !== id)
+      );
+    }
+
+    return true;
+  }
+
+  // Issue Links
+  addIssueLink(link: IssueLink): void {
+    this.issueLinks.set(link.id, link);
+
+    // Index by both inward and outward issues
+    if (link.inwardIssue) {
+      const links = this.issueLinksByIssue.get(link.inwardIssue.id) || [];
+      links.push(link);
+      this.issueLinksByIssue.set(link.inwardIssue.id, links);
+    }
+
+    if (link.outwardIssue) {
+      const links = this.issueLinksByIssue.get(link.outwardIssue.id) || [];
+      links.push(link);
+      this.issueLinksByIssue.set(link.outwardIssue.id, links);
+    }
+  }
+
+  getIssueLink(id: string): IssueLink | undefined {
+    return this.issueLinks.get(id);
+  }
+
+  getIssueLinksByIssue(issueIdOrKey: string): IssueLink[] {
+    const issue = this.getIssue(issueIdOrKey);
+    if (!issue) {
+      return [];
+    }
+    return this.issueLinksByIssue.get(issue.id) || [];
+  }
+
+  deleteIssueLink(id: string): boolean {
+    const link = this.issueLinks.get(id);
+    if (!link) {
+      return false;
+    }
+
+    this.issueLinks.delete(id);
+
+    // Remove from issue indexes
+    if (link.inwardIssue) {
+      const links = this.issueLinksByIssue.get(link.inwardIssue.id) || [];
+      this.issueLinksByIssue.set(
+        link.inwardIssue.id,
+        links.filter((l) => l.id !== id)
+      );
+    }
+
+    if (link.outwardIssue) {
+      const links = this.issueLinksByIssue.get(link.outwardIssue.id) || [];
+      this.issueLinksByIssue.set(
+        link.outwardIssue.id,
+        links.filter((l) => l.id !== id)
+      );
+    }
+
+    return true;
+  }
+
+  // Issue Link Types
+  addIssueLinkType(linkType: IssueLinkType): void {
+    this.issueLinkTypes.set(linkType.id, linkType);
+  }
+
+  getIssueLinkType(id: string): IssueLinkType | undefined {
+    return this.issueLinkTypes.get(id);
+  }
+
+  getIssueLinkTypeByName(name: string): IssueLinkType | undefined {
+    return Array.from(this.issueLinkTypes.values()).find((lt) => lt.name === name);
+  }
+
+  getAllIssueLinkTypes(): IssueLinkType[] {
+    return Array.from(this.issueLinkTypes.values());
+  }
+
+  // User Properties
+  getUserProperty(accountId: string, key: string): UserProperty | undefined {
+    const userProps = this.userProperties.get(accountId);
+    return userProps?.get(key);
+  }
+
+  setUserProperty(accountId: string, key: string, value: any): void {
+    if (!this.userProperties.has(accountId)) {
+      this.userProperties.set(accountId, new Map());
+    }
+    this.userProperties.get(accountId)!.set(key, { key, value });
+  }
+
+  deleteUserProperty(accountId: string, key: string): boolean {
+    const userProps = this.userProperties.get(accountId);
+    if (!userProps) {
+      return false;
+    }
+    return userProps.delete(key);
+  }
+
+  getAllUserProperties(accountId: string): UserProperty[] {
+    const userProps = this.userProperties.get(accountId);
+    return userProps ? Array.from(userProps.values()) : [];
+  }
+
+  // Project Properties
+  getProjectProperty(projectId: string, key: string): ProjectProperty | undefined {
+    const projectProps = this.projectProperties.get(projectId);
+    return projectProps?.get(key);
+  }
+
+  setProjectProperty(projectId: string, key: string, value: any): void {
+    if (!this.projectProperties.has(projectId)) {
+      this.projectProperties.set(projectId, new Map());
+    }
+    this.projectProperties.get(projectId)!.set(key, { key, value });
+  }
+
+  deleteProjectProperty(projectId: string, key: string): boolean {
+    const projectProps = this.projectProperties.get(projectId);
+    if (!projectProps) {
+      return false;
+    }
+    return projectProps.delete(key);
+  }
+
+  getAllProjectProperties(projectId: string): ProjectProperty[] {
+    const projectProps = this.projectProperties.get(projectId);
+    return projectProps ? Array.from(projectProps.values()) : [];
+  }
+
+  // Issue Properties
+  getIssueProperty(issueId: string, key: string): IssueProperty | undefined {
+    const issueProps = this.issueProperties.get(issueId);
+    return issueProps?.get(key);
+  }
+
+  setIssueProperty(issueId: string, key: string, value: any): void {
+    if (!this.issueProperties.has(issueId)) {
+      this.issueProperties.set(issueId, new Map());
+    }
+    this.issueProperties.get(issueId)!.set(key, { key, value });
+  }
+
+  deleteIssueProperty(issueId: string, key: string): boolean {
+    const issueProps = this.issueProperties.get(issueId);
+    if (!issueProps) {
+      return false;
+    }
+    return issueProps.delete(key);
+  }
+
+  getAllIssueProperties(issueId: string): IssueProperty[] {
+    const issueProps = this.issueProperties.get(issueId);
+    return issueProps ? Array.from(issueProps.values()) : [];
+  }
+
+  // Permissions
+  getUserPermissions(accountId: string): Permission[] {
+    return this.userPermissions.get(accountId) || [];
+  }
+
+  setUserPermissions(accountId: string, permissions: Permission[]): void {
+    this.userPermissions.set(accountId, permissions);
+  }
+
+  // Worklog Tracking
+  updateWorklog(worklogId: string, updates: Partial<Worklog>): Worklog | undefined {
+    const worklog = this.worklogs.get(worklogId);
+    if (!worklog) {
+      return undefined;
+    }
+
+    const updated: Worklog = {
+      ...worklog,
+      ...updates,
+      updated: new Date().toISOString(),
+    };
+
+    this.worklogs.set(worklogId, updated);
+
+    // Track the update
+    this.worklogUpdates.set(worklogId, {
+      worklog: updated,
+      timestamp: Date.now(),
+    });
+
+    // Update in issue index
+    const issueWorklogs = this.worklogsByIssue.get(worklog.issueId) || [];
+    const index = issueWorklogs.findIndex((w) => w.id === worklogId);
+    if (index !== -1) {
+      issueWorklogs[index] = updated;
+      this.worklogsByIssue.set(worklog.issueId, issueWorklogs);
+    }
+
+    return updated;
+  }
+
+  deleteWorklogById(worklogId: string): boolean {
+    const worklog = this.worklogs.get(worklogId);
+    if (!worklog) {
+      return false;
+    }
+
+    this.worklogs.delete(worklogId);
+
+    // Track the deletion
+    this.worklogDeletes.set(worklogId, Date.now());
+
+    // Remove from issue index
+    const issueWorklogs = this.worklogsByIssue.get(worklog.issueId) || [];
+    this.worklogsByIssue.set(
+      worklog.issueId,
+      issueWorklogs.filter((w) => w.id !== worklogId)
+    );
+
+    return true;
+  }
+
+  getUpdatedWorklogs(since: number): Worklog[] {
+    const updates: Worklog[] = [];
+    for (const [_, entry] of this.worklogUpdates.entries()) {
+      if (entry.timestamp >= since) {
+        updates.push(entry.worklog);
+      }
+    }
+    return updates;
+  }
+
+  getDeletedWorklogIds(since: number): string[] {
+    const deleted: string[] = [];
+    for (const [id, timestamp] of this.worklogDeletes.entries()) {
+      if (timestamp >= since) {
+        deleted.push(id);
+      }
+    }
+    return deleted;
+  }
+
+  getWorklogsByIds(ids: string[]): Worklog[] {
+    const worklogs: Worklog[] = [];
+    for (const id of ids) {
+      const worklog = this.worklogs.get(id);
+      if (worklog) {
+        worklogs.push(worklog);
+      }
+    }
+    return worklogs;
+  }
+
+  // Version Management
+  swapVersionIssues(fromVersionId: string, toVersionId: string): void {
+    const fromVersion = this.versions.get(fromVersionId);
+    const toVersion = this.versions.get(toVersionId);
+
+    if (!fromVersion || !toVersion) {
+      return;
+    }
+
+    // Update all issues that have fromVersion
+    for (const issue of this.issues.values()) {
+      let updated = false;
+
+      // Check fixVersions
+      if (issue.fields.fixVersions) {
+        const index = issue.fields.fixVersions.findIndex((v) => v.id === fromVersionId);
+        if (index !== -1) {
+          issue.fields.fixVersions[index] = toVersion;
+          updated = true;
+        }
+      }
+
+      // Check versions (affects versions)
+      if (issue.fields.versions) {
+        const index = issue.fields.versions.findIndex((v) => v.id === fromVersionId);
+        if (index !== -1) {
+          issue.fields.versions[index] = toVersion;
+          updated = true;
+        }
+      }
+
+      if (updated) {
+        issue.fields.updated = new Date().toISOString();
+      }
+    }
+  }
+
   // Utility methods
   clear(): void {
     this.users.clear();
@@ -357,6 +782,19 @@ export class DataStore {
     this.worklogs.clear();
     this.worklogsByIssue.clear();
     this.fields.clear();
+    this.comments.clear();
+    this.commentsByIssue.clear();
+    this.attachments.clear();
+    this.attachmentsByIssue.clear();
+    this.issueLinks.clear();
+    this.issueLinksByIssue.clear();
+    this.issueLinkTypes.clear();
+    this.userProperties.clear();
+    this.projectProperties.clear();
+    this.issueProperties.clear();
+    this.userPermissions.clear();
+    this.worklogUpdates.clear();
+    this.worklogDeletes.clear();
     this.currentUser = null;
   }
 
@@ -373,6 +811,14 @@ export class DataStore {
       versions: this.versions.size,
       worklogs: this.worklogs.size,
       fields: this.fields.size,
+      comments: this.comments.size,
+      attachments: this.attachments.size,
+      issueLinks: this.issueLinks.size,
+      issueLinkTypes: this.issueLinkTypes.size,
+      userProperties: this.userProperties.size,
+      projectProperties: this.projectProperties.size,
+      issueProperties: this.issueProperties.size,
+      userPermissions: this.userPermissions.size,
     };
   }
 }
