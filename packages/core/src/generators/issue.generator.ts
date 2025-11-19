@@ -448,8 +448,47 @@ export class IssueGenerator {
   }
 
   private getRandomStatus(statuses: Status[], context: IssueContext): Status {
-    const index = context.faker.number.int({ min: 0, max: statuses.length - 1 });
-    return statuses[index];
+    const mergedConfig = mergeWithDefaults(context.config);
+    const distribution = mergedConfig.statusDistribution!;
+
+    // Categorize statuses by category key
+    const todoStatuses = statuses.filter(
+      (s) => s.statusCategory.key === 'new'
+    );
+    const inProgressStatuses = statuses.filter(
+      (s) => s.statusCategory.key === 'indeterminate'
+    );
+    const doneStatuses = statuses.filter(
+      (s) => s.statusCategory.key === 'done'
+    );
+
+    // Use weighted distribution to pick a category
+    const categoryWeights = normalizeDistribution({
+      toDo: distribution.toDo!,
+      inProgress: distribution.inProgress!,
+      done: distribution.done!,
+    });
+
+    const category = weightedPick(context.faker, categoryWeights);
+
+    // Pick a random status from the selected category
+    let selectedStatuses: Status[];
+    switch (category) {
+      case 'toDo':
+        selectedStatuses = todoStatuses.length > 0 ? todoStatuses : statuses;
+        break;
+      case 'inProgress':
+        selectedStatuses = inProgressStatuses.length > 0 ? inProgressStatuses : statuses;
+        break;
+      case 'done':
+        selectedStatuses = doneStatuses.length > 0 ? doneStatuses : statuses;
+        break;
+      default:
+        selectedStatuses = statuses;
+    }
+
+    const index = context.faker.number.int({ min: 0, max: selectedStatuses.length - 1 });
+    return selectedStatuses[index];
   }
 
   private getRandomUser(users: User[], context: IssueContext): User {
@@ -486,6 +525,15 @@ export class IssueGenerator {
       return [];
     }
 
+    const mergedConfig = mergeWithDefaults(context.config);
+    const versionConfig = mergedConfig.versions!;
+
+    // Check if we should assign a version based on probability
+    if (!shouldApply(context.faker, versionConfig.assignProbability!)) {
+      return [];
+    }
+
+    // Assign 1 version (most common case in Jira)
     const count = context.faker.number.int({ min: 0, max: 1 });
     if (count === 0) {
       return [];
