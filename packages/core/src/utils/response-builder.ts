@@ -48,5 +48,6 @@ export function generateSelfUrls(baseUrl: string = DEFAULT_BASE_URL) {
     issueLink: (linkId: string) => `${baseUrl}/rest/api/2/issueLink/${linkId}`,
     issueLinkType: (linkTypeId: string) =>
       `${baseUrl}/rest/api/2/issueLinkType/${linkTypeId}`,
+    sprint: (sprintId: string) => `${baseUrl}/rest/agile/1.0/sprint/${sprintId}`,
   };
 }
