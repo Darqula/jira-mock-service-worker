@@ -20,7 +20,9 @@ import {
   AttachmentGenerator,
   IssueLinkGenerator,
   IssueLinkTypeGenerator,
+  SprintGenerator,
 } from './generators/index.js';
+import { mergeWithDefaults } from './config/defaults.js';
 
 export interface GenerateMockDataResult {
   dataStore: DataStore;
@@ -64,6 +66,7 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
   const attachmentGenerator = new AttachmentGenerator();
   const issueLinkGenerator = new IssueLinkGenerator();
   const issueLinkTypeGenerator = new IssueLinkTypeGenerator();
+  const sprintGenerator = new SprintGenerator();
 
   // Generate global metadata
   const statusCategories = statusGenerator.generateStatusCategories(context);
@@ -112,6 +115,17 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
     const versions = versionGenerator.generateVersions(project, context);
     versions.forEach((version) => dataStore.addVersion(version));
 
+    // Generate sprints for this project based on configured date range
+    const mergedConfig = mergeWithDefaults(validConfig);
+    const startDate = mergedConfig.general?.startDate
+      ? new Date(mergedConfig.general.startDate)
+      : new Date(Date.now() - 180 * 24 * 60 * 60 * 1000);
+    const endDate = mergedConfig.general?.endDate
+      ? new Date(mergedConfig.general.endDate)
+      : new Date();
+
+    const sprints = sprintGenerator.generateSprints(startDate, endDate, context);
+
     // Generate issues for this project
     const issueContext: IssueContext = {
       ...context,
@@ -122,6 +136,7 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
       issueTypes,
       priorities,
       statuses,
+      sprints,
     };
 
     const issues = issueGenerator.generateIssues(

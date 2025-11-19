@@ -62,6 +62,11 @@ export interface IssueFields {
   comment?: CommentPage;
   attachment?: Attachment[];
   issuelinks?: IssueLink[];
+  sprint?: {
+    id: string;
+    name: string;
+    state: string;
+  };
   [key: string]: any;
 }
 
