@@ -21,8 +21,10 @@ import {
   generateIssueSummary,
   generateIssueDescription,
 } from './utils/templates.js';
+import { SprintGenerator } from './sprint.generator.js';
 
 export class IssueGenerator {
+  private sprintGenerator = new SprintGenerator();
   generateIssues(
     project: Project,
     count: number,
@@ -35,6 +37,7 @@ export class IssueGenerator {
     context: IssueContext
   ): IssueBean[] {
     const mergedConfig = mergeWithDefaults(context.config);
+    const startIssueNumber = mergedConfig.general?.startIssueNumber || 1;
     const issues: IssueBean[] = [];
 
     // Check if we should use epic-based generation
@@ -52,13 +55,14 @@ export class IssueGenerator {
         statuses,
         components,
         versions,
-        context
+        context,
+        startIssueNumber
       );
       issues.push(...epics);
     } else {
       // Generate without epics (legacy behavior)
       for (let i = 0; i < count; i++) {
-        const issueNumber = issues.length + 1;
+        const issueNumber = startIssueNumber + issues.length;
         const issue = this.generateIssue(
           project,
           issueNumber,
@@ -84,7 +88,8 @@ export class IssueGenerator {
       statuses,
       components,
       versions,
-      context
+      context,
+      startIssueNumber
     );
 
     return issues;
@@ -101,7 +106,8 @@ export class IssueGenerator {
     statuses: Status[],
     components: Component[],
     versions: Version[],
-    context: IssueContext
+    context: IssueContext,
+    startIssueNumber: number
   ): IssueBean[] {
     const mergedConfig = mergeWithDefaults(context.config);
     const epicConfig = mergedConfig.issueTypes!.epic!;
@@ -117,7 +123,7 @@ export class IssueGenerator {
     }
 
     for (let epicIndex = 0; epicIndex < epicCount; epicIndex++) {
-      const issueNumber = issues.length + 1;
+      const issueNumber = startIssueNumber + issues.length;
 
       // Generate epic
       const epic = this.generateEpic(
@@ -145,7 +151,7 @@ export class IssueGenerator {
         components,
         versions,
         context,
-        issues.length
+        startIssueNumber + issues.length
       );
       issues.push(...children);
     }
@@ -205,6 +211,22 @@ export class IssueGenerator {
       fixVersions: this.getRandomVersions(versions, context),
     };
 
+    // Assign sprint if configured
+    if (context.sprints && context.sprints.length > 0) {
+      const sprint = this.sprintGenerator.getRandomSprint(
+        context.sprints,
+        context,
+        mergedConfig.sprints?.assignProbability || 0.7
+      );
+      if (sprint) {
+        fields.sprint = {
+          id: sprint.id,
+          name: sprint.name,
+          state: sprint.state,
+        };
+      }
+    }
+
     return {
       id,
       key,
@@ -241,7 +263,7 @@ export class IssueGenerator {
     const children: IssueBean[] = [];
 
     for (let i = 0; i < count; i++) {
-      const issueNumber = startIndex + i + 1;
+      const issueNumber = startIndex + i;
 
       // Determine child type based on distribution
       const childTypeName = weightedPick(context.faker, childDistribution);
@@ -286,7 +308,8 @@ export class IssueGenerator {
     statuses: Status[],
     components: Component[],
     versions: Version[],
-    context: IssueContext
+    context: IssueContext,
+    startIssueNumber: number
   ): void {
     const mergedConfig = mergeWithDefaults(context.config);
     const issueTypesConfig = mergedConfig.issueTypes!;
@@ -308,7 +331,7 @@ export class IssueGenerator {
       }
 
       for (let i = 0; i < count; i++) {
-        const issueNumber = existingIssues.length + 1;
+        const issueNumber = startIssueNumber + existingIssues.length;
         const issue = this.generateStandaloneIssue(
           project,
           issueNumber,
@@ -595,6 +618,22 @@ export class IssueGenerator {
       fixVersions: this.getRandomVersions(versions, context),
     };
 
+    // Assign sprint if configured
+    if (context.sprints && context.sprints.length > 0) {
+      const sprint = this.sprintGenerator.getRandomSprint(
+        context.sprints,
+        context,
+        mergedConfig.sprints?.assignProbability || 0.7
+      );
+      if (sprint) {
+        fields.sprint = {
+          id: sprint.id,
+          name: sprint.name,
+          state: sprint.state,
+        };
+      }
+    }
+
     // Add parent relationship
     if (mergedConfig.general?.projectType === 'team-managed') {
       // Team-managed projects use custom field
@@ -677,6 +716,22 @@ export class IssueGenerator {
       versions: [],
       fixVersions: this.getRandomVersions(versions, context),
     };
+
+    // Assign sprint if configured
+    if (context.sprints && context.sprints.length > 0) {
+      const sprint = this.sprintGenerator.getRandomSprint(
+        context.sprints,
+        context,
+        mergedConfig.sprints?.assignProbability || 0.7
+      );
+      if (sprint) {
+        fields.sprint = {
+          id: sprint.id,
+          name: sprint.name,
+          state: sprint.state,
+        };
+      }
+    }
 
     return {
       id,
