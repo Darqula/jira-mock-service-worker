@@ -1,6 +1,7 @@
 import type { Priority } from '../types/jira-schemas.js';
 import type { GenerationContext } from '../types/generator.types.js';
 import { generateSelfUrls } from '../utils/response-builder.js';
+import { mergeWithDefaults } from '../config/defaults.js';
 
 const PRIORITIES: Omit<Priority, 'self' | 'id'>[] = [
   {
@@ -27,9 +28,29 @@ const PRIORITIES: Omit<Priority, 'self' | 'id'>[] = [
 
 export class PriorityGenerator {
   generatePriorities(context: GenerationContext): Priority[] {
+    const mergedConfig = mergeWithDefaults(context.config);
+    const configPriorities = mergedConfig.data?.priorities || [];
     const urls = generateSelfUrls();
 
-    return PRIORITIES.map((priority) => {
+    // Filter priorities based on config, or use all if none specified
+    let prioritiesToGenerate = PRIORITIES;
+    if (configPriorities.length > 0) {
+      prioritiesToGenerate = PRIORITIES.filter((p) =>
+        configPriorities.some(
+          (configName) => configName.toLowerCase() === p.name.toLowerCase()
+        )
+      );
+
+      // If no matches found, fall back to all priorities
+      if (prioritiesToGenerate.length === 0) {
+        console.warn(
+          `No matching priorities found for config: ${configPriorities.join(', ')}. Using all priorities.`
+        );
+        prioritiesToGenerate = PRIORITIES;
+      }
+    }
+
+    return prioritiesToGenerate.map((priority) => {
       const id = context.idGenerator.next('priority');
       return {
         self: urls.priority(id),
