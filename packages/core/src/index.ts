@@ -172,8 +172,45 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
 }
 
 // Re-export types and utilities
-export type { JiraMockConfig } from './config/types.js';
-export { validateConfig, isValidConfig, getConfigErrors } from './config/validator.js';
+export type {
+  JiraMockConfig,
+  ProjectType,
+  GeneralConfig,
+  StatusDistribution,
+  ChildDistribution,
+  EpicConfig,
+  IssueTypeConfig,
+  IssueTypesConfig,
+  SprintsConfig,
+  VersionsConfig,
+  WorklogsConfig,
+  DataConfig,
+} from './config/types.js';
+
+export {
+  validateConfig,
+  validateConfigWithWarnings,
+  isValidConfig,
+  getConfigErrors,
+  getHumanReadableErrors,
+  ConfigValidationError,
+} from './config/validator.js';
+
+export type { ConfigWarning, ValidationResult } from './config/validator.js';
+
+export {
+  DEFAULT_CONFIG,
+  DEFAULT_GENERAL_CONFIG,
+  DEFAULT_STATUS_DISTRIBUTION,
+  DEFAULT_ISSUE_TYPES_CONFIG,
+  DEFAULT_SPRINTS_CONFIG,
+  DEFAULT_VERSIONS_CONFIG,
+  DEFAULT_WORKLOGS_CONFIG,
+  DEFAULT_DATA_CONFIG,
+  mergeWithDefaults,
+  getConfigValue,
+} from './config/defaults.js';
+
 export { DataStore } from './store/data-store.js';
 export { QueryEngine } from './store/query-engine.js';
 export type * from './types/jira-schemas.js';
