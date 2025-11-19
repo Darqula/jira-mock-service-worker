@@ -36,8 +36,8 @@ export class DateGenerator {
   }
 
   // Generate issue created date (within project timeframe)
-  issueCreated(projectCreatedDate: Date): Date {
-    return this.between(projectCreatedDate, this.baseDate);
+  issueCreated(projectCreatedDate: Date, endDate?: Date): Date {
+    return this.between(projectCreatedDate, endDate || this.baseDate);
   }
 
   // Generate issue updated date (after created date)
