@@ -1,0 +1,89 @@
+{
+  "version": "1.0",
+  "seed": 42,
+  "general": {
+    "projectKey": "FULL",
+    "startIssueNumber": 1,
+    "startDate": "2024-01-01",
+    "endDate": "2024-12-31",
+    "projectType": "company-managed",
+    "chunkSize": 250
+  },
+  "statusDistribution": {
+    "toDo": 0.25,
+    "inProgress": 0.40,
+    "done": 0.35
+  },
+  "issueTypes": {
+    "epic": {
+      "count": 10,
+      "childrenPerEpic": 30,
+      "assignProbability": 0.95,
+      "labelProbability": 0.85,
+      "childDistribution": {
+        "story": 0.50,
+        "task": 0.35,
+        "bug": 0.15
+      }
+    },
+    "story": {
+      "standaloneCount": 25,
+      "assignProbability": 0.85,
+      "labelProbability": 0.75
+    },
+    "task": {
+      "standaloneCount": 15,
+      "assignProbability": 0.80,
+      "labelProbability": 0.70
+    },
+    "bug": {
+      "standaloneCount": 10,
+      "assignProbability": 0.95,
+      "labelProbability": 0.90
+    }
+  },
+  "sprints": {
+    "startNumber": 1,
+    "duration": 14,
+    "assignProbability": 0.80
+  },
+  "versions": {
+    "startNumber": 1,
+    "count": 6,
+    "assignProbability": 0.50
+  },
+  "worklogs": {
+    "probability": 0.75,
+    "hoursMin": 1,
+    "hoursMax": 8,
+    "countMin": 2,
+    "countMax": 10
+  },
+  "data": {
+    "assignees": [
+      "john.doe@example.com",
+      "jane.smith@example.com",
+      "alice.johnson@example.com",
+      "bob.williams@example.com",
+      "charlie.brown@example.com"
+    ],
+    "priorities": ["Highest", "High", "Medium", "Low", "Lowest"],
+    "labels": [
+      "frontend",
+      "backend",
+      "api",
+      "database",
+      "security",
+      "performance",
+      "bug",
+      "enhancement",
+      "feature",
+      "documentation",
+      "testing"
+    ]
+  },
+  "projects": {
+    "count": 1,
+    "issuesPerProject": 400
+  }
+}
