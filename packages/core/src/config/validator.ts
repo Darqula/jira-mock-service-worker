@@ -12,6 +12,22 @@ export class ConfigValidationError extends Error {
   }
 }
 
+export interface ConfigWarning {
+  path: string;
+  message: string;
+  severity: 'warning' | 'info';
+}
+
+export interface ValidationResult {
+  valid: boolean;
+  config?: JiraMockConfig;
+  errors: string[];
+  warnings: ConfigWarning[];
+}
+
+/**
+ * Validates configuration and throws on error
+ */
 export function validateConfig(config: unknown): JiraMockConfig {
   try {
     return JiraMockConfigSchema.parse(config);
@@ -23,10 +39,105 @@ export function validateConfig(config: unknown): JiraMockConfig {
   }
 }
 
+/**
+ * Validates configuration and returns detailed result with warnings
+ */
+export function validateConfigWithWarnings(config: unknown): ValidationResult {
+  const result = JiraMockConfigSchema.safeParse(config);
+
+  if (!result.success) {
+    return {
+      valid: false,
+      errors: result.error.errors.map(
+        (err) => `${err.path.join('.')}: ${err.message}`
+      ),
+      warnings: [],
+    };
+  }
+
+  const warnings: ConfigWarning[] = [];
+  const validConfig = result.data;
+
+  // Check for large issue counts
+  const totalIssues =
+    validConfig.projects.count * validConfig.projects.issuesPerProject;
+  if (totalIssues > 1000) {
+    warnings.push({
+      path: 'projects.issuesPerProject',
+      message: `Total issue count (${totalIssues}) is large. Generation may take some time.`,
+      severity: 'warning',
+    });
+  }
+
+  if (totalIssues > 10000) {
+    warnings.push({
+      path: 'projects.issuesPerProject',
+      message: `Total issue count (${totalIssues}) is very large. Consider using export chunking.`,
+      severity: 'warning',
+    });
+  }
+
+  // Check if epic count matches issue count
+  if (validConfig.issueTypes?.epic) {
+    const epicCount = validConfig.issueTypes.epic.count || 0;
+    const childrenPerEpic = validConfig.issueTypes.epic.childrenPerEpic || 0;
+    const calculatedIssues = epicCount * (childrenPerEpic + 1);
+
+    if (calculatedIssues > validConfig.projects.issuesPerProject) {
+      warnings.push({
+        path: 'issueTypes.epic',
+        message: `Epic configuration will generate ${calculatedIssues} issues, which exceeds issuesPerProject (${validConfig.projects.issuesPerProject}). Some epics may be skipped.`,
+        severity: 'info',
+      });
+    }
+  }
+
+  // Check status distribution sums close to 1
+  if (validConfig.statusDistribution) {
+    const { toDo = 0.4, inProgress = 0.3, done = 0.3 } =
+      validConfig.statusDistribution;
+    const sum = toDo + inProgress + done;
+    if (Math.abs(sum - 1.0) > 0.01) {
+      warnings.push({
+        path: 'statusDistribution',
+        message: `Status distribution probabilities sum to ${sum.toFixed(2)}, expected ~1.0. Values will be normalized.`,
+        severity: 'info',
+      });
+    }
+  }
+
+  // Check child distribution sums close to 1
+  if (validConfig.issueTypes?.epic?.childDistribution) {
+    const { story = 0.5, task = 0.3, bug = 0.2 } =
+      validConfig.issueTypes.epic.childDistribution;
+    const sum = story + task + bug;
+    if (Math.abs(sum - 1.0) > 0.01) {
+      warnings.push({
+        path: 'issueTypes.epic.childDistribution',
+        message: `Child distribution probabilities sum to ${sum.toFixed(2)}, expected ~1.0. Values will be normalized.`,
+        severity: 'info',
+      });
+    }
+  }
+
+  return {
+    valid: true,
+    config: validConfig,
+    errors: [],
+    warnings,
+  };
+}
+
+/**
+ * Type guard for config validation
+ */
 export function isValidConfig(config: unknown): config is JiraMockConfig {
   return JiraMockConfigSchema.safeParse(config).success;
 }
 
+/**
+ * Gets validation errors as string array
+ */
 export function getConfigErrors(config: unknown): string[] {
   const result = JiraMockConfigSchema.safeParse(config);
   if (result.success) {
@@ -35,4 +146,49 @@ export function getConfigErrors(config: unknown): string[] {
   return result.error.errors.map(
     (err) => `${err.path.join('.')}: ${err.message}`
   );
+}
+
+/**
+ * Gets human-readable error messages
+ */
+export function getHumanReadableErrors(config: unknown): string[] {
+  const result = JiraMockConfigSchema.safeParse(config);
+  if (result.success) {
+    return [];
+  }
+
+  return result.error.errors.map((err) => {
+    const path = err.path.join('.');
+
+    switch (err.code) {
+      case 'invalid_type':
+        return `${path}: Expected ${err.expected}, but got ${err.received}`;
+      case 'too_small':
+        if (err.type === 'number') {
+          return `${path}: Value must be at least ${err.minimum}`;
+        }
+        if (err.type === 'string') {
+          return `${path}: String must be at least ${err.minimum} characters`;
+        }
+        return `${path}: ${err.message}`;
+      case 'too_big':
+        if (err.type === 'number') {
+          return `${path}: Value must be at most ${err.maximum}`;
+        }
+        if (err.type === 'string') {
+          return `${path}: String must be at most ${err.maximum} characters`;
+        }
+        return `${path}: ${err.message}`;
+      case 'invalid_string':
+        if (err.validation === 'email') {
+          return `${path}: Must be a valid email address`;
+        }
+        if (err.validation === 'datetime') {
+          return `${path}: Must be a valid ISO 8601 date-time string`;
+        }
+        return `${path}: ${err.message}`;
+      default:
+        return `${path}: ${err.message}`;
+    }
+  });
 }

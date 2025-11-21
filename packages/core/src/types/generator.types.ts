@@ -15,6 +15,7 @@ import type {
   Worklog,
   Field,
 } from './jira-schemas.js';
+import type { Sprint } from '../generators/sprint.generator.js';
 
 export interface GenerationContext {
   config: JiraMockConfig;
@@ -35,6 +36,7 @@ export interface IssueContext extends ProjectContext {
   issueTypes: IssueType[];
   priorities: Priority[];
   statuses: Status[];
+  sprints?: Sprint[];
 }
 
 export interface DataStore {

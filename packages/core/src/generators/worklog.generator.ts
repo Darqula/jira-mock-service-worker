@@ -1,6 +1,8 @@
 import type { Worklog, IssueBean, User } from '../types/jira-schemas.js';
 import type { GenerationContext } from '../types/generator.types.js';
 import { generateSelfUrls } from '../utils/response-builder.js';
+import { mergeWithDefaults } from '../config/defaults.js';
+import { shouldApply, randomInRange } from './utils/probability.js';
 
 export class WorklogGenerator {
   generateWorklogs(
@@ -8,8 +10,20 @@ export class WorklogGenerator {
     users: User[],
     context: GenerationContext
   ): Worklog[] {
-    // Generate 0-5 worklogs per issue
-    const count = context.faker.number.int({ min: 0, max: 5 });
+    const mergedConfig = mergeWithDefaults(context.config);
+    const worklogConfig = mergedConfig.worklogs!;
+
+    // Check if we should generate worklogs based on probability
+    if (!shouldApply(context.faker, worklogConfig.probability!)) {
+      return [];
+    }
+
+    // Generate configurable number of worklogs
+    const count = context.faker.number.int({
+      min: worklogConfig.countMin!,
+      max: worklogConfig.countMax!,
+    });
+
     const worklogs: Worklog[] = [];
 
     for (let i = 0; i < count; i++) {
@@ -24,6 +38,9 @@ export class WorklogGenerator {
     users: User[],
     context: GenerationContext
   ): Worklog {
+    const mergedConfig = mergeWithDefaults(context.config);
+    const worklogConfig = mergedConfig.worklogs!;
+
     const id = context.idGenerator.next('worklog');
     const author = users[context.faker.number.int({ min: 0, max: users.length - 1 })];
     const updateAuthor = author;
@@ -32,8 +49,13 @@ export class WorklogGenerator {
     const created = started;
     const updated = started;
 
-    // Generate time spent in seconds (15 minutes to 8 hours)
-    const timeSpentSeconds = context.faker.number.int({ min: 900, max: 28800 });
+    // Generate time spent in hours based on config
+    const hours = randomInRange(
+      context.faker,
+      worklogConfig.hoursMin!,
+      worklogConfig.hoursMax!
+    );
+    const timeSpentSeconds = Math.floor(hours * 3600);
     const timeSpent = this.formatTimeSpent(timeSpentSeconds);
     const urls = generateSelfUrls();
 
