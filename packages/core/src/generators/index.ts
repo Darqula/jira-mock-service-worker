@@ -12,6 +12,7 @@ export { CommentGenerator } from './comment.generator.js';
 export { AttachmentGenerator } from './attachment.generator.js';
 export { IssueLinkGenerator } from './issue-link.generator.js';
 export { IssueLinkTypeGenerator } from './issue-link-type.generator.js';
+export { SprintGenerator } from './sprint.generator.js';
 export { TransitionGenerator } from './transition.generator.js';
 export { UserPropertyGenerator } from './user-property.generator.js';
 export { ProjectPropertyGenerator } from './project-property.generator.js';

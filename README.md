@@ -11,6 +11,9 @@ A comprehensive Mock Service Worker (MSW) integration for mocking Jira Cloud API
 - 💬 **Comments & Attachments** - Full support for issue discussions and file attachments
 - 🔗 **Issue Links & Transitions** - Complete workflow and relationship management
 - 📋 **Components & Versions** - Project organization, release tracking, and version swapping
+- 🏃 **Sprints & Agile** - Sprint generation with realistic lifecycle states
+- 🎯 **Epic Hierarchy** - Epics with children (stories/tasks/bugs) and configurable distribution
+- 📊 **Flexible Configuration** - Extensive customization of data generation
 - 🔐 **User Properties & Permissions** - User preferences and role-based access control
 - 🏷️ **Entity Properties** - Custom properties for users, projects, and issues
 - 📊 **Field Metadata** - Complete create/edit metadata for dynamic form generation
@@ -71,7 +74,11 @@ await worker.start();
 
 ## Configuration
 
-The configuration file controls what mock data is generated:
+The configuration file controls what mock data is generated. The configuration system supports extensive customization including project types, issue hierarchies (epics with children), sprint management, version tracking, worklog generation, and more.
+
+### Basic Configuration
+
+The minimal configuration requires only `version` and `projects`:
 
 ```typescript
 interface JiraMockConfig {
@@ -79,23 +86,197 @@ interface JiraMockConfig {
   seed?: number;              // Optional: for reproducible data
   projects: {
     count: number;            // 1-100 projects
-    issuesPerProject: number; // 1-10000 issues per project
+    issuesPerProject: number; // 1-10000 issues per project (used when not using epics)
   };
 }
 ```
 
-### Example with Seed
+### Minimal Example
 
 ```typescript
 const config = {
   version: '1.0',
-  seed: 12345, // Same seed = same data every time
   projects: {
-    count: 2,
-    issuesPerProject: 20,
+    count: 1,
+    issuesPerProject: 50,
   },
 };
 ```
+
+### Advanced Configuration
+
+For advanced use cases, you can customize nearly every aspect of the generated data:
+
+```typescript
+const config = {
+  version: '1.0',
+  seed: 12345, // Reproducible data generation
+
+  // General project settings
+  general: {
+    projectKey: 'DEMO',           // Custom project key
+    startIssueNumber: 1,          // Starting issue number
+    startDate: '2024-01-01',      // Project start date
+    endDate: '2024-12-31',        // Project end date
+    projectType: 'company-managed', // or 'team-managed'
+    chunkSize: 250,               // Issues per export chunk (0 = no chunking)
+  },
+
+  // Status distribution (percentages)
+  statusDistribution: {
+    toDo: 0.3,       // 30% To Do
+    inProgress: 0.5, // 50% In Progress
+    done: 0.2,       // 20% Done
+  },
+
+  // Epic and issue type configuration
+  issueTypes: {
+    epic: {
+      count: 10,                 // Number of epics
+      childrenPerEpic: 30,       // Children per epic
+      assignProbability: 0.9,    // 90% chance of assignee
+      labelProbability: 0.8,     // 80% chance of labels
+      childDistribution: {       // Child type distribution
+        story: 0.5,  // 50% stories
+        task: 0.3,   // 30% tasks
+        bug: 0.2,    // 20% bugs
+      },
+    },
+    story: {
+      standaloneCount: 25,       // Stories not in epics
+      assignProbability: 0.85,
+      labelProbability: 0.75,
+    },
+    task: {
+      standaloneCount: 15,       // Tasks not in epics
+      assignProbability: 0.8,
+      labelProbability: 0.7,
+    },
+    bug: {
+      standaloneCount: 10,       // Bugs not in epics
+      assignProbability: 0.95,
+      labelProbability: 0.9,
+    },
+  },
+
+  // Sprint configuration
+  sprints: {
+    startNumber: 1,              // Starting sprint number
+    duration: 14,                // Sprint duration in days
+    assignProbability: 0.7,      // 70% of issues in sprints
+  },
+
+  // Version/Release configuration
+  versions: {
+    startNumber: 1,              // Starting version number
+    count: 6,                    // Number of versions
+    assignProbability: 0.5,      // 50% of issues have fix versions
+  },
+
+  // Worklog configuration
+  worklogs: {
+    probability: 0.75,           // 75% of issues have worklogs
+    hoursMin: 1,                 // Min hours per worklog
+    hoursMax: 8,                 // Max hours per worklog
+    countMin: 2,                 // Min worklogs per issue
+    countMax: 10,                // Max worklogs per issue
+  },
+
+  // Data customization
+  data: {
+    assignees: [                 // Custom user email list
+      'john.doe@example.com',
+      'jane.smith@example.com',
+    ],
+    priorities: [                // Filter available priorities
+      'Highest', 'High', 'Medium', 'Low', 'Lowest'
+    ],
+    labels: [                    // Available labels
+      'frontend', 'backend', 'api', 'documentation'
+    ],
+  },
+
+  projects: {
+    count: 1,
+    issuesPerProject: 400,       // Only used if not using epic-based generation
+  },
+};
+```
+
+### Configuration Examples
+
+See the `examples/configs/` directory for ready-to-use configuration examples:
+
+- **minimal.json** - Simplest configuration with defaults (50 issues)
+- **small-project.json** - Small team project with customization (~58 issues)
+- **team-managed.json** - Team-managed (Next-Gen) project example (~123 issues)
+- **large-project.json** - Large enterprise project (~1,200 issues)
+- **full-featured.json** - Comprehensive feature showcase (~360 issues)
+
+Each example includes detailed comments and demonstrates different use cases. See `examples/configs/README.md` for complete documentation.
+
+### Key Configuration Features
+
+#### Epic Hierarchy
+When using epics, the total issue count is calculated automatically:
+```
+Total Issues = (Epic Count × Children Per Epic) + Standalone Stories + Standalone Tasks + Standalone Bugs
+```
+
+Example: 10 epics × 30 children + 25 stories + 15 tasks + 10 bugs = 350 total issues
+
+#### Project Types
+- **Company-managed**: Traditional Jira projects with parent field for epic relationships
+- **Team-managed**: Next-Gen projects using custom ParentKey field
+
+#### Sprint Generation
+Sprints are automatically generated based on your date range and sprint duration:
+```
+Number of Sprints = (End Date - Start Date) / Sprint Duration
+```
+
+Sprints have realistic states:
+- **Future**: Starts after current date
+- **Active**: Currently running (1 sprint max)
+- **Closed**: Completed sprints
+
+#### Probability-Based Generation
+Many fields use probability (0-1) to control how often they appear:
+- `assignProbability`: Chance an issue has an assignee
+- `labelProbability`: Chance an issue has labels
+- `sprints.assignProbability`: Chance an issue is in a sprint
+- `versions.assignProbability`: Chance an issue has a fix version
+- `worklogs.probability`: Chance an issue has worklogs
+
+#### Data Seeding
+Use the `seed` field for reproducible data generation:
+```typescript
+const config = {
+  version: '1.0',
+  seed: 12345, // Same seed = same data every time
+  projects: { count: 2, issuesPerProject: 20 },
+};
+```
+
+### Configuration Validation
+
+All configurations are validated using Zod schemas with helpful error messages:
+
+```typescript
+import { validateConfig } from '@jira-mock/core';
+
+try {
+  const validConfig = validateConfig(config);
+  // Config is valid, use it
+} catch (error) {
+  console.error('Invalid configuration:', error.message);
+}
+```
+
+For detailed configuration documentation, see:
+- [Configuration Plan](./CONFIGURATION_EXTENSION_PLAN.md) - Complete feature specifications
+- [Implementation Checklist](./IMPLEMENTATION_CHECKLIST.md) - Implementation progress
+- [Example Configurations](./examples/configs/README.md) - Ready-to-use examples
 
 ## Configuration UI
 
@@ -114,8 +295,18 @@ The UI provides:
 - 📋 **LocalStorage persistence** for your settings
 - 🌙 **Dark mode** support
 - 📱 **Responsive design** for mobile and desktop
+- ⚙️ **Advanced configuration sections** for all features:
+  - Project settings (type, key, dates)
+  - Status distribution sliders
+  - Epic hierarchy configuration
+  - Sprint management
+  - Version tracking
+  - Worklog generation
+  - Custom assignees, priorities, and labels
 
 Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
+
+> **Note:** The UI currently supports basic configuration. Advanced features (epics, sprints, custom data) can be configured by importing JSON configurations or editing the configuration JSON directly.
 
 ## Supported Endpoints
 
@@ -287,7 +478,15 @@ jira-mock-service-worker/
 │   ├── core/                 # Core data generation library
 │   │   ├── src/
 │   │   │   ├── config/       # Configuration schema & validation
+│   │   │   │   ├── types.ts  # TypeScript interfaces
+│   │   │   │   ├── schema.ts # Zod validation schemas
+│   │   │   │   ├── defaults.ts # Default values & merging
+│   │   │   │   └── validator.ts # Validation with warnings
 │   │   │   ├── generators/   # Data generators
+│   │   │   │   ├── issue.generator.ts # Issue & epic generation
+│   │   │   │   ├── sprint.generator.ts # Sprint lifecycle
+│   │   │   │   ├── worklog.generator.ts # Worklog entries
+│   │   │   │   └── utils/    # Probability & templates
 │   │   │   ├── store/        # In-memory data store
 │   │   │   ├── types/        # TypeScript types
 │   │   │   └── utils/        # Utilities (JQL parser, pagination)
@@ -299,10 +498,20 @@ jira-mock-service-worker/
 │   │   │   └── setup/        # Setup for Node.js & browser
 │   │   └── tests/            # Integration tests
 │   │
-│   └── config-ui/            # Next.js configuration UI (coming soon)
+│   └── config-ui/            # Next.js configuration UI
 │
-├── examples/                 # Usage examples (coming soon)
-└── docs/                     # Documentation (coming soon)
+├── examples/                 # Example configurations
+│   └── configs/
+│       ├── minimal.json      # Minimal configuration
+│       ├── small-project.json # Small team project
+│       ├── team-managed.json # Team-managed project
+│       ├── large-project.json # Large enterprise project
+│       ├── full-featured.json # All features showcase
+│       └── README.md         # Configuration guide
+│
+└── docs/                     # Documentation
+    ├── CONFIGURATION_EXTENSION_PLAN.md
+    └── IMPLEMENTATION_CHECKLIST.md
 ```
 
 ## Architecture
@@ -380,7 +589,7 @@ MIT
 - ✅ Comprehensive tests
 - ✅ Next.js configuration UI
 
-### Iteration 2 (Current)
+### Iteration 2
 - ✅ Comments - Full CRUD operations
 - ✅ Issue transitions & workflows
 - ✅ Attachments metadata support
@@ -389,14 +598,26 @@ MIT
 - ✅ Versions CRUD operations
 - ✅ 70+ API endpoints total
 
+### Iteration 3 (Current)
+- ✅ Configuration extension system
+- ✅ Epic hierarchy with parent-child relationships
+- ✅ Sprint generation and lifecycle management
+- ✅ Team-managed vs Company-managed projects
+- ✅ Probability-based data generation
+- ✅ Status distribution control
+- ✅ Configurable worklogs, versions, and assignees
+- ✅ Example configurations library
+- ✅ Enhanced TypeScript types and validation
+
 ### Future Iterations
 - 🔄 Advanced JQL support (complex queries, functions)
 - 🔄 Custom fields configuration
 - 🔄 Subtasks support
-- 🔄 Boards & Sprints (Agile endpoints)
+- 🔄 Agile board endpoints
 - 🔄 Webhooks simulation
 - 🔄 Real-time updates
 - 🔄 Advanced workflow schemes
+- 🔄 Configuration UI enhancements (visual editors for all new features)
 
 ## Support
 
