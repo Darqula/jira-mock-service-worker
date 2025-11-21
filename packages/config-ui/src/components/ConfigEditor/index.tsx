@@ -5,7 +5,16 @@ import type { JiraMockConfig } from '@jira-mock/core';
 import { validateConfig, getConfigErrors } from '@jira-mock/core';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { ProjectsSection } from './ProjectsSection';
+import { GeneralSection } from './GeneralSection';
+import { StatusSection } from './StatusSection';
+import { IssueTypesSection } from './IssueTypesSection';
+import { SprintsSection } from './SprintsSection';
+import { VersionsSection } from './VersionsSection';
+import { WorklogsSection } from './WorklogsSection';
+import { DataSection } from './DataSection';
 import { PreviewSection } from './PreviewSection';
 import { saveConfig, loadConfig, downloadConfig, uploadConfig } from '@/lib/config-manager';
 import { Download, Upload, Save, FileJson } from 'lucide-react';
@@ -71,63 +80,9 @@ export function ConfigEditor() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Main Config Card */}
+      {/* Action Buttons - Top */}
       <Card>
-        <CardHeader>
-          <CardTitle>Configuration</CardTitle>
-          <CardDescription>
-            Configure the mock data generation parameters
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <ProjectsSection config={config} onChange={setConfig} />
-
-          {/* Seed Input */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Seed (optional)
-              <span className="ml-2 text-xs text-muted-foreground">
-                For reproducible data generation
-              </span>
-            </label>
-            <input
-              type="number"
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              value={config.seed || ''}
-              onChange={(e) =>
-                setConfig({
-                  ...config,
-                  seed: e.target.value ? parseInt(e.target.value) : undefined,
-                })
-              }
-              placeholder="Leave empty for random data"
-            />
-          </div>
-
-          {/* Validation Errors */}
-          {errors.length > 0 && (
-            <div className="rounded-md bg-destructive/10 p-4 border border-destructive/20">
-              <h4 className="text-sm font-semibold text-destructive mb-2">
-                Validation Errors
-              </h4>
-              <ul className="text-sm text-destructive/90 space-y-1">
-                {errors.map((error, i) => (
-                  <li key={i}>• {error}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Success Message */}
-          {saved && (
-            <div className="rounded-md bg-green-50 dark:bg-green-900/20 p-4 border border-green-200 dark:border-green-800">
-              <p className="text-sm text-green-800 dark:text-green-200">
-                Configuration saved successfully!
-              </p>
-            </div>
-          )}
-
-          {/* Action Buttons */}
+        <CardContent className="pt-6">
           <div className="flex flex-wrap gap-3">
             <Button onClick={handleSave} disabled={!isValid}>
               <Save className="mr-2 h-4 w-4" />
@@ -157,8 +112,95 @@ export function ConfigEditor() {
               Copy JSON
             </Button>
           </div>
+
+          {/* Validation Errors */}
+          {errors.length > 0 && (
+            <div className="rounded-md bg-destructive/10 p-4 border border-destructive/20 mt-4">
+              <h4 className="text-sm font-semibold text-destructive mb-2">
+                Validation Errors
+              </h4>
+              <ul className="text-sm text-destructive/90 space-y-1">
+                {errors.map((error, i) => (
+                  <li key={i}>• {error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Success Message */}
+          {saved && (
+            <div className="rounded-md bg-green-50 dark:bg-green-900/20 p-4 border border-green-200 dark:border-green-800 mt-4">
+              <p className="text-sm text-green-800 dark:text-green-200">
+                Configuration saved successfully!
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {/* Legacy Projects Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Legacy Project Configuration</CardTitle>
+          <CardDescription>
+            Basic project and issue count settings (required for backward compatibility)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ProjectsSection config={config} onChange={setConfig} />
+        </CardContent>
+      </Card>
+
+      {/* Seed Input */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Random Seed</CardTitle>
+          <CardDescription>
+            Optional seed for reproducible data generation
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <Label htmlFor="seed">Seed (optional)</Label>
+            <Input
+              id="seed"
+              type="number"
+              value={config.seed || ''}
+              onChange={(e) =>
+                setConfig({
+                  ...config,
+                  seed: e.target.value ? parseInt(e.target.value) : undefined,
+                })
+              }
+              placeholder="Leave empty for random data"
+            />
+            <p className="text-xs text-muted-foreground">
+              Use the same seed to generate identical data across runs
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* General Settings */}
+      <GeneralSection config={config} onChange={setConfig} />
+
+      {/* Status Distribution */}
+      <StatusSection config={config} onChange={setConfig} />
+
+      {/* Issue Types */}
+      <IssueTypesSection config={config} onChange={setConfig} />
+
+      {/* Sprints */}
+      <SprintsSection config={config} onChange={setConfig} />
+
+      {/* Versions */}
+      <VersionsSection config={config} onChange={setConfig} />
+
+      {/* Worklogs */}
+      <WorklogsSection config={config} onChange={setConfig} />
+
+      {/* Data Options */}
+      <DataSection config={config} onChange={setConfig} />
 
       {/* Preview Section */}
       {isValid && <PreviewSection config={config} />}
