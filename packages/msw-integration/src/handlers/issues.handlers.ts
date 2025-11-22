@@ -105,12 +105,10 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
         );
       }
 
-      // Find issue type
+      // Find issue type (build Map for O(1) lookup)
       const issueTypes = dataStore.getAllIssueTypes();
-      const issueType = issueTypes.find(
-        (it) =>
-          it.id === body.fields.issuetype.id || it.name === body.fields.issuetype.name
-      );
+      const issueTypeMap = new Map(issueTypes.flatMap(it => [[it.id, it], [it.name, it]]));
+      const issueType = issueTypeMap.get(body.fields.issuetype.id) || issueTypeMap.get(body.fields.issuetype.name);
 
       if (!issueType) {
         return HttpResponse.json(
@@ -119,13 +117,12 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
         );
       }
 
-      // Find priority
+      // Find priority (build Map for O(1) lookup)
       const priorities = dataStore.getAllPriorities();
+      const priorityMap = new Map(priorities.flatMap(p => [[p.id, p], [p.name, p]]));
       const priority =
         body.fields.priority
-          ? priorities.find(
-              (p) => p.id === body.fields.priority?.id || p.name === body.fields.priority?.name
-            ) || priorities[2] // Default to medium
+          ? priorityMap.get(body.fields.priority.id) || priorityMap.get(body.fields.priority.name) || priorities[2]
           : priorities[2];
 
       // Find or default status
