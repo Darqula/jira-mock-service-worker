@@ -22,9 +22,12 @@ export function DataSection({ config, onChange }: DataSectionProps) {
   const updateData = (updates: Partial<typeof data>) => {
     onChange({
       ...config,
-      data: {
-        ...data,
-        ...updates,
+      globalDefaults: {
+        ...config.globalDefaults,
+        data: {
+          ...data,
+          ...updates,
+        },
       },
     });
   };
