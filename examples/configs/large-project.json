@@ -4,7 +4,6 @@
     {
       "projectKey": "LARGE",
       "projectType": "company-managed",
-      "issueCount": 1500,
       "startIssueNumber": 1000,
       "seed": 98765,
       "startDate": "2023-01-01T00:00:00.000Z",

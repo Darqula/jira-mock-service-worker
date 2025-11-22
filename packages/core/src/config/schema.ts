@@ -109,6 +109,7 @@ export const ProjectConfigSchema = z.object({
 
 /**
  * Project configuration with key schema
+ * Issue count is calculated automatically from issue types configuration
  */
 export const ProjectConfigWithKeySchema = z.object({
   projectKey: z
@@ -121,11 +122,6 @@ export const ProjectConfigWithKeySchema = z.object({
     ),
   projectName: z.string().optional(),
   projectType: ProjectTypeSchema.optional(),
-  issueCount: z
-    .number()
-    .int('Issue count must be an integer')
-    .min(1, 'Issue count must be at least 1')
-    .max(10000, 'Issue count must be at most 10000'),
   seed: z.number().int().optional(),
   statusDistribution: StatusDistributionSchema,
   issueTypes: IssueTypesConfigSchema,

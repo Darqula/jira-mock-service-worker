@@ -21,7 +21,6 @@ export async function GET() {
         {
           projectKey: 'DEMO',
           projectName: 'Demo Project',
-          issueCount: 100,
           seed: 42,
         },
       ],

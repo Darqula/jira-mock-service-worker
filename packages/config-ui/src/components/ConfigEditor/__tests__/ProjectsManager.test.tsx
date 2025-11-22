@@ -12,8 +12,14 @@ describe('ProjectsManager', () => {
       {
         projectKey: 'PROJ1',
         projectName: 'Project One',
-        issueCount: 100,
         projectType: 'company-managed',
+        // issueCount is now calculated from issue types (defaults to 1,010)
+        issueTypes: {
+          epic: {
+            count: 1,
+            childrenPerEpic: 99,
+          },
+        },
       },
     ],
   };
@@ -42,7 +48,7 @@ describe('ProjectsManager', () => {
         ...defaultConfig.projects,
         {
           projectKey: 'PROJ2',
-          issueCount: 50,
+          // No issueCount - it's calculated from issue types
         },
       ],
     });
@@ -52,8 +58,8 @@ describe('ProjectsManager', () => {
     const configWithTwoProjects: JiraMockConfig = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 100 },
-        { projectKey: 'PROJ2', issueCount: 50 },
+        { projectKey: 'PROJ1' },
+        { projectKey: 'PROJ2' },
       ],
     };
 
@@ -67,7 +73,7 @@ describe('ProjectsManager', () => {
 
     expect(mockOnChange).toHaveBeenCalledWith({
       version: '1.0',
-      projects: [{ projectKey: 'PROJ2', issueCount: 50 }],
+      projects: [{ projectKey: 'PROJ2' }],
     });
   });
 
@@ -109,56 +115,8 @@ describe('ProjectsManager', () => {
     });
   });
 
-  it('updates issue count', () => {
-    render(<ProjectsManager config={defaultConfig} onChange={mockOnChange} />);
-
-    // First project is already expanded - use label to find the specific input
-    const issueCountInput = screen.getByLabelText(/Issue Count/i);
-    fireEvent.change(issueCountInput, { target: { value: '200' } });
-
-    expect(mockOnChange).toHaveBeenCalledWith({
-      ...defaultConfig,
-      projects: [
-        {
-          ...defaultConfig.projects[0],
-          issueCount: 200,
-        },
-      ],
-    });
-  });
-
-  it('clamps issue count to valid range', () => {
-    render(<ProjectsManager config={defaultConfig} onChange={mockOnChange} />);
-
-    // First project is already expanded - use label to find the specific input
-    const issueCountInput = screen.getByLabelText(/Issue Count/i);
-
-    // Test upper bound
-    fireEvent.change(issueCountInput, { target: { value: '20000' } });
-    expect(mockOnChange).toHaveBeenCalledWith({
-      ...defaultConfig,
-      projects: [
-        {
-          ...defaultConfig.projects[0],
-          issueCount: 10000, // Clamped to max
-        },
-      ],
-    });
-
-    mockOnChange.mockClear();
-
-    // Test lower bound
-    fireEvent.change(issueCountInput, { target: { value: '0' } });
-    expect(mockOnChange).toHaveBeenCalledWith({
-      ...defaultConfig,
-      projects: [
-        {
-          ...defaultConfig.projects[0],
-          issueCount: 1, // Clamped to min
-        },
-      ],
-    });
-  });
+  // Note: Issue count is now calculated automatically from issue types configuration
+  // and is displayed as read-only, so we no longer test manual issue count input
 
   it('updates project type', () => {
     render(<ProjectsManager config={defaultConfig} onChange={mockOnChange} />);

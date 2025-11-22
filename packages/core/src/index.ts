@@ -3,6 +3,7 @@ import { QueryEngine } from './store/query-engine.js';
 import { validateConfig } from './config/validator.js';
 import type { GenerationContext, IssueContext } from './types/generator.types.js';
 import type { JiraMockConfig } from './config/types.js';
+import { calculateIssueCount } from './config/types.js';
 import { createFaker } from './generators/base/faker-config.js';
 import { IdGenerator } from './generators/base/id-generator.js';
 import { DateGenerator } from './generators/base/date-generator.js';
@@ -169,9 +170,12 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
       sprints,
     };
 
+    // Calculate issue count from project configuration
+    const issueCount = calculateIssueCount(mergedProjectConfig);
+
     const issues = issueGenerator.generateIssues(
       project,
-      projectConfig.issueCount,
+      issueCount,
       users,
       issueTypes,
       priorities,
@@ -232,6 +236,8 @@ export type {
   WorklogsConfig,
   DataConfig,
 } from './config/types.js';
+
+export { calculateIssueCount } from './config/types.js';
 
 export {
   validateConfig,

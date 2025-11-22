@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { JiraMockConfig, ProjectConfigWithKey } from '@jira-mock/core';
+import { calculateIssueCount } from '@jira-mock/core';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -37,7 +38,6 @@ export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
     const newProjectNumber = config.projects.length + 1;
     const newProject: ProjectConfigWithKey = {
       projectKey: `PROJ${newProjectNumber}`,
-      issueCount: 50,
     };
 
     onChange({
@@ -114,7 +114,7 @@ export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
                       {project.projectKey} - {project.projectName || 'Unnamed Project'}
                     </CardTitle>
                     <CardDescription className="text-xs">
-                      {project.issueCount} issues
+                      {calculateIssueCount(project)} issues
                       {project.projectType && ` • ${project.projectType}`}
                     </CardDescription>
                   </div>
@@ -170,25 +170,15 @@ export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
                     />
                   </div>
 
-                  {/* Issue Count */}
+                  {/* Calculated Issue Count */}
                   <div className="space-y-2">
-                    <Label htmlFor={`issue-count-${index}`}>
-                      Issue Count *
-                      <span className="ml-2 text-xs text-muted-foreground">(1-10,000)</span>
+                    <Label>
+                      Issue Count (Calculated)
+                      <span className="ml-2 text-xs text-muted-foreground">(Based on issue types)</span>
                     </Label>
-                    <Input
-                      id={`issue-count-${index}`}
-                      type="number"
-                      min="1"
-                      max="10000"
-                      value={project.issueCount}
-                      onChange={(e) =>
-                        updateProject(index, {
-                          issueCount: Math.max(1, Math.min(10000, parseInt(e.target.value) || 1)),
-                        })
-                      }
-                      required
-                    />
+                    <div className="h-10 px-3 py-2 rounded-md border border-input bg-muted flex items-center text-sm">
+                      {calculateIssueCount(project).toLocaleString()}
+                    </div>
                   </div>
 
                   {/* Project Type */}

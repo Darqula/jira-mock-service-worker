@@ -179,7 +179,6 @@ export function mergeProjectWithDefaults(
   return {
     ...merged,
     projectKey: projectConfig.projectKey,
-    issueCount: projectConfig.issueCount,
     projectName: projectConfig.projectName,
     projectType: projectConfig.projectType || 'company-managed',
   };
