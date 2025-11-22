@@ -112,8 +112,8 @@ describe('ProjectsManager', () => {
   it('updates issue count', () => {
     render(<ProjectsManager config={defaultConfig} onChange={mockOnChange} />);
 
-    // First project is already expanded
-    const issueCountInput = screen.getByDisplayValue('100');
+    // First project is already expanded - use label to find the specific input
+    const issueCountInput = screen.getByLabelText(/Issue Count/i);
     fireEvent.change(issueCountInput, { target: { value: '200' } });
 
     expect(mockOnChange).toHaveBeenCalledWith({
@@ -130,8 +130,8 @@ describe('ProjectsManager', () => {
   it('clamps issue count to valid range', () => {
     render(<ProjectsManager config={defaultConfig} onChange={mockOnChange} />);
 
-    // First project is already expanded
-    const issueCountInput = screen.getByDisplayValue('100');
+    // First project is already expanded - use label to find the specific input
+    const issueCountInput = screen.getByLabelText(/Issue Count/i);
 
     // Test upper bound
     fireEvent.change(issueCountInput, { target: { value: '20000' } });
