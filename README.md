@@ -37,10 +37,11 @@ import { setupJiraMockServer } from '@jira-mock/msw-integration/node';
 
 const config = {
   version: '1.0',
-  projects: {
-    count: 3,
-    issuesPerProject: 50,
-  },
+  projects: [
+    { projectKey: 'PROJ1', issueCount: 50 },
+    { projectKey: 'PROJ2', issueCount: 50 },
+    { projectKey: 'PROJ3', issueCount: 50 },
+  ],
 };
 
 const { server, dataStore } = setupJiraMockServer({ config });
@@ -60,10 +61,12 @@ import { setupJiraMockWorker } from '@jira-mock/msw-integration/browser';
 
 const config = {
   version: '1.0',
-  projects: {
-    count: 5,
-    issuesPerProject: 100,
-  },
+  projects: [
+    { projectKey: 'PROJ1', issueCount: 20 },
+    { projectKey: 'PROJ2', issueCount: 30 },
+    { projectKey: 'PROJ3', issueCount: 25 },
+    { projectKey: 'PROJ4', issueCount: 25 },
+  ],
 };
 
 const { worker, dataStore } = setupJiraMockWorker({ config });
@@ -74,7 +77,7 @@ await worker.start();
 
 ## Configuration
 
-The configuration file controls what mock data is generated. The configuration system supports extensive customization including project types, issue hierarchies (epics with children), sprint management, version tracking, worklog generation, and more.
+The configuration system supports **per-project configuration**, allowing you to define different settings for each project. You can set global defaults and override them for specific projects.
 
 ### Basic Configuration
 
@@ -83,11 +86,17 @@ The minimal configuration requires only `version` and `projects`:
 ```typescript
 interface JiraMockConfig {
   version: '1.0';
-  seed?: number;              // Optional: for reproducible data
-  projects: {
-    count: number;            // 1-100 projects
-    issuesPerProject: number; // 1-10000 issues per project (used when not using epics)
+  globalDefaults?: {          // Optional: shared configuration for all projects
+    seed?: number;
+    // ... other settings
   };
+  projects: Array<{           // Required: array of project configurations
+    projectKey: string;       // Required: unique project identifier (e.g., "PROJ")
+    issueCount: number;       // Required: number of issues for this project (1-10000)
+    projectName?: string;     // Optional: project display name
+    projectType?: 'company-managed' | 'team-managed';
+    // ... any configuration can be overridden per project
+  }>;
 }
 ```
 
@@ -96,10 +105,50 @@ interface JiraMockConfig {
 ```typescript
 const config = {
   version: '1.0',
-  projects: {
-    count: 1,
-    issuesPerProject: 50,
+  projects: [
+    { projectKey: 'PROJ', issueCount: 50 },
+  ],
+};
+```
+
+### Per-Project Configuration Example
+
+```typescript
+const config = {
+  version: '1.0',
+  globalDefaults: {
+    seed: 42,
+    statusDistribution: {
+      toDo: 0.4,
+      inProgress: 0.3,
+      done: 0.3,
+    },
   },
+  projects: [
+    {
+      projectKey: 'BACKEND',
+      projectName: 'Backend Services',
+      issueCount: 150,
+      data: {
+        assignees: ['backend-dev@example.com'],
+        labels: ['api', 'database'],
+      },
+    },
+    {
+      projectKey: 'FRONTEND',
+      projectName: 'Frontend App',
+      issueCount: 100,
+      statusDistribution: {  // Override global defaults
+        toDo: 0.5,
+        inProgress: 0.4,
+        done: 0.1,
+      },
+      data: {
+        assignees: ['frontend-dev@example.com'],
+        labels: ['ui', 'ux'],
+      },
+    },
+  ],
 };
 ```
 

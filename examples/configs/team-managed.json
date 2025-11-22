@@ -1,75 +1,76 @@
 {
   "version": "1.0",
-  "seed": 54321,
-  "general": {
-    "projectKey": "TEAM",
-    "startIssueNumber": 1,
-    "startDate": "2024-06-01",
-    "endDate": "2024-12-31",
-    "projectType": "team-managed"
-  },
-  "statusDistribution": {
-    "toDo": 0.25,
-    "inProgress": 0.45,
-    "done": 0.3
-  },
-  "issueTypes": {
-    "epic": {
-      "count": 5,
-      "childrenPerEpic": 20,
-      "assignProbability": 1.0,
-      "labelProbability": 0.8,
-      "childDistribution": {
-        "story": 0.6,
-        "task": 0.25,
-        "bug": 0.15
+  "globalDefaults": {
+    "seed": 54321,
+    "startDate": "2024-06-01T00:00:00.000Z",
+    "endDate": "2024-12-31T23:59:59.999Z",
+    "statusDistribution": {
+      "toDo": 0.25,
+      "inProgress": 0.45,
+      "done": 0.3
+    },
+    "issueTypes": {
+      "epic": {
+        "count": 5,
+        "childrenPerEpic": 20,
+        "assignProbability": 1.0,
+        "labelProbability": 0.8,
+        "childDistribution": {
+          "story": 0.6,
+          "task": 0.25,
+          "bug": 0.15
+        }
+      },
+      "story": {
+        "standaloneCount": 10,
+        "assignProbability": 0.95,
+        "labelProbability": 0.7
+      },
+      "task": {
+        "standaloneCount": 5,
+        "assignProbability": 0.85,
+        "labelProbability": 0.6
+      },
+      "bug": {
+        "standaloneCount": 3,
+        "assignProbability": 1.0,
+        "labelProbability": 0.9
       }
     },
-    "story": {
-      "standaloneCount": 10,
-      "assignProbability": 0.95,
-      "labelProbability": 0.7
+    "sprints": {
+      "startNumber": 1,
+      "duration": 7,
+      "assignProbability": 0.85
     },
-    "task": {
-      "standaloneCount": 5,
-      "assignProbability": 0.85,
-      "labelProbability": 0.6
+    "versions": {
+      "startNumber": 1,
+      "count": 5,
+      "assignProbability": 0.5
     },
-    "bug": {
-      "standaloneCount": 3,
-      "assignProbability": 1.0,
-      "labelProbability": 0.9
+    "worklogs": {
+      "probability": 0.7,
+      "hoursMin": 2,
+      "hoursMax": 6,
+      "countMin": 2,
+      "countMax": 8
+    },
+    "data": {
+      "assignees": [
+        "alice.developer@team.com",
+        "bob.engineer@team.com",
+        "charlie.designer@team.com",
+        "diana.qa@team.com"
+      ],
+      "priorities": ["Highest", "High", "Medium", "Low", "Lowest"],
+      "labels": ["ui", "ux", "backend", "api", "database", "testing", "design", "feature", "bugfix"]
     }
   },
-  "sprints": {
-    "startNumber": 1,
-    "duration": 7,
-    "assignProbability": 0.85
-  },
-  "versions": {
-    "startNumber": 1,
-    "count": 5,
-    "assignProbability": 0.5
-  },
-  "worklogs": {
-    "probability": 0.7,
-    "hoursMin": 2,
-    "hoursMax": 6,
-    "countMin": 2,
-    "countMax": 8
-  },
-  "data": {
-    "assignees": [
-      "alice.developer@team.com",
-      "bob.engineer@team.com",
-      "charlie.designer@team.com",
-      "diana.qa@team.com"
-    ],
-    "priorities": ["Highest", "High", "Medium", "Low", "Lowest"],
-    "labels": ["ui", "ux", "backend", "api", "database", "testing", "design", "feature", "bugfix"]
-  },
-  "projects": {
-    "count": 1,
-    "issuesPerProject": 200
-  }
+  "projects": [
+    {
+      "projectKey": "TEAM",
+      "projectType": "team-managed",
+      "issueCount": 200,
+      "startIssueNumber": 1
+    }
+  ]
 }
