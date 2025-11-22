@@ -59,11 +59,11 @@ describe('ProjectsManager', () => {
 
     render(<ProjectsManager config={configWithTwoProjects} onChange={mockOnChange} />);
 
-    // Find the first delete button by aria-label
-    const deleteButtons = screen.getAllByLabelText('Delete project');
-    expect(deleteButtons.length).toBeGreaterThan(0);
+    // Find the delete button for PROJ1
+    const deleteButton = screen.getByRole('button', { name: /Remove project PROJ1/i });
 
-    fireEvent.click(deleteButtons[0]);
+    expect(deleteButton).toBeDefined();
+    fireEvent.click(deleteButton);
 
     expect(mockOnChange).toHaveBeenCalledWith({
       version: '1.0',
@@ -77,8 +77,10 @@ describe('ProjectsManager', () => {
 
     render(<ProjectsManager config={defaultConfig} onChange={mockOnChange} />);
 
-    // Find the delete button by aria-label
-    const deleteButton = screen.getByLabelText('Delete project');
+    // Find the delete button for PROJ1
+    const deleteButton = screen.getByRole('button', { name: /Remove project PROJ1/i });
+
+    expect(deleteButton).toBeDefined();
     fireEvent.click(deleteButton);
 
     expect(alertMock).toHaveBeenCalledWith(

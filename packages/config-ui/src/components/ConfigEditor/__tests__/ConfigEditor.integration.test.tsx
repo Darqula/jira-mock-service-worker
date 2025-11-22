@@ -54,7 +54,7 @@ describe('ConfigEditor Integration Tests', () => {
     render(<ConfigEditor />);
 
     // Update global seed
-    const seedInput = screen.getByPlaceholderText(/Leave empty for random data/i);
+    const seedInput = screen.getByLabelText(/Global Seed/i);
     fireEvent.change(seedInput, { target: { value: '12345' } });
 
     // Add a project

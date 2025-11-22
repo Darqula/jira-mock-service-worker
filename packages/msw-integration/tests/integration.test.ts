@@ -5,15 +5,16 @@ import type { JiraMockConfig } from '@jira-mock/core';
 describe('MSW Integration', () => {
   const config: JiraMockConfig = {
     version: '1.0',
-    seed: 12345,
     projects: [
       {
         projectKey: 'TEST1',
         issueCount: 5,
+        seed: 12345,
       },
       {
         projectKey: 'TEST2',
         issueCount: 5,
+        seed: 12345,
       },
     ],
   };

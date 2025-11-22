@@ -7,8 +7,9 @@ A Next.js application for testing Jira API requests through an interactive OpenA
 - 🔧 **Interactive OpenAPI UI**: Test Jira API endpoints directly in the browser
 - 🎲 **Configurable Mock Data**: Use `jira-mock-config.json` to customize mock data generation
 - 🔄 **MSW Integration**: Browser-based request interception with Mock Service Worker
-- 📝 **Full API Coverage**: Access 100+ mocked Jira Cloud API endpoints
+- 📝 **Filtered API Display**: Shows only MSW-mocked endpoints from the full Jira Cloud API
 - 🎯 **Deterministic Testing**: Seeded data generation for reproducible tests
+- 🔌 **Maintainable**: Easy to add new endpoints via `mocked-endpoints.json`
 
 ## Getting Started
 
@@ -86,12 +87,94 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 4. Click "Execute"
 5. View filtered issues
 
+## Adding New Mocked Endpoints
+
+The OpenAPI UI is filtered to show only endpoints that are actually mocked with MSW. To display additional endpoints:
+
+### 1. Add MSW Handlers
+
+First, implement the MSW handlers in the `@jira-mock/msw-integration` package:
+
+```typescript
+// packages/msw-integration/src/handlers/your-feature.handlers.ts
+export function createYourFeatureHandlers(dataStore: DataStore, baseUrl: string) {
+  return [
+    http.get(`${baseUrl}/rest/api/2/your-endpoint`, () => {
+      // Your handler implementation
+    }),
+  ];
+}
+```
+
+### 2. Update mocked-endpoints.json
+
+Add the new endpoint to `mocked-endpoints.json`:
+
+```json
+{
+  "endpoints": [
+    {
+      "path": "/rest/api/2/your-endpoint",
+      "methods": ["get"]
+    }
+  ]
+}
+```
+
+**Important**: Use OpenAPI parameter syntax `{paramName}`, not MSW syntax `:paramName`.
+
+### 3. Restart the Development Server
+
+```bash
+npm run dev
+```
+
+The new endpoint will now appear in the OpenAPI UI!
+
+## Configuration Files
+
+### jira-mock-config.json
+
+Controls mock data generation:
+
+```json
+{
+  "version": "1.0",
+  "globalDefaults": {
+    "seed": 42
+  },
+  "projects": [
+    {
+      "projectKey": "PROJ1",
+      "issueCount": 20
+    }
+  ]
+}
+```
+
+### mocked-endpoints.json
+
+Defines which endpoints appear in the OpenAPI UI:
+
+- **path**: OpenAPI path using `{param}` syntax
+- **methods**: Array of HTTP methods (lowercase)
+
+Example:
+
+```json
+{
+  "path": "/rest/api/2/issue/{issueIdOrKey}",
+  "methods": ["get", "put", "delete"]
+}
+```
+
 ## Configuration Options
 
 You can modify behavior by:
 
 - **Changing seed**: Get different random data
 - **Adjusting counts**: Test with more/fewer projects and issues
+- **Adding endpoints**: Update `mocked-endpoints.json` to show more endpoints
 - **Modifying MSW setup**: Edit `src/lib/msw.ts` for custom behavior
 
 ## Related Packages
