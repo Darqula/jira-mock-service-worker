@@ -24,8 +24,8 @@ export const DEFAULT_STATUS_DISTRIBUTION: Required<StatusDistribution> = {
  */
 export const DEFAULT_ISSUE_TYPES_CONFIG: Required<IssueTypesConfig> = {
   epic: {
-    count: 10,
-    childrenPerEpic: 100,
+    count: 0,
+    childrenPerEpic: 10,
     assignProbability: 0.9,
     labelProbability: 0.8,
     childDistribution: {
