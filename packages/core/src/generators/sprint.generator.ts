@@ -1,6 +1,6 @@
 import type { GenerationContext } from '../types/generator.types.js';
 import { generateSelfUrls } from '../utils/response-builder.js';
-import { mergeWithDefaults } from '../config/defaults.js';
+import { getBuiltInDefaults } from '../config/defaults.js';
 
 export interface Sprint {
   id: string;
@@ -23,8 +23,8 @@ export class SprintGenerator {
     endDate: Date,
     context: GenerationContext
   ): Sprint[] {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const sprintConfig = mergedConfig.sprints!;
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const sprintConfig = projectConfig.sprints!;
     const startNumber = sprintConfig.startNumber!;
     const duration = sprintConfig.duration!;
 

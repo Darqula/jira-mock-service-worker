@@ -1,0 +1,57 @@
+{
+  "version": "1.0",
+  "globalDefaults": {
+    "seed": 12345,
+    "statusDistribution": {
+      "toDo": 0.4,
+      "inProgress": 0.3,
+      "done": 0.3
+    },
+    "worklogs": {
+      "probability": 0.5
+    }
+  },
+  "projects": [
+    {
+      "projectKey": "BACKEND",
+      "projectName": "Backend Services",
+      "projectType": "company-managed",
+      "issueCount": 150,
+      "issueTypes": {
+        "epic": {
+          "count": 5,
+          "childrenPerEpic": 10
+        }
+      },
+      "data": {
+        "assignees": ["backend-dev1@example.com", "backend-dev2@example.com"],
+        "labels": ["api", "database", "performance"]
+      }
+    },
+    {
+      "projectKey": "FRONTEND",
+      "projectName": "Frontend Application",
+      "projectType": "team-managed",
+      "issueCount": 100,
+      "statusDistribution": {
+        "toDo": 0.5,
+        "inProgress": 0.4,
+        "done": 0.1
+      },
+      "data": {
+        "assignees": ["frontend-dev1@example.com", "frontend-dev2@example.com"],
+        "labels": ["ui", "ux", "accessibility"]
+      }
+    },
+    {
+      "projectKey": "INFRA",
+      "projectName": "Infrastructure",
+      "projectType": "company-managed",
+      "issueCount": 50,
+      "data": {
+        "assignees": ["devops1@example.com"],
+        "labels": ["aws", "kubernetes", "monitoring"]
+      }
+    }
+  ]
+}
