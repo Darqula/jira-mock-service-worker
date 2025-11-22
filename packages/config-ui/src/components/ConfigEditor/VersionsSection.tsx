@@ -17,9 +17,12 @@ export function VersionsSection({ config, onChange }: VersionsSectionProps) {
   const updateVersions = (updates: Partial<typeof versions>) => {
     onChange({
       ...config,
-      versions: {
-        ...versions,
-        ...updates,
+      globalDefaults: {
+        ...config.globalDefaults,
+        versions: {
+          ...versions,
+          ...updates,
+        },
       },
     });
   };

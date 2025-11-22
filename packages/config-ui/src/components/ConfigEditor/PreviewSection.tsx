@@ -9,13 +9,14 @@ interface PreviewSectionProps {
 }
 
 export function PreviewSection({ config }: PreviewSectionProps) {
-  const totalIssues = config.projects.count * config.projects.issuesPerProject;
-  const estimatedUsers = Math.min(20, Math.max(10, config.projects.count * 3));
+  const projectCount = config.projects.length;
+  const totalIssues = config.projects.reduce((sum, project) => sum + project.issueCount, 0);
+  const estimatedUsers = Math.min(20, Math.max(10, projectCount * 3));
 
   // Rough estimation: ~2KB per issue, ~0.5KB per project, ~0.3KB per user
   const estimatedSize = (
     (totalIssues * 2) +
-    (config.projects.count * 0.5) +
+    (projectCount * 0.5) +
     (estimatedUsers * 0.3)
   ).toFixed(1);
 
@@ -39,7 +40,7 @@ export function PreviewSection({ config }: PreviewSectionProps) {
             </div>
             <div>
               <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                {config.projects.count}
+                {projectCount}
               </p>
               <p className="text-sm text-blue-700 dark:text-blue-300">Projects</p>
             </div>
@@ -97,13 +98,13 @@ export function PreviewSection({ config }: PreviewSectionProps) {
             What&apos;s included:
           </h4>
           <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-            <li>• {config.projects.count} Projects with metadata</li>
+            <li>• {projectCount} Projects with metadata</li>
             <li>• {totalIssues.toLocaleString()} Issues with realistic data</li>
             <li>• ~{estimatedUsers} Users (reporters, assignees, etc.)</li>
             <li>• Issue types, priorities, statuses, and fields</li>
             <li>• Components and versions for each project</li>
             <li>• Worklogs for issues</li>
-            {config.seed && <li>• Reproducible data (seed: {config.seed})</li>}
+            {config.globalDefaults?.seed && <li>• Reproducible data (seed: {config.globalDefaults.seed})</li>}
           </ul>
         </div>
       </CardContent>
