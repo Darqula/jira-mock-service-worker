@@ -14,14 +14,17 @@ interface IssueTypesSectionProps {
 
 export function IssueTypesSection({ config, onChange }: IssueTypesSectionProps) {
   const [activeTab, setActiveTab] = useState<'epic' | 'story' | 'task' | 'bug'>('epic');
-  const issueTypes = config.issueTypes || {};
+  const issueTypes = config.globalDefaults?.issueTypes || {};
 
   const updateIssueTypes = (updates: Partial<typeof issueTypes>) => {
     onChange({
       ...config,
-      issueTypes: {
-        ...issueTypes,
-        ...updates,
+      globalDefaults: {
+        ...config.globalDefaults,
+        issueTypes: {
+          ...issueTypes,
+          ...updates,
+        },
       },
     });
   };

@@ -1,7 +1,9 @@
 {
   "version": "1.0",
-  "projects": {
-    "count": 1,
-    "issuesPerProject": 50
-  }
+  "projects": [
+    {
+      "projectKey": "PROJ",
+      "issueCount": 10
+    }
+  ]
 }

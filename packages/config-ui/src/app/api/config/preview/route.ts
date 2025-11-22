@@ -6,13 +6,13 @@ export async function POST(request: Request) {
   try {
     const config: JiraMockConfig = await request.json();
 
-    // Generate a small sample to preview
+    // Generate a small sample to preview - limit to first project with max 5 issues
     const sampleConfig: JiraMockConfig = {
       ...config,
-      projects: {
-        count: Math.min(config.projects.count, 1),
-        issuesPerProject: Math.min(config.projects.issuesPerProject, 5),
-      },
+      projects: config.projects.slice(0, 1).map((project) => ({
+        ...project,
+        issueCount: Math.min(project.issueCount, 5),
+      })),
     };
 
     const { dataStore } = generateMockData(sampleConfig);

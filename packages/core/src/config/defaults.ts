@@ -1,6 +1,7 @@
 import type {
   JiraMockConfig,
-  GeneralConfig,
+  ProjectConfig,
+  ProjectConfigWithKey,
   StatusDistribution,
   IssueTypesConfig,
   SprintsConfig,
@@ -8,18 +9,6 @@ import type {
   WorklogsConfig,
   DataConfig,
 } from './types.js';
-
-/**
- * Default general configuration
- */
-export const DEFAULT_GENERAL_CONFIG: Required<GeneralConfig> = {
-  projectKey: 'PROJ',
-  projectType: 'company-managed',
-  startIssueNumber: 1,
-  startDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(), // 6 months ago
-  endDate: new Date().toISOString(),
-  chunkSize: 0,
-};
 
 /**
  * Default status distribution
@@ -101,11 +90,27 @@ export const DEFAULT_DATA_CONFIG: Required<DataConfig> = {
 };
 
 /**
- * Complete default configuration (excluding seed which is optional)
+ * Built-in default project configuration
+ * These are the baseline defaults that apply if no overrides are specified
+ */
+export const DEFAULT_PROJECT_CONFIG: Required<Omit<ProjectConfig, 'seed'>> = {
+  statusDistribution: DEFAULT_STATUS_DISTRIBUTION,
+  issueTypes: DEFAULT_ISSUE_TYPES_CONFIG,
+  sprints: DEFAULT_SPRINTS_CONFIG,
+  versions: DEFAULT_VERSIONS_CONFIG,
+  worklogs: DEFAULT_WORKLOGS_CONFIG,
+  data: DEFAULT_DATA_CONFIG,
+  startIssueNumber: 1,
+  startDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(), // 6 months ago
+  endDate: new Date().toISOString(),
+};
+
+/**
+ * Complete default configuration (for backward compatibility)
+ * @deprecated Use getBuiltInDefaults() instead
  */
 export const DEFAULT_CONFIG = {
   version: '1.0' as const,
-  general: DEFAULT_GENERAL_CONFIG,
   statusDistribution: DEFAULT_STATUS_DISTRIBUTION,
   issueTypes: DEFAULT_ISSUE_TYPES_CONFIG,
   sprints: DEFAULT_SPRINTS_CONFIG,
@@ -115,86 +120,102 @@ export const DEFAULT_CONFIG = {
 };
 
 /**
- * Merges user configuration with default values
- * Performs deep merge for nested objects
+ * Deep merge helper function
+ * Merges source into target, recursively merging nested objects
+ */
+function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
+  const result = { ...target } as any;
+
+  for (const key in source) {
+    if (Object.prototype.hasOwnProperty.call(source, key)) {
+      const sourceValue = source[key];
+      const targetValue = result[key];
+
+      if (
+        sourceValue !== undefined &&
+        targetValue !== undefined &&
+        typeof sourceValue === 'object' &&
+        typeof targetValue === 'object' &&
+        !Array.isArray(sourceValue) &&
+        !Array.isArray(targetValue)
+      ) {
+        // Recursively merge nested objects
+        result[key] = deepMerge(targetValue, sourceValue);
+      } else if (sourceValue !== undefined) {
+        // Override with source value
+        result[key] = sourceValue;
+      }
+    }
+  }
+
+  return result as T;
+}
+
+/**
+ * Gets the built-in default project configuration
+ * @returns Built-in default configuration
+ */
+export function getBuiltInDefaults(): Required<Omit<ProjectConfig, 'seed'>> {
+  return DEFAULT_PROJECT_CONFIG;
+}
+
+/**
+ * Merges project configuration with global defaults and built-in defaults
+ * Performs 3-level merge: built-in defaults → global defaults → project config
  *
+ * @param projectConfig - Project-specific configuration
+ * @param globalDefaults - Global default configuration (optional)
+ * @returns Fully merged project configuration
+ */
+export function mergeProjectWithDefaults(
+  projectConfig: ProjectConfigWithKey,
+  globalDefaults?: ProjectConfig
+): ProjectConfigWithKey {
+  // 1. Start with built-in defaults
+  const builtInDefaults = getBuiltInDefaults();
+
+  // 2. Merge with global defaults if provided
+  const baseConfig = globalDefaults
+    ? deepMerge(builtInDefaults, globalDefaults)
+    : builtInDefaults;
+
+  // 3. Merge with project-specific config (preserve required fields)
+  const merged = deepMerge(baseConfig, projectConfig);
+
+  // Ensure required fields are preserved
+  return {
+    ...merged,
+    projectKey: projectConfig.projectKey,
+    issueCount: projectConfig.issueCount,
+    projectName: projectConfig.projectName,
+    projectType: projectConfig.projectType || 'company-managed',
+  };
+}
+
+/**
+ * Merges user configuration with default values (for backward compatibility)
+ * @deprecated This function is deprecated and will be removed in the next version
  * @param config - User-provided configuration
  * @returns Merged configuration with all defaults applied
  */
 export function mergeWithDefaults(config: JiraMockConfig): JiraMockConfig {
-  return {
-    version: config.version,
-    seed: config.seed,
-
-    general: {
-      ...DEFAULT_GENERAL_CONFIG,
-      ...config.general,
-    },
-
-    statusDistribution: {
-      ...DEFAULT_STATUS_DISTRIBUTION,
-      ...config.statusDistribution,
-    },
-
-    issueTypes: {
-      epic: {
-        ...DEFAULT_ISSUE_TYPES_CONFIG.epic,
-        ...config.issueTypes?.epic,
-        childDistribution: {
-          ...DEFAULT_ISSUE_TYPES_CONFIG.epic.childDistribution,
-          ...config.issueTypes?.epic?.childDistribution,
-        },
-      },
-      story: {
-        ...DEFAULT_ISSUE_TYPES_CONFIG.story,
-        ...config.issueTypes?.story,
-      },
-      task: {
-        ...DEFAULT_ISSUE_TYPES_CONFIG.task,
-        ...config.issueTypes?.task,
-      },
-      bug: {
-        ...DEFAULT_ISSUE_TYPES_CONFIG.bug,
-        ...config.issueTypes?.bug,
-      },
-    },
-
-    sprints: {
-      ...DEFAULT_SPRINTS_CONFIG,
-      ...config.sprints,
-    },
-
-    versions: {
-      ...DEFAULT_VERSIONS_CONFIG,
-      ...config.versions,
-    },
-
-    worklogs: {
-      ...DEFAULT_WORKLOGS_CONFIG,
-      ...config.worklogs,
-    },
-
-    data: {
-      ...DEFAULT_DATA_CONFIG,
-      ...config.data,
-    },
-
-    projects: config.projects,
-  };
+  return config;
 }
 
 /**
  * Gets a specific configuration value with fallback to default
  *
- * @param config - User configuration
- * @param path - Path to configuration value (e.g., 'general.projectKey')
+ * @param projectConfig - Project configuration
+ * @param globalDefaults - Global defaults (optional)
+ * @param path - Path to configuration value (e.g., 'statusDistribution.toDo')
  * @returns Configuration value or default
  */
 export function getConfigValue<T>(
-  config: JiraMockConfig,
+  projectConfig: ProjectConfigWithKey,
+  globalDefaults: ProjectConfig | undefined,
   path: string
 ): T | undefined {
-  const merged = mergeWithDefaults(config);
+  const merged = mergeProjectWithDefaults(projectConfig, globalDefaults);
   const parts = path.split('.');
   let value: any = merged;
 

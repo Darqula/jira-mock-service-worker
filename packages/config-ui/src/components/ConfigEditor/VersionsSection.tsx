@@ -12,14 +12,17 @@ interface VersionsSectionProps {
 }
 
 export function VersionsSection({ config, onChange }: VersionsSectionProps) {
-  const versions = config.versions || {};
+  const versions = config.globalDefaults?.versions || {};
 
   const updateVersions = (updates: Partial<typeof versions>) => {
     onChange({
       ...config,
-      versions: {
-        ...versions,
-        ...updates,
+      globalDefaults: {
+        ...config.globalDefaults,
+        versions: {
+          ...versions,
+          ...updates,
+        },
       },
     });
   };
