@@ -1,0 +1,241 @@
+{
+  "description": "This file defines which Jira API endpoints are mocked by MSW. Add new endpoints here to display them in the OpenAPI tester.",
+  "endpoints": [
+    {
+      "path": "/rest/api/2/attachment/{id}",
+      "methods": ["get", "delete"]
+    },
+    {
+      "path": "/rest/api/2/issue/{issueIdOrKey}/attachments",
+      "methods": ["post"]
+    },
+    {
+      "path": "/rest/api/2/issue/{issueIdOrKey}/comment",
+      "methods": ["get", "post"]
+    },
+    {
+      "path": "/rest/api/2/issue/{issueIdOrKey}/comment/{id}",
+      "methods": ["get", "put", "delete"]
+    },
+    {
+      "path": "/rest/api/2/component",
+      "methods": ["get", "post"]
+    },
+    {
+      "path": "/rest/api/2/component/page",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/component/{id}",
+      "methods": ["get", "put", "delete"]
+    },
+    {
+      "path": "/rest/api/2/project/{projectIdOrKey}/components",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/filter/{id}",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/filter/search",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/issueLinkType",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/issueLink",
+      "methods": ["post"]
+    },
+    {
+      "path": "/rest/api/2/issueLink/{linkId}",
+      "methods": ["get", "delete"]
+    },
+    {
+      "path": "/rest/api/2/issue/{issueIdOrKey}/properties/{propertyKey}",
+      "methods": ["get", "put", "delete"]
+    },
+    {
+      "path": "/rest/api/2/issue/{issueIdOrKey}/properties",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/issue/properties/multi",
+      "methods": ["post"]
+    },
+    {
+      "path": "/rest/api/2/issue",
+      "methods": ["post"]
+    },
+    {
+      "path": "/rest/api/2/issue/{issueIdOrKey}",
+      "methods": ["get", "put", "delete"]
+    },
+    {
+      "path": "/rest/api/2/issue/picker",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/issuetype",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/issuetype/page",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/issuetype/project",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/field",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/priority",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/status",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/statuscategory",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/label",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/issue/createmeta",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/issue/createmeta/{projectIdOrKey}/issuetypes",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/issue/createmeta/{projectIdOrKey}/issuetypes/{issueTypeId}",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/issue/{issueIdOrKey}/editmeta",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/project/{projectIdOrKey}/properties",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/project/{projectIdOrKey}/properties/{propertyKey}",
+      "methods": ["get", "put", "delete"]
+    },
+    {
+      "path": "/rest/api/2/project",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/project/search",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/project/{projectIdOrKey}",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/project/{projectIdOrKey}/statuses",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/search",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/search/jql",
+      "methods": ["post"]
+    },
+    {
+      "path": "/rest/api/2/search/approximate-count",
+      "methods": ["post"]
+    },
+    {
+      "path": "/rest/api/2/jql/match",
+      "methods": ["post"]
+    },
+    {
+      "path": "/rest/api/2/jql/autocompletedata/suggestions",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/issue/{issueIdOrKey}/transitions",
+      "methods": ["get", "post"]
+    },
+    {
+      "path": "/rest/api/2/user/properties/{propertyKey}",
+      "methods": ["get", "put", "delete"]
+    },
+    {
+      "path": "/rest/api/2/myself",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/user",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/user/search",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/user/assignable/multiProjectSearch",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/user/search/query",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/mypermissions",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/project/{projectIdOrKey}/version",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/version",
+      "methods": ["post"]
+    },
+    {
+      "path": "/rest/api/2/version/{id}",
+      "methods": ["get", "put", "delete"]
+    },
+    {
+      "path": "/rest/api/2/version/{id}/removeAndSwap",
+      "methods": ["post"]
+    },
+    {
+      "path": "/rest/api/2/issue/{issueIdOrKey}/worklog",
+      "methods": ["get", "post"]
+    },
+    {
+      "path": "/rest/api/2/issue/{issueIdOrKey}/worklog/{id}",
+      "methods": ["get", "put", "delete"]
+    },
+    {
+      "path": "/rest/api/2/worklog/updated",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/worklog/list",
+      "methods": ["post"]
+    },
+    {
+      "path": "/rest/api/2/worklog/deleted",
+      "methods": ["get"]
+    }
+  ]
+}
