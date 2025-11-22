@@ -46,9 +46,9 @@ describe('MSW Integration', () => {
     const response = await fetch(`${baseUrl}/rest/api/2/project`);
     expect(response.status).toBe(200);
 
-    const result = await response.json();
-    expect(result.values).toHaveLength(2);
-    expect(result.total).toBe(2);
+    const projects = await response.json();
+    expect(Array.isArray(projects)).toBe(true);
+    expect(projects).toHaveLength(2);
   });
 
   it('should get project by key', async () => {

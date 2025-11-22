@@ -9,7 +9,6 @@ export interface User {
   displayName: string;
   active: boolean;
   timeZone?: string;
-  locale?: string;
 }
 
 export interface AvatarUrls {
