@@ -3,6 +3,52 @@ import type { DataStore, CreateIssueInput, UpdateIssueInput } from '@jira-mock/c
 
 export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
   return [
+    // GET /rest/api/2/issue/picker - Issue picker suggestions
+    // NOTE: This MUST come before /rest/api/2/issue/:issueIdOrKey to avoid route collision
+    http.get(`${baseUrl}/rest/api/2/issue/picker`, ({ request }) => {
+      const url = new URL(request.url);
+      const query = url.searchParams.get('query') || '';
+      const currentProjectKey = url.searchParams.get('currentProjectKey');
+
+      let issues = dataStore.getAllIssues();
+
+      // Filter by project if specified
+      if (currentProjectKey) {
+        issues = issues.filter((issue) => issue.fields.project.key === currentProjectKey);
+      }
+
+      // Filter by query
+      if (query) {
+        const lowerQuery = query.toLowerCase();
+        issues = issues.filter(
+          (issue) =>
+            issue.key.toLowerCase().includes(lowerQuery) ||
+            issue.fields.summary.toLowerCase().includes(lowerQuery)
+        );
+      }
+
+      // Limit to 10 results
+      issues = issues.slice(0, 10);
+
+      return HttpResponse.json({
+        sections: [
+          {
+            label: 'Current Search',
+            sub: 'Search results',
+            id: 'cs',
+            issues: issues.map((issue) => ({
+              id: parseInt(issue.id, 10),
+              key: issue.key,
+              keyHtml: issue.key,
+              img: issue.fields.issuetype.iconUrl,
+              summary: issue.fields.summary,
+              summaryText: issue.fields.summary,
+            })),
+          },
+        ],
+      });
+    }),
+
     // GET /rest/api/2/issue/:issueIdOrKey - Get issue
     http.get(`${baseUrl}/rest/api/2/issue/:issueIdOrKey`, ({ params, request }) => {
       const { issueIdOrKey } = params;
@@ -211,51 +257,6 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
       }
 
       return HttpResponse.json(null, { status: 204 });
-    }),
-
-    // GET /rest/api/2/issue/picker - Issue picker suggestions
-    http.get(`${baseUrl}/rest/api/2/issue/picker`, ({ request }) => {
-      const url = new URL(request.url);
-      const query = url.searchParams.get('query') || '';
-      const currentProjectKey = url.searchParams.get('currentProjectKey');
-
-      let issues = dataStore.getAllIssues();
-
-      // Filter by project if specified
-      if (currentProjectKey) {
-        issues = issues.filter((issue) => issue.fields.project.key === currentProjectKey);
-      }
-
-      // Filter by query
-      if (query) {
-        const lowerQuery = query.toLowerCase();
-        issues = issues.filter(
-          (issue) =>
-            issue.key.toLowerCase().includes(lowerQuery) ||
-            issue.fields.summary.toLowerCase().includes(lowerQuery)
-        );
-      }
-
-      // Limit to 10 results
-      issues = issues.slice(0, 10);
-
-      return HttpResponse.json({
-        sections: [
-          {
-            label: 'Current Search',
-            sub: 'Search results',
-            id: 'cs',
-            issues: issues.map((issue) => ({
-              id: issue.id,
-              key: issue.key,
-              keyHtml: issue.key,
-              img: issue.fields.issuetype.iconUrl,
-              summary: issue.fields.summary,
-              summaryText: issue.fields.summary,
-            })),
-          },
-        ],
-      });
     }),
   ];
 }
