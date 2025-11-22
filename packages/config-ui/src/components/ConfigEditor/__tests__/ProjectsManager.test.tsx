@@ -59,16 +59,11 @@ describe('ProjectsManager', () => {
 
     render(<ProjectsManager config={configWithTwoProjects} onChange={mockOnChange} />);
 
-    // First project is already expanded by default
-    // Find all buttons and get the trash icon button (in the card header)
-    const allButtons = screen.getAllByRole('button');
-    const deleteButton = allButtons.find(button => {
-      const svg = button.querySelector('svg');
-      return svg && svg.classList.contains('lucide-trash-2');
-    });
+    // Find the first delete button by aria-label
+    const deleteButtons = screen.getAllByLabelText('Delete project');
+    expect(deleteButtons.length).toBeGreaterThan(0);
 
-    expect(deleteButton).toBeDefined();
-    fireEvent.click(deleteButton!);
+    fireEvent.click(deleteButtons[0]);
 
     expect(mockOnChange).toHaveBeenCalledWith({
       version: '1.0',
@@ -82,15 +77,9 @@ describe('ProjectsManager', () => {
 
     render(<ProjectsManager config={defaultConfig} onChange={mockOnChange} />);
 
-    // First project is already expanded, try to delete the only project
-    const allButtons = screen.getAllByRole('button');
-    const deleteButton = allButtons.find(button => {
-      const svg = button.querySelector('svg');
-      return svg && svg.classList.contains('lucide-trash-2');
-    });
-
-    expect(deleteButton).toBeDefined();
-    fireEvent.click(deleteButton!);
+    // Find the delete button by aria-label
+    const deleteButton = screen.getByLabelText('Delete project');
+    fireEvent.click(deleteButton);
 
     expect(alertMock).toHaveBeenCalledWith(
       'Cannot remove the last project. At least one project is required.'
