@@ -12,7 +12,7 @@ interface SprintsSectionProps {
 }
 
 export function SprintsSection({ config, onChange }: SprintsSectionProps) {
-  const sprints = config.sprints || {};
+  const sprints = config.globalDefaults?.sprints || {};
 
   const updateSprints = (updates: Partial<typeof sprints>) => {
     onChange({

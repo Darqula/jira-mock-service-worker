@@ -11,14 +11,17 @@ interface StatusSectionProps {
 }
 
 export function StatusSection({ config, onChange }: StatusSectionProps) {
-  const status = config.statusDistribution || {};
+  const status = config.globalDefaults?.statusDistribution || {};
 
   const updateStatus = (updates: Partial<typeof status>) => {
     onChange({
       ...config,
-      statusDistribution: {
-        ...status,
-        ...updates,
+      globalDefaults: {
+        ...config.globalDefaults,
+        statusDistribution: {
+          ...status,
+          ...updates,
+        },
       },
     });
   };

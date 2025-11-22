@@ -14,7 +14,7 @@ interface DataSectionProps {
 }
 
 export function DataSection({ config, onChange }: DataSectionProps) {
-  const data = config.data || {};
+  const data = config.globalDefaults?.data || {};
   const [newAssignee, setNewAssignee] = useState('');
   const [newPriority, setNewPriority] = useState('');
   const [newLabel, setNewLabel] = useState('');
