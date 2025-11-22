@@ -53,9 +53,9 @@ export default function Home() {
           <div className="config-info">
             <h3>📋 Current Configuration</h3>
             <div>
-              Seed: <code>{config.seed || 'random'}</code> |
-              Projects: <code>{config.projects.count}</code> |
-              Issues per Project: <code>{config.projects.issuesPerProject}</code>
+              Seed: <code>{config.globalDefaults?.seed || 'random'}</code> |
+              Projects: <code>{config.projects.length}</code> |
+              Total Issues: <code>{config.projects.reduce((sum, p) => sum + p.issueCount, 0)}</code>
             </div>
             {stats && (
               <div style={{ marginTop: '0.5rem' }}>
