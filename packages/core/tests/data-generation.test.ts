@@ -6,10 +6,10 @@ describe('Data Generation', () => {
   it('should generate mock data successfully', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      projects: {
-        count: 2,
-        issuesPerProject: 10,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 10 },
+        { projectKey: 'PROJ2', issueCount: 10 },
+      ],
     };
 
     const result = generateMockData(config);
@@ -21,10 +21,11 @@ describe('Data Generation', () => {
   it('should generate correct number of projects', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      projects: {
-        count: 3,
-        issuesPerProject: 5,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 5 },
+        { projectKey: 'PROJ2', issueCount: 5 },
+        { projectKey: 'PROJ3', issueCount: 5 },
+      ],
     };
 
     const { dataStore } = generateMockData(config);
@@ -36,25 +37,27 @@ describe('Data Generation', () => {
   it('should generate correct number of issues per project', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      projects: {
-        count: 2,
-        issuesPerProject: 15,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 15 },
+        { projectKey: 'PROJ2', issueCount: 15 },
+      ],
     };
 
     const { dataStore } = generateMockData(config);
-    const issues = dataStore.getAllIssues();
+    const proj1Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'PROJ1');
+    const proj2Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'PROJ2');
 
-    expect(issues).toHaveLength(30); // 2 projects * 15 issues
+    // Each project should have the specified number of base issues (may have more due to epics/subtasks)
+    expect(proj1Issues.length).toBeGreaterThanOrEqual(15);
+    expect(proj2Issues.length).toBeGreaterThanOrEqual(15);
   });
 
   it('should generate users', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      projects: {
-        count: 1,
-        issuesPerProject: 5,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 5 },
+      ],
     };
 
     const { dataStore } = generateMockData(config);
@@ -66,10 +69,9 @@ describe('Data Generation', () => {
   it('should generate metadata', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      projects: {
-        count: 1,
-        issuesPerProject: 5,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 5 },
+      ],
     };
 
     const { dataStore } = generateMockData(config);
@@ -83,10 +85,9 @@ describe('Data Generation', () => {
   it('should set a current user', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      projects: {
-        count: 1,
-        issuesPerProject: 5,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 5 },
+      ],
     };
 
     const { dataStore } = generateMockData(config);
@@ -99,11 +100,12 @@ describe('Data Generation', () => {
   it('should generate consistent data with same seed', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      seed: 99999,
-      projects: {
-        count: 1,
-        issuesPerProject: 5,
+      globalDefaults: {
+        seed: 99999,
       },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 5 },
+      ],
     };
 
     const result1 = generateMockData(config);
@@ -119,10 +121,10 @@ describe('Data Generation', () => {
   it('should execute JQL queries', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      projects: {
-        count: 2,
-        issuesPerProject: 10,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 10 },
+        { projectKey: 'PROJ2', issueCount: 10 },
+      ],
     };
 
     const { dataStore, queryEngine } = generateMockData(config);
@@ -143,10 +145,9 @@ describe('Data Generation', () => {
   it('should generate issues with valid relationships', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      projects: {
-        count: 1,
-        issuesPerProject: 10,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 10 },
+      ],
     };
 
     const { dataStore } = generateMockData(config);

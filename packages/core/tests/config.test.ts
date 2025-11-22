@@ -6,10 +6,13 @@ describe('Config Validation', () => {
   it('should validate a valid config', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      projects: {
-        count: 5,
-        issuesPerProject: 100,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 100 },
+        { projectKey: 'PROJ2', issueCount: 100 },
+        { projectKey: 'PROJ3', issueCount: 100 },
+        { projectKey: 'PROJ4', issueCount: 100 },
+        { projectKey: 'PROJ5', issueCount: 100 },
+      ],
     };
 
     expect(() => validateConfig(config)).not.toThrow();
@@ -20,10 +23,11 @@ describe('Config Validation', () => {
     const config: JiraMockConfig = {
       version: '1.0',
       seed: 12345,
-      projects: {
-        count: 3,
-        issuesPerProject: 50,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 50 },
+        { projectKey: 'PROJ2', issueCount: 50 },
+        { projectKey: 'PROJ3', issueCount: 50 },
+      ],
     };
 
     expect(() => validateConfig(config)).not.toThrow();
@@ -33,10 +37,9 @@ describe('Config Validation', () => {
   it('should reject invalid version', () => {
     const config = {
       version: '2.0',
-      projects: {
-        count: 5,
-        issuesPerProject: 100,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 100 },
+      ],
     };
 
     expect(() => validateConfig(config)).toThrow();
@@ -46,23 +49,20 @@ describe('Config Validation', () => {
   it('should reject project count < 1', () => {
     const config = {
       version: '1.0',
-      projects: {
-        count: 0,
-        issuesPerProject: 100,
-      },
+      projects: [],
     };
 
     expect(() => validateConfig(config)).toThrow();
     expect(isValidConfig(config)).toBe(false);
   });
 
-  it('should reject project count > 100', () => {
+  it('should reject duplicate project keys', () => {
     const config = {
       version: '1.0',
-      projects: {
-        count: 101,
-        issuesPerProject: 100,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 100 },
+        { projectKey: 'PROJ1', issueCount: 50 }, // Duplicate key
+      ],
     };
 
     expect(() => validateConfig(config)).toThrow();
@@ -72,10 +72,9 @@ describe('Config Validation', () => {
   it('should reject issues per project < 1', () => {
     const config = {
       version: '1.0',
-      projects: {
-        count: 5,
-        issuesPerProject: 0,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 0 },
+      ],
     };
 
     expect(() => validateConfig(config)).toThrow();
@@ -85,10 +84,9 @@ describe('Config Validation', () => {
   it('should reject issues per project > 10000', () => {
     const config = {
       version: '1.0',
-      projects: {
-        count: 5,
-        issuesPerProject: 10001,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 10001 },
+      ],
     };
 
     expect(() => validateConfig(config)).toThrow();
@@ -98,15 +96,13 @@ describe('Config Validation', () => {
   it('should return error messages for invalid config', () => {
     const config = {
       version: '1.0',
-      projects: {
-        count: 0,
-        issuesPerProject: 0,
-      },
+      projects: [
+        { projectKey: 'PROJ1', issueCount: 0 },
+      ],
     };
 
     const errors = getConfigErrors(config);
     expect(errors.length).toBeGreaterThan(0);
-    expect(errors.some((e) => e.includes('count'))).toBe(true);
-    expect(errors.some((e) => e.includes('issuesPerProject'))).toBe(true);
+    expect(errors.some((e) => e.includes('issueCount'))).toBe(true);
   });
 });
