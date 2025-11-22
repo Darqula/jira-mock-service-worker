@@ -1,6 +1,7 @@
 import { ZodError } from 'zod';
 import { JiraMockConfigSchema } from './schema.js';
 import type { JiraMockConfig } from './types.js';
+import { calculateIssueCount } from './types.js';
 
 export class ConfigValidationError extends Error {
   constructor(
@@ -59,7 +60,7 @@ export function validateConfigWithWarnings(config: unknown): ValidationResult {
   const validConfig = result.data;
 
   // Check for large issue counts across all projects
-  const totalIssues = validConfig.projects.reduce((sum, p) => sum + p.issueCount, 0);
+  const totalIssues = validConfig.projects.reduce((sum, p) => sum + calculateIssueCount(p), 0);
   if (totalIssues > 1000) {
     warnings.push({
       path: 'projects',
@@ -78,32 +79,17 @@ export function validateConfigWithWarnings(config: unknown): ValidationResult {
 
   // Check each project's configuration
   validConfig.projects.forEach((project, index) => {
-    // Check epic configuration
+    // Check epic child distribution sums close to 1
     const epicConfig = project.issueTypes?.epic;
-    if (epicConfig) {
-      const epicCount = epicConfig.count || 0;
-      const childrenPerEpic = epicConfig.childrenPerEpic || 0;
-      const calculatedIssues = epicCount * (childrenPerEpic + 1);
-
-      if (calculatedIssues > project.issueCount) {
+    if (epicConfig?.childDistribution) {
+      const { story = 0.5, task = 0.3, bug = 0.2 } = epicConfig.childDistribution;
+      const sum = story + task + bug;
+      if (Math.abs(sum - 1.0) > 0.01) {
         warnings.push({
-          path: `projects[${index}].issueTypes.epic`,
-          message: `Epic configuration will generate ${calculatedIssues} issues, which exceeds issueCount (${project.issueCount}) for project ${project.projectKey}. Some epics may be skipped.`,
+          path: `projects[${index}].issueTypes.epic.childDistribution`,
+          message: `Child distribution probabilities sum to ${sum.toFixed(2)}, expected ~1.0. Values will be normalized.`,
           severity: 'info',
         });
-      }
-
-      // Check child distribution sums close to 1
-      if (epicConfig.childDistribution) {
-        const { story = 0.5, task = 0.3, bug = 0.2 } = epicConfig.childDistribution;
-        const sum = story + task + bug;
-        if (Math.abs(sum - 1.0) > 0.01) {
-          warnings.push({
-            path: `projects[${index}].issueTypes.epic.childDistribution`,
-            message: `Child distribution probabilities sum to ${sum.toFixed(2)}, expected ~1.0. Values will be normalized.`,
-            severity: 'info',
-          });
-        }
       }
     }
 

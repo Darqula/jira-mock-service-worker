@@ -1,6 +1,7 @@
 'use client';
 
 import type { JiraMockConfig } from '@jira-mock/core';
+import { calculateIssueCount } from '@jira-mock/core';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Database, FileText, Users, FolderKanban } from 'lucide-react';
 
@@ -10,7 +11,7 @@ interface PreviewSectionProps {
 
 export function PreviewSection({ config }: PreviewSectionProps) {
   const projectCount = config.projects.length;
-  const totalIssues = config.projects.reduce((sum, project) => sum + project.issueCount, 0);
+  const totalIssues = config.projects.reduce((sum, project) => sum + calculateIssueCount(project), 0);
   const estimatedUsers = Math.min(20, Math.max(10, projectCount * 3));
 
   // Rough estimation: ~2KB per issue, ~0.5KB per project, ~0.3KB per user

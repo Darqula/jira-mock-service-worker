@@ -12,7 +12,6 @@ try {
       {
         projectKey: 'DEMO',
         projectName: 'Demo Project',
-        issueCount: 100,
         seed: 42,
       },
     ],
@@ -25,7 +24,6 @@ try {
       {
         projectKey: 'DEMO',
         projectName: 'Demo Project',
-        issueCount: 100,
         seed: 42,
       },
     ],

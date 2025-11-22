@@ -4,7 +4,6 @@
     {
       "projectKey": "DEMO",
       "projectType": "company-managed",
-      "issueCount": 100,
       "startIssueNumber": 1,
       "seed": 12345,
       "startDate": "2024-01-01T00:00:00.000Z",
