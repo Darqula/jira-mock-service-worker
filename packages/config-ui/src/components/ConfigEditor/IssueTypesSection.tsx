@@ -21,9 +21,10 @@ export function IssueTypesSection({ config, onChange }: IssueTypesSectionProps) 
       ...config,
       globalDefaults: {
         ...config.globalDefaults,
-      issueTypes: {
-        ...issueTypes,
-        ...updates,
+        issueTypes: {
+          ...issueTypes,
+          ...updates,
+        },
       },
     });
   };
