@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select } from '@/components/ui/select';
 import { Plus, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
 
 interface ProjectsManagerProps {
@@ -188,18 +188,16 @@ export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
                   <div className="space-y-2">
                     <Label htmlFor={`project-type-${index}`}>Project Type</Label>
                     <Select
+                      id={`project-type-${index}`}
                       value={project.projectType || 'company-managed'}
-                      onValueChange={(value: 'company-managed' | 'team-managed') =>
-                        updateProject(index, { projectType: value })
+                      onChange={(e) =>
+                        updateProject(index, {
+                          projectType: e.target.value as 'company-managed' | 'team-managed',
+                        })
                       }
                     >
-                      <SelectTrigger id={`project-type-${index}`}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="company-managed">Company-managed</SelectItem>
-                        <SelectItem value="team-managed">Team-managed</SelectItem>
-                      </SelectContent>
+                      <option value="company-managed">Company-managed</option>
+                      <option value="team-managed">Team-managed</option>
                     </Select>
                   </div>
 
