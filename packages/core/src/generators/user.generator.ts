@@ -43,7 +43,6 @@ export class UserGenerator {
       displayName,
       active: true,
       timeZone: context.faker.location.timeZone(),
-      locale: 'en_US',
     };
   }
 
@@ -74,7 +73,6 @@ export class UserGenerator {
       displayName,
       active: true,
       timeZone: context.faker.location.timeZone(),
-      locale: 'en_US',
     };
   }
 

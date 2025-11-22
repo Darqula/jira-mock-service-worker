@@ -96,8 +96,7 @@ describe('OpenAPI Schema Validation', () => {
   });
 
   describe('Project Endpoints', () => {
-    // SKIPPED: Returns paginated object instead of array - see OPENAPI_VALIDATION_RESULTS.md
-    it.skip('GET /rest/api/2/project should match OpenAPI schema', async () => {
+    it('GET /rest/api/2/project should match OpenAPI schema', async () => {
       const response = await fetch(`${baseUrl}/rest/api/2/project`);
       expect(response.status).toBe(200);
 
@@ -240,8 +239,7 @@ describe('OpenAPI Schema Validation', () => {
       expect(response.status).toBe(204);
     });
 
-    // SKIPPED: Returns 404 - endpoint needs proper query params - see OPENAPI_VALIDATION_RESULTS.md
-    it.skip('GET /rest/api/2/issue/picker should match OpenAPI schema', async () => {
+    it('GET /rest/api/2/issue/picker should match OpenAPI schema', async () => {
       const response = await fetch(`${baseUrl}/rest/api/2/issue/picker?query=test`);
       expect(response.status).toBe(200);
 
@@ -345,8 +343,7 @@ describe('OpenAPI Schema Validation', () => {
   });
 
   describe('Worklog Endpoints', () => {
-    // SKIPPED: User objects have additional properties - see OPENAPI_VALIDATION_RESULTS.md
-    it.skip('GET /rest/api/2/issue/{issueIdOrKey}/worklog should match OpenAPI schema', async () => {
+    it('GET /rest/api/2/issue/{issueIdOrKey}/worklog should match OpenAPI schema', async () => {
       const issues = dataStore.getAllIssues();
       const issue = issues[0];
 
@@ -369,8 +366,7 @@ describe('OpenAPI Schema Validation', () => {
       expect(result.valid).toBe(true);
     });
 
-    // SKIPPED: User objects have additional properties - see OPENAPI_VALIDATION_RESULTS.md
-    it.skip('POST /rest/api/2/issue/{issueIdOrKey}/worklog should match OpenAPI schema', async () => {
+    it('POST /rest/api/2/issue/{issueIdOrKey}/worklog should match OpenAPI schema', async () => {
       const issues = dataStore.getAllIssues();
       const issue = issues[0];
 

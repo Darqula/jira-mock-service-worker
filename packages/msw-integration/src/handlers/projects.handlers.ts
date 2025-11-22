@@ -50,24 +50,9 @@ export function createProjectsHandlers(dataStore: DataStore, baseUrl: string) {
     }),
 
     // GET /rest/api/2/project - Get all projects
-    http.get(`${baseUrl}/rest/api/2/project`, ({ request }) => {
-      const url = new URL(request.url);
-      const startAt = parseInt(url.searchParams.get('startAt') || '0', 10);
-      const maxResults = parseInt(url.searchParams.get('maxResults') || '50', 10);
-
+    http.get(`${baseUrl}/rest/api/2/project`, () => {
       const allProjects = dataStore.getAllProjects();
-      const total = allProjects.length;
-      const projects = allProjects.slice(startAt, startAt + maxResults);
-      const isLast = startAt + projects.length >= total;
-
-      return HttpResponse.json({
-        self: `${baseUrl}/rest/api/2/project`,
-        maxResults,
-        startAt,
-        total,
-        isLast,
-        values: projects,
-      });
+      return HttpResponse.json(allProjects);
     }),
 
     // GET /rest/api/2/project/:projectIdOrKey - Get project by ID or key
