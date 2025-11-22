@@ -1,12 +1,12 @@
 import type { Version, Project } from '../types/jira-schemas.js';
 import type { GenerationContext } from '../types/generator.types.js';
 import { generateSelfUrls } from '../utils/response-builder.js';
-import { mergeWithDefaults } from '../config/defaults.js';
+import { getBuiltInDefaults } from '../config/defaults.js';
 
 export class VersionGenerator {
   generateVersions(project: Project, context: GenerationContext): Version[] {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const versionConfig = mergedConfig.versions!;
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const versionConfig = projectConfig.versions!;
     const count = versionConfig.count!;
     const versions: Version[] = [];
 
@@ -18,8 +18,8 @@ export class VersionGenerator {
   }
 
   generateVersion(project: Project, index: number, context: GenerationContext): Version {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const versionConfig = mergedConfig.versions!;
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const versionConfig = projectConfig.versions!;
     const startNumber = versionConfig.startNumber!;
 
     const id = context.idGenerator.next('version');

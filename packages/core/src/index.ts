@@ -2,6 +2,7 @@ import { DataStore } from './store/data-store.js';
 import { QueryEngine } from './store/query-engine.js';
 import { validateConfig } from './config/validator.js';
 import type { GenerationContext, IssueContext } from './types/generator.types.js';
+import type { JiraMockConfig } from './config/types.js';
 import { createFaker } from './generators/base/faker-config.js';
 import { IdGenerator } from './generators/base/id-generator.js';
 import { DateGenerator } from './generators/base/date-generator.js';
@@ -22,11 +23,32 @@ import {
   IssueLinkTypeGenerator,
   SprintGenerator,
 } from './generators/index.js';
-import { mergeWithDefaults } from './config/defaults.js';
+import { mergeProjectWithDefaults } from './config/defaults.js';
 
 export interface GenerateMockDataResult {
   dataStore: DataStore;
   queryEngine: QueryEngine;
+}
+
+/**
+ * Aggregates all assignee emails from all projects
+ */
+function aggregateAssignees(config: JiraMockConfig): string[] {
+  const allAssignees = new Set<string>();
+
+  // Add assignees from global defaults
+  if (config.globalDefaults?.data?.assignees) {
+    config.globalDefaults.data.assignees.forEach((email) => allAssignees.add(email));
+  }
+
+  // Add assignees from each project
+  config.projects.forEach((project) => {
+    if (project.data?.assignees) {
+      project.data.assignees.forEach((email) => allAssignees.add(email));
+    }
+  });
+
+  return Array.from(allAssignees);
 }
 
 export function generateMockData(config: unknown): GenerateMockDataResult {
@@ -37,9 +59,9 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
   const dataStore = new DataStore();
   const queryEngine = new QueryEngine(dataStore);
 
-  // Setup generation context
-  const seed = validConfig.seed || Date.now();
-  const faker = createFaker(seed);
+  // Setup generation context with global seed
+  const globalSeed = validConfig.globalDefaults?.seed || Date.now();
+  const faker = createFaker(globalSeed);
   const idGenerator = new IdGenerator();
   const dateGenerator = new DateGenerator(faker);
 
@@ -48,7 +70,7 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
     faker,
     idGenerator,
     dateGenerator,
-    seed,
+    seed: globalSeed,
   };
 
   // Initialize generators
@@ -68,7 +90,7 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
   const issueLinkTypeGenerator = new IssueLinkTypeGenerator();
   const sprintGenerator = new SprintGenerator();
 
-  // Generate global metadata
+  // Generate global metadata (shared across all projects)
   const statusCategories = statusGenerator.generateStatusCategories(context);
   statusCategories.forEach((cat) => dataStore.addStatusCategory(cat));
 
@@ -88,8 +110,9 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
   const issueLinkTypes = issueLinkTypeGenerator.generateIssueLinkTypes(context);
   issueLinkTypes.forEach((linkType) => dataStore.addIssueLinkType(linkType));
 
-  // Generate users (10-20 users for all projects)
-  const userCount = faker.number.int({ min: 10, max: 20 });
+  // Aggregate user emails from all projects
+  const customAssignees = aggregateAssignees(validConfig);
+  const userCount = customAssignees.length > 0 ? customAssignees.length : faker.number.int({ min: 10, max: 20 });
   const users = userGenerator.generateUsers(userCount, context);
   users.forEach((user) => dataStore.addUser(user));
 
@@ -99,36 +122,51 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
   }
 
   // Generate projects and their issues
-  const projectCount = validConfig.projects.count;
-  const issuesPerProject = validConfig.projects.issuesPerProject;
+  for (let projectIndex = 0; projectIndex < validConfig.projects.length; projectIndex++) {
+    const projectConfig = validConfig.projects[projectIndex];
 
-  for (let projectIndex = 0; projectIndex < projectCount; projectIndex++) {
+    // Merge project config with global defaults
+    const mergedProjectConfig = mergeProjectWithDefaults(
+      projectConfig,
+      validConfig.globalDefaults
+    );
+
+    // Create project-specific context
+    const projectSeed = mergedProjectConfig.seed || globalSeed;
+    const projectFaker = createFaker(projectSeed);
+    const projectContext: GenerationContext = {
+      ...context,
+      faker: projectFaker,
+      seed: projectSeed,
+      currentProject: mergedProjectConfig,
+      projectIndex,
+    };
+
     // Generate project
-    const project = projectGenerator.generateProject(projectIndex, users, context);
+    const project = projectGenerator.generateProject(projectConfig, users, projectContext);
     dataStore.addProject(project);
 
     // Generate components for this project
-    const components = componentGenerator.generateComponents(project, users, context);
+    const components = componentGenerator.generateComponents(project, users, projectContext);
     components.forEach((component) => dataStore.addComponent(component));
 
     // Generate versions for this project
-    const versions = versionGenerator.generateVersions(project, context);
+    const versions = versionGenerator.generateVersions(project, projectContext);
     versions.forEach((version) => dataStore.addVersion(version));
 
     // Generate sprints for this project based on configured date range
-    const mergedConfig = mergeWithDefaults(validConfig);
-    const startDate = mergedConfig.general?.startDate
-      ? new Date(mergedConfig.general.startDate)
+    const startDate = mergedProjectConfig.startDate
+      ? new Date(mergedProjectConfig.startDate)
       : new Date(Date.now() - 180 * 24 * 60 * 60 * 1000);
-    const endDate = mergedConfig.general?.endDate
-      ? new Date(mergedConfig.general.endDate)
+    const endDate = mergedProjectConfig.endDate
+      ? new Date(mergedProjectConfig.endDate)
       : new Date();
 
-    const sprints = sprintGenerator.generateSprints(startDate, endDate, context);
+    const sprints = sprintGenerator.generateSprints(startDate, endDate, projectContext);
 
     // Generate issues for this project
     const issueContext: IssueContext = {
-      ...context,
+      ...projectContext,
       project,
       projectIndex,
       issueIndex: 0,
@@ -141,7 +179,7 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
 
     const issues = issueGenerator.generateIssues(
       project,
-      issuesPerProject,
+      projectConfig.issueCount,
       users,
       issueTypes,
       priorities,
@@ -155,15 +193,15 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
       dataStore.addIssue(issue);
 
       // Generate worklogs for this issue
-      const worklogs = worklogGenerator.generateWorklogs(issue, users, context);
+      const worklogs = worklogGenerator.generateWorklogs(issue, users, projectContext);
       worklogs.forEach((worklog) => dataStore.addWorklog(worklog));
 
       // Generate comments for this issue
-      const comments = commentGenerator.generateComments(issue, users, context);
+      const comments = commentGenerator.generateComments(issue, users, projectContext);
       comments.forEach((comment) => dataStore.addComment(comment, issue.key));
 
       // Generate attachments for this issue
-      const attachments = attachmentGenerator.generateAttachments(issue, users, context);
+      const attachments = attachmentGenerator.generateAttachments(issue, users, projectContext);
       attachments.forEach((attachment) => dataStore.addAttachment(attachment, issue.key));
     });
   }
@@ -190,7 +228,8 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
 export type {
   JiraMockConfig,
   ProjectType,
-  GeneralConfig,
+  ProjectConfig,
+  ProjectConfigWithKey,
   StatusDistribution,
   ChildDistribution,
   EpicConfig,
@@ -215,13 +254,15 @@ export type { ConfigWarning, ValidationResult } from './config/validator.js';
 
 export {
   DEFAULT_CONFIG,
-  DEFAULT_GENERAL_CONFIG,
+  DEFAULT_PROJECT_CONFIG,
   DEFAULT_STATUS_DISTRIBUTION,
   DEFAULT_ISSUE_TYPES_CONFIG,
   DEFAULT_SPRINTS_CONFIG,
   DEFAULT_VERSIONS_CONFIG,
   DEFAULT_WORKLOGS_CONFIG,
   DEFAULT_DATA_CONFIG,
+  getBuiltInDefaults,
+  mergeProjectWithDefaults,
   mergeWithDefaults,
   getConfigValue,
 } from './config/defaults.js';

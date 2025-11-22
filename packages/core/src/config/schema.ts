@@ -6,18 +6,6 @@ import { z } from 'zod';
 export const ProjectTypeSchema = z.enum(['company-managed', 'team-managed']);
 
 /**
- * General configuration schema
- */
-export const GeneralConfigSchema = z.object({
-  projectKey: z.string().min(1).max(10).optional(),
-  projectType: ProjectTypeSchema.optional(),
-  startIssueNumber: z.number().int().min(1).max(999999).optional(),
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional(),
-  chunkSize: z.number().int().min(0).max(10000).optional(),
-}).optional();
-
-/**
  * Status distribution schema
  */
 export const StatusDistributionSchema = z.object({
@@ -104,41 +92,69 @@ export const DataConfigSchema = z.object({
 }).optional();
 
 /**
- * Main Jira Mock configuration schema
+ * Project-specific configuration schema
  */
-export const JiraMockConfigSchema = z.object({
-  version: z.literal('1.0'),
+export const ProjectConfigSchema = z.object({
   seed: z.number().int().optional(),
-  general: GeneralConfigSchema,
   statusDistribution: StatusDistributionSchema,
   issueTypes: IssueTypesConfigSchema,
   sprints: SprintsConfigSchema,
   versions: VersionsConfigSchema,
   worklogs: WorklogsConfigSchema,
   data: DataConfigSchema,
-  projects: z.object({
-    count: z.number().int().min(1).max(100),
-    issuesPerProject: z.number().int().min(1).max(10000),
-  }),
+  startIssueNumber: z.number().int().min(1).max(999999).optional(),
+  startDate: z.string().datetime().optional(),
+  endDate: z.string().datetime().optional(),
+}).optional();
+
+/**
+ * Project configuration with key schema
+ */
+export const ProjectConfigWithKeySchema = z.object({
+  projectKey: z
+    .string()
+    .min(1, 'Project key is required')
+    .max(10, 'Project key must be 10 characters or less')
+    .regex(
+      /^[A-Z][A-Z0-9]*$/,
+      'Project key must start with a letter and contain only uppercase letters and numbers'
+    ),
+  projectName: z.string().optional(),
+  projectType: ProjectTypeSchema.optional(),
+  issueCount: z
+    .number()
+    .int('Issue count must be an integer')
+    .min(1, 'Issue count must be at least 1')
+    .max(10000, 'Issue count must be at most 10000'),
+  seed: z.number().int().optional(),
+  statusDistribution: StatusDistributionSchema,
+  issueTypes: IssueTypesConfigSchema,
+  sprints: SprintsConfigSchema,
+  versions: VersionsConfigSchema,
+  worklogs: WorklogsConfigSchema,
+  data: DataConfigSchema,
+  startIssueNumber: z.number().int().min(1).max(999999).optional(),
+  startDate: z.string().datetime().optional(),
+  endDate: z.string().datetime().optional(),
 }).refine(
-  (config) => {
+  (project) => {
     // Validate date range if both dates are provided
-    if (config.general?.startDate && config.general?.endDate) {
-      const startDate = new Date(config.general.startDate);
-      const endDate = new Date(config.general.endDate);
+    if (project.startDate && project.endDate) {
+      const startDate = new Date(project.startDate);
+      const endDate = new Date(project.endDate);
       return startDate < endDate;
     }
     return true;
   },
   {
     message: 'startDate must be before endDate',
-    path: ['general', 'startDate'],
+    path: ['startDate'],
   }
 ).refine(
-  (config) => {
+  (project) => {
     // Validate worklog hours range
-    if (config.worklogs?.hoursMin !== undefined && config.worklogs?.hoursMax !== undefined) {
-      return config.worklogs.hoursMin <= config.worklogs.hoursMax;
+    if (project.worklogs?.hoursMin !== undefined && project.worklogs?.hoursMax !== undefined) {
+      return project.worklogs.hoursMin <= project.worklogs.hoursMax;
     }
     return true;
   },
@@ -147,10 +163,10 @@ export const JiraMockConfigSchema = z.object({
     path: ['worklogs', 'hoursMin'],
   }
 ).refine(
-  (config) => {
+  (project) => {
     // Validate worklog count range
-    if (config.worklogs?.countMin !== undefined && config.worklogs?.countMax !== undefined) {
-      return config.worklogs.countMin <= config.worklogs.countMax;
+    if (project.worklogs?.countMin !== undefined && project.worklogs?.countMax !== undefined) {
+      return project.worklogs.countMin <= project.worklogs.countMax;
     }
     return true;
   },
@@ -159,6 +175,24 @@ export const JiraMockConfigSchema = z.object({
     path: ['worklogs', 'countMin'],
   }
 );
+
+/**
+ * Main Jira Mock configuration schema with per-project support
+ */
+export const JiraMockConfigSchema = z.object({
+  version: z.literal('1.0'),
+  globalDefaults: ProjectConfigSchema,
+  projects: z
+    .array(ProjectConfigWithKeySchema)
+    .min(1, 'At least one project is required')
+    .refine(
+      (projects) => {
+        const keys = projects.map((p) => p.projectKey);
+        return keys.length === new Set(keys).size;
+      },
+      { message: 'Project keys must be unique' }
+    ),
+});
 
 export type JiraMockConfigInput = z.input<typeof JiraMockConfigSchema>;
 export type JiraMockConfigOutput = z.output<typeof JiraMockConfigSchema>;

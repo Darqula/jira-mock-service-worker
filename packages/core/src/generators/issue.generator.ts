@@ -11,7 +11,7 @@ import type {
 } from '../types/jira-schemas.js';
 import type { IssueContext } from '../types/generator.types.js';
 import { generateSelfUrls } from '../utils/response-builder.js';
-import { mergeWithDefaults } from '../config/defaults.js';
+import { getBuiltInDefaults } from '../config/defaults.js';
 import {
   shouldApply,
   weightedPick,
@@ -36,14 +36,15 @@ export class IssueGenerator {
     versions: Version[],
     context: IssueContext
   ): IssueBean[] {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const startIssueNumber = mergedConfig.general?.startIssueNumber || 1;
+    // Use merged project config from context, or fall back to defaults
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const startIssueNumber = projectConfig.startIssueNumber || 1;
     const issues: IssueBean[] = [];
 
     // Check if we should use epic-based generation
     const useEpics =
-      mergedConfig.issueTypes?.epic &&
-      (mergedConfig.issueTypes.epic.count || 0) > 0;
+      projectConfig.issueTypes?.epic &&
+      (projectConfig.issueTypes.epic.count || 0) > 0;
 
     if (useEpics) {
       // Generate with epics
@@ -109,8 +110,8 @@ export class IssueGenerator {
     context: IssueContext,
     startIssueNumber: number
   ): IssueBean[] {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const epicConfig = mergedConfig.issueTypes!.epic!;
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const epicConfig = projectConfig.issueTypes!.epic!;
     const epicCount = epicConfig.count || 0;
     const childrenPerEpic = epicConfig.childrenPerEpic || 0;
 
@@ -173,8 +174,8 @@ export class IssueGenerator {
     versions: Version[],
     context: IssueContext
   ): IssueBean {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const epicConfig = mergedConfig.issueTypes!.epic!;
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const epicConfig = projectConfig.issueTypes!.epic!;
 
     const id = context.idGenerator.next('issue');
     const key = context.idGenerator.issueKey(project.key, issueNumber);
@@ -216,7 +217,7 @@ export class IssueGenerator {
       const sprint = this.sprintGenerator.getRandomSprint(
         context.sprints,
         context,
-        mergedConfig.sprints?.assignProbability || 0.7
+        projectConfig.sprints?.assignProbability || 0.7
       );
       if (sprint) {
         fields.sprint = {
@@ -251,8 +252,8 @@ export class IssueGenerator {
     context: IssueContext,
     startIndex: number
   ): IssueBean[] {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const epicConfig = mergedConfig.issueTypes!.epic!;
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const epicConfig = projectConfig.issueTypes!.epic!;
     const distribution = epicConfig.childDistribution || {};
     const childDistribution = normalizeDistribution({
       story: distribution.story || 0.5,
@@ -311,8 +312,8 @@ export class IssueGenerator {
     context: IssueContext,
     startIssueNumber: number
   ): void {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const issueTypesConfig = mergedConfig.issueTypes!;
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const issueTypesConfig = projectConfig.issueTypes!;
 
     const standaloneTypes = [
       { name: 'Story', config: issueTypesConfig.story },
@@ -433,8 +434,8 @@ export class IssueGenerator {
   }
 
   private generateLabels(context: IssueContext): string[] {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const labelOptions = mergedConfig.data?.labels || [
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const labelOptions = projectConfig.data?.labels || [
       'frontend',
       'backend',
       'api',
@@ -471,8 +472,8 @@ export class IssueGenerator {
   }
 
   private getRandomStatus(statuses: Status[], context: IssueContext): Status {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const distribution = mergedConfig.statusDistribution!;
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const distribution = projectConfig.statusDistribution!;
 
     // Categorize statuses by category key
     const todoStatuses = statuses.filter(
@@ -548,8 +549,8 @@ export class IssueGenerator {
       return [];
     }
 
-    const mergedConfig = mergeWithDefaults(context.config);
-    const versionConfig = mergedConfig.versions!;
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const versionConfig = projectConfig.versions!;
 
     // Check if we should assign a version based on probability
     if (!shouldApply(context.faker, versionConfig.assignProbability!)) {
@@ -580,8 +581,8 @@ export class IssueGenerator {
     versions: Version[],
     context: IssueContext
   ): IssueBean {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const typeConfig = this.getIssueTypeConfig(issueType.name, mergedConfig);
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const typeConfig = this.getIssueTypeConfig(issueType.name, projectConfig);
 
     const id = context.idGenerator.next('issue');
     const key = context.idGenerator.issueKey(project.key, issueNumber);
@@ -623,7 +624,7 @@ export class IssueGenerator {
       const sprint = this.sprintGenerator.getRandomSprint(
         context.sprints,
         context,
-        mergedConfig.sprints?.assignProbability || 0.7
+        projectConfig.sprints?.assignProbability || 0.7
       );
       if (sprint) {
         fields.sprint = {
@@ -635,7 +636,7 @@ export class IssueGenerator {
     }
 
     // Add parent relationship
-    if (mergedConfig.general?.projectType === 'team-managed') {
+    if ((projectConfig as any).projectType === 'team-managed') {
       // Team-managed projects use custom field
       fields.customFieldValues = fields.customFieldValues || [];
       fields.customFieldValues.push({
@@ -679,8 +680,8 @@ export class IssueGenerator {
     versions: Version[],
     context: IssueContext
   ): IssueBean {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const typeConfig = this.getIssueTypeConfig(issueType.name, mergedConfig);
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const typeConfig = this.getIssueTypeConfig(issueType.name, projectConfig);
 
     const id = context.idGenerator.next('issue');
     const key = context.idGenerator.issueKey(project.key, issueNumber);
@@ -722,7 +723,7 @@ export class IssueGenerator {
       const sprint = this.sprintGenerator.getRandomSprint(
         context.sprints,
         context,
-        mergedConfig.sprints?.assignProbability || 0.7
+        projectConfig.sprints?.assignProbability || 0.7
       );
       if (sprint) {
         fields.sprint = {
@@ -748,13 +749,13 @@ export class IssueGenerator {
     created: Date;
     updated: Date;
   } {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const startDate = mergedConfig.general?.startDate
-      ? new Date(mergedConfig.general.startDate)
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const startDate = projectConfig.startDate
+      ? new Date(projectConfig.startDate)
       : new Date(Date.now() - 180 * 24 * 60 * 60 * 1000);
 
-    const endDate = mergedConfig.general?.endDate
-      ? new Date(mergedConfig.general.endDate)
+    const endDate = projectConfig.endDate
+      ? new Date(projectConfig.endDate)
       : new Date();
 
     const created = context.dateGenerator.issueCreated(startDate, endDate);
@@ -796,12 +797,12 @@ export class IssueGenerator {
    */
   private getIssueTypeConfig(
     issueTypeName: string,
-    mergedConfig: ReturnType<typeof mergeWithDefaults>
+    projectConfig: any
   ): {
     assignProbability: number;
     labelProbability: number;
   } {
-    const issueTypesConfig = mergedConfig.issueTypes!;
+    const issueTypesConfig = projectConfig.issueTypes!;
     const normalizedName = issueTypeName.toLowerCase();
 
     switch (normalizedName) {

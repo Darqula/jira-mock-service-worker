@@ -1,7 +1,7 @@
 import type { Worklog, IssueBean, User } from '../types/jira-schemas.js';
 import type { GenerationContext } from '../types/generator.types.js';
 import { generateSelfUrls } from '../utils/response-builder.js';
-import { mergeWithDefaults } from '../config/defaults.js';
+import { getBuiltInDefaults } from '../config/defaults.js';
 import { shouldApply, randomInRange } from './utils/probability.js';
 
 export class WorklogGenerator {
@@ -10,8 +10,8 @@ export class WorklogGenerator {
     users: User[],
     context: GenerationContext
   ): Worklog[] {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const worklogConfig = mergedConfig.worklogs!;
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const worklogConfig = projectConfig.worklogs!;
 
     // Check if we should generate worklogs based on probability
     if (!shouldApply(context.faker, worklogConfig.probability!)) {
@@ -38,8 +38,8 @@ export class WorklogGenerator {
     users: User[],
     context: GenerationContext
   ): Worklog {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const worklogConfig = mergedConfig.worklogs!;
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const worklogConfig = projectConfig.worklogs!;
 
     const id = context.idGenerator.next('worklog');
     const author = users[context.faker.number.int({ min: 0, max: users.length - 1 })];

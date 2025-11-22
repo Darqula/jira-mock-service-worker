@@ -1,7 +1,7 @@
 import type { Faker } from '@faker-js/faker';
 import type { IdGenerator } from '../generators/base/id-generator.js';
 import type { DateGenerator } from '../generators/base/date-generator.js';
-import type { JiraMockConfig } from '../config/types.js';
+import type { JiraMockConfig, ProjectConfigWithKey } from '../config/types.js';
 import type {
   User,
   Project,
@@ -23,6 +23,9 @@ export interface GenerationContext {
   idGenerator: IdGenerator;
   dateGenerator: DateGenerator;
   seed: number;
+  currentProject?: ProjectConfigWithKey;
+  projectIndex?: number;
+  issueIndex?: number;
 }
 
 export interface ProjectContext extends GenerationContext {

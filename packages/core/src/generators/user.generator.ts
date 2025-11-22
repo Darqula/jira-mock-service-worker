@@ -1,12 +1,12 @@
 import type { User, AvatarUrls } from '../types/jira-schemas.js';
 import type { GenerationContext } from '../types/generator.types.js';
 import { generateSelfUrls } from '../utils/response-builder.js';
-import { mergeWithDefaults } from '../config/defaults.js';
+import { getBuiltInDefaults } from '../config/defaults.js';
 
 export class UserGenerator {
   generateUsers(count: number, context: GenerationContext): User[] {
-    const mergedConfig = mergeWithDefaults(context.config);
-    const customAssignees = mergedConfig.data?.assignees || [];
+    const projectConfig = context.currentProject || getBuiltInDefaults();
+    const customAssignees = projectConfig.data?.assignees || [];
     const users: User[] = [];
 
     // Generate custom assignee users first
