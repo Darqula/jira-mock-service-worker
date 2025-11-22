@@ -9,21 +9,24 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 interface SprintsSectionProps {
   config: JiraMockConfig;
   onChange: (config: JiraMockConfig) => void;
+  projectIndex: number;
 }
 
-export function SprintsSection({ config, onChange }: SprintsSectionProps) {
-  const sprints = config.globalDefaults?.sprints || {};
+export function SprintsSection({ config, onChange, projectIndex }: SprintsSectionProps) {
+  const sprints = config.projects[projectIndex]?.sprints || {};
 
   const updateSprints = (updates: Partial<typeof sprints>) => {
+    const newProjects = [...config.projects];
+    newProjects[projectIndex] = {
+      ...newProjects[projectIndex],
+      sprints: {
+        ...sprints,
+        ...updates,
+      },
+    };
     onChange({
       ...config,
-      globalDefaults: {
-        ...config.globalDefaults,
-        sprints: {
-          ...sprints,
-          ...updates,
-        },
-      },
+      projects: newProjects,
     });
   };
 

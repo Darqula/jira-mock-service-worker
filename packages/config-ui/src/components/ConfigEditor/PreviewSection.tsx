@@ -104,7 +104,6 @@ export function PreviewSection({ config }: PreviewSectionProps) {
             <li>• Issue types, priorities, statuses, and fields</li>
             <li>• Components and versions for each project</li>
             <li>• Worklogs for issues</li>
-            {config.globalDefaults?.seed && <li>• Reproducible data (seed: {config.globalDefaults.seed})</li>}
           </ul>
         </div>
       </CardContent>
