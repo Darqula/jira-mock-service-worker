@@ -7,8 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { ProjectsSection } from './ProjectsSection';
-import { GeneralSection } from './GeneralSection';
+import { ProjectsManager } from './ProjectsManager';
 import { StatusSection } from './StatusSection';
 import { IssueTypesSection } from './IssueTypesSection';
 import { SprintsSection } from './SprintsSection';
@@ -17,15 +16,17 @@ import { WorklogsSection } from './WorklogsSection';
 import { DataSection } from './DataSection';
 import { PreviewSection } from './PreviewSection';
 import { saveConfig, loadConfig, downloadConfig, uploadConfig } from '@/lib/config-manager';
-import { Download, Upload, Save, FileJson } from 'lucide-react';
+import { Download, Upload, Save, FileJson, Globe } from 'lucide-react';
 
 export function ConfigEditor() {
   const [config, setConfig] = useState<JiraMockConfig>({
     version: '1.0',
-    projects: {
-      count: 3,
-      issuesPerProject: 50,
-    },
+    projects: [
+      {
+        projectKey: 'PROJ',
+        issueCount: 50,
+      },
+    ],
   });
 
   const [errors, setErrors] = useState<string[]>([]);
@@ -138,51 +139,65 @@ export function ConfigEditor() {
         </CardContent>
       </Card>
 
-      {/* Legacy Projects Section */}
+      {/* Projects Manager */}
       <Card>
         <CardHeader>
-          <CardTitle>Legacy Project Configuration</CardTitle>
+          <CardTitle>Projects</CardTitle>
           <CardDescription>
-            Basic project and issue count settings (required for backward compatibility)
+            Configure individual projects with unique keys, issue counts, and project-specific settings
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ProjectsSection config={config} onChange={setConfig} />
+          <ProjectsManager config={config} onChange={setConfig} />
         </CardContent>
       </Card>
 
-      {/* Seed Input */}
+      {/* Global Defaults Header */}
+      <Card className="bg-muted/50 border-2 border-primary/20">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Globe className="h-5 w-5 text-primary" />
+            <CardTitle>Global Defaults</CardTitle>
+          </div>
+          <CardDescription>
+            These settings apply to all projects unless overridden at the project level.
+            Configure shared settings once and let individual projects inherit or customize them.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
+      {/* Global Seed */}
       <Card>
         <CardHeader>
-          <CardTitle>Random Seed</CardTitle>
+          <CardTitle>Global Random Seed</CardTitle>
           <CardDescription>
-            Optional seed for reproducible data generation
+            Optional seed for reproducible data generation across all projects
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <Label htmlFor="seed">Seed (optional)</Label>
+            <Label htmlFor="global-seed">Global Seed (optional)</Label>
             <Input
-              id="seed"
+              id="global-seed"
               type="number"
-              value={config.seed || ''}
+              value={config.globalDefaults?.seed || ''}
               onChange={(e) =>
                 setConfig({
                   ...config,
-                  seed: e.target.value ? parseInt(e.target.value) : undefined,
+                  globalDefaults: {
+                    ...config.globalDefaults,
+                    seed: e.target.value ? parseInt(e.target.value) : undefined,
+                  },
                 })
               }
               placeholder="Leave empty for random data"
             />
             <p className="text-xs text-muted-foreground">
-              Use the same seed to generate identical data across runs
+              Use the same seed to generate identical data across runs. Can be overridden per project.
             </p>
           </div>
         </CardContent>
       </Card>
-
-      {/* General Settings */}
-      <GeneralSection config={config} onChange={setConfig} />
 
       {/* Status Distribution */}
       <StatusSection config={config} onChange={setConfig} />

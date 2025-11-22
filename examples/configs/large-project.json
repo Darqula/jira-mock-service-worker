@@ -1,96 +1,96 @@
 {
   "version": "1.0",
-  "seed": 98765,
-  "general": {
-    "projectKey": "LARGE",
-    "startIssueNumber": 1000,
-    "startDate": "2023-01-01",
-    "endDate": "2024-12-31",
-    "projectType": "company-managed",
-    "chunkSize": 500
-  },
-  "statusDistribution": {
-    "toDo": 0.2,
-    "inProgress": 0.3,
-    "done": 0.5
-  },
-  "issueTypes": {
-    "epic": {
-      "count": 20,
-      "childrenPerEpic": 50,
-      "assignProbability": 0.95,
-      "labelProbability": 0.85,
-      "childDistribution": {
-        "story": 0.55,
-        "task": 0.30,
-        "bug": 0.15
+  "globalDefaults": {
+    "seed": 98765,
+    "startDate": "2023-01-01T00:00:00.000Z",
+    "endDate": "2024-12-31T23:59:59.999Z",
+    "statusDistribution": {
+      "toDo": 0.2,
+      "inProgress": 0.3,
+      "done": 0.5
+    },
+    "issueTypes": {
+      "epic": {
+        "count": 20,
+        "childrenPerEpic": 50,
+        "assignProbability": 0.95,
+        "labelProbability": 0.85,
+        "childDistribution": {
+          "story": 0.55,
+          "task": 0.30,
+          "bug": 0.15
+        }
+      },
+      "story": {
+        "standaloneCount": 100,
+        "assignProbability": 0.85,
+        "labelProbability": 0.7
+      },
+      "task": {
+        "standaloneCount": 50,
+        "assignProbability": 0.8,
+        "labelProbability": 0.65
+      },
+      "bug": {
+        "standaloneCount": 30,
+        "assignProbability": 0.95,
+        "labelProbability": 0.9
       }
     },
-    "story": {
-      "standaloneCount": 100,
-      "assignProbability": 0.85,
-      "labelProbability": 0.7
+    "sprints": {
+      "startNumber": 1,
+      "duration": 14,
+      "assignProbability": 0.75
     },
-    "task": {
-      "standaloneCount": 50,
-      "assignProbability": 0.8,
-      "labelProbability": 0.65
+    "versions": {
+      "startNumber": 1,
+      "count": 12,
+      "assignProbability": 0.6
     },
-    "bug": {
-      "standaloneCount": 30,
-      "assignProbability": 0.95,
-      "labelProbability": 0.9
+    "worklogs": {
+      "probability": 0.8,
+      "hoursMin": 0.5,
+      "hoursMax": 8,
+      "countMin": 1,
+      "countMax": 15
+    },
+    "data": {
+      "assignees": [
+        "alice.smith@company.com",
+        "bob.johnson@company.com",
+        "carol.williams@company.com",
+        "david.brown@company.com",
+        "eve.davis@company.com",
+        "frank.miller@company.com",
+        "grace.wilson@company.com",
+        "henry.moore@company.com"
+      ],
+      "priorities": ["Highest", "High", "Medium", "Low", "Lowest"],
+      "labels": [
+        "frontend",
+        "backend",
+        "api",
+        "database",
+        "security",
+        "performance",
+        "bug",
+        "enhancement",
+        "feature",
+        "refactoring",
+        "documentation",
+        "testing",
+        "infrastructure",
+        "ui",
+        "ux"
+      ]
     }
   },
-  "sprints": {
-    "startNumber": 1,
-    "duration": 14,
-    "assignProbability": 0.75
-  },
-  "versions": {
-    "startNumber": 1,
-    "count": 12,
-    "assignProbability": 0.6
-  },
-  "worklogs": {
-    "probability": 0.8,
-    "hoursMin": 0.5,
-    "hoursMax": 8,
-    "countMin": 1,
-    "countMax": 15
-  },
-  "data": {
-    "assignees": [
-      "alice.smith@company.com",
-      "bob.johnson@company.com",
-      "carol.williams@company.com",
-      "david.brown@company.com",
-      "eve.davis@company.com",
-      "frank.miller@company.com",
-      "grace.wilson@company.com",
-      "henry.moore@company.com"
-    ],
-    "priorities": ["Highest", "High", "Medium", "Low", "Lowest"],
-    "labels": [
-      "frontend",
-      "backend",
-      "api",
-      "database",
-      "security",
-      "performance",
-      "bug",
-      "enhancement",
-      "feature",
-      "refactoring",
-      "documentation",
-      "testing",
-      "infrastructure",
-      "ui",
-      "ux"
-    ]
-  },
-  "projects": {
-    "count": 1,
-    "issuesPerProject": 1500
-  }
+  "projects": [
+    {
+      "projectKey": "LARGE",
+      "projectType": "company-managed",
+      "issueCount": 1500,
+      "startIssueNumber": 1000
+    }
+  ]
 }

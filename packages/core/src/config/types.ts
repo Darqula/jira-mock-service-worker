@@ -140,15 +140,12 @@ export interface DataConfig {
 }
 
 /**
- * Main Jira Mock configuration interface
+ * Project-specific configuration
+ * Contains all configuration fields that can be applied per-project
  */
-export interface JiraMockConfig {
-  /** Configuration version */
-  version: '1.0';
+export interface ProjectConfig {
   /** Random seed for reproducibility */
   seed?: number;
-  /** General settings */
-  general?: GeneralConfig;
   /** Status distribution */
   statusDistribution?: StatusDistribution;
   /** Issue types configuration */
@@ -161,18 +158,52 @@ export interface JiraMockConfig {
   worklogs?: WorklogsConfig;
   /** Data options */
   data?: DataConfig;
-  /** Legacy project configuration (required) */
-  projects: {
-    /** Number of projects to generate (1-100) */
-    count: number;
-    /** Number of issues per project (1-10000) */
-    issuesPerProject: number;
-  };
+  /** Starting issue number. Default: 1 */
+  startIssueNumber?: number;
+  /** Start date for issue generation (ISO 8601). Default: 6 months ago */
+  startDate?: string;
+  /** End date for issue generation (ISO 8601). Default: today */
+  endDate?: string;
 }
 
+/**
+ * Project configuration with required project-specific fields
+ */
+export interface ProjectConfigWithKey extends ProjectConfig {
+  /** Project key (e.g., "PROJ", "DEMO") - Required and must be unique */
+  projectKey: string;
+  /** Project name - Optional display name */
+  projectName?: string;
+  /** Project type. Default: "company-managed" */
+  projectType?: ProjectType;
+  /** Number of issues to generate for this project (1-10000) - Required */
+  issueCount: number;
+}
+
+/**
+ * Main Jira Mock configuration interface with per-project support
+ */
+export interface JiraMockConfig {
+  /** Configuration version */
+  version: '1.0';
+  /** Global defaults inherited by all projects (optional) */
+  globalDefaults?: ProjectConfig;
+  /** Array of project-specific configurations (required, min 1 item) */
+  projects: ProjectConfigWithKey[];
+}
+
+/**
+ * Context for data generation
+ */
 export interface GenerationContext {
+  /** The full configuration */
   config: JiraMockConfig;
+  /** Random seed for reproducibility */
   seed: number;
+  /** Current project being generated (optional) */
+  currentProject?: ProjectConfigWithKey;
+  /** Project index (for backward compatibility) */
   projectIndex?: number;
+  /** Issue index (for backward compatibility) */
   issueIndex?: number;
 }

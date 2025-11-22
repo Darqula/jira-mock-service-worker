@@ -8,21 +8,31 @@ try {
   // In browser, we'll fetch the config
   config = {
     version: '1.0',
-    seed: 42,
-    projects: {
-      count: 5,
-      issuesPerProject: 20,
+    globalDefaults: {
+      seed: 42,
     },
+    projects: [
+      {
+        projectKey: 'DEMO',
+        projectName: 'Demo Project',
+        issueCount: 100,
+      },
+    ],
   };
 } catch (error) {
   console.error('Failed to load config, using defaults:', error);
   config = {
     version: '1.0',
-    seed: 42,
-    projects: {
-      count: 5,
-      issuesPerProject: 20,
+    globalDefaults: {
+      seed: 42,
     },
+    projects: [
+      {
+        projectKey: 'DEMO',
+        projectName: 'Demo Project',
+        issueCount: 100,
+      },
+    ],
   };
 }
 

@@ -10,7 +10,7 @@ export function createGenerationContext(seed?: number): GenerationContext {
   }
 
   return {
-    config: { version: '1.0', projects: { count: 1, issuesPerProject: 1 } },
+    config: { version: '1.0', projects: [{ projectKey: 'TEST', issueCount: 1 }] },
     faker,
     idGenerator: new IdGenerator(),
     dateGenerator: new DateGenerator(faker),
