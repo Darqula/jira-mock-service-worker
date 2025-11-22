@@ -80,15 +80,11 @@ Currently, the system uses a **single monolithic configuration** that applies to
 
 **Key Features:**
 - `globalDefaults`: Optional default settings inherited by all projects
-- `projects`: Array of project-specific configurations (instead of object with count/issuesPerProject)
+- `projects`: Array of project-specific configurations (replaces object with count/issuesPerProject)
 - Each project can override any setting from globalDefaults
 - Each project has its own `issueCount` instead of global `issuesPerProject`
 - Each project must specify `projectKey` (required, unique identifier)
-
-**Format Detection:**
-- Legacy format: `projects` is an object with `{ count, issuesPerProject }`
-- New format: `projects` is an array of project configurations
-- Both formats use `version: "1.0"` - no version increment needed
+- **Breaking Change**: Old configuration format is no longer supported
 
 ## Architecture Changes
 
@@ -117,34 +113,11 @@ interface ProjectConfigWithKey extends ProjectConfig {
   issueCount: number;           // Required, 1-10000
 }
 
-// Legacy format (object with count)
-interface LegacyProjectsConfig {
-  count: number;
-  issuesPerProject: number;
-}
-
-// New format (array of projects)
-type ProjectsArrayConfig = ProjectConfigWithKey[];
-
-// Main config interface - supports both formats
+// Main config interface
 interface JiraMockConfig {
   version: '1.0';
-  globalDefaults?: ProjectConfig;  // Optional defaults (only used with array format)
-  projects: LegacyProjectsConfig | ProjectsArrayConfig; // Can be object or array
-  // ... other fields for backward compatibility
-  seed?: number;
-  general?: GeneralConfig;
-  statusDistribution?: StatusDistribution;
-  issueTypes?: IssueTypesConfig;
-  sprints?: SprintsConfig;
-  versions?: VersionsConfig;
-  worklogs?: WorklogsConfig;
-  data?: DataConfig;
-}
-
-// Type guard to detect format
-function isProjectArray(projects: unknown): projects is ProjectsArrayConfig {
-  return Array.isArray(projects);
+  globalDefaults?: ProjectConfig;  // Optional defaults inherited by all projects
+  projects: ProjectConfigWithKey[]; // Array of project configs (required, min 1 item)
 }
 ```
 
@@ -174,47 +147,20 @@ const projectConfigWithKeySchema = projectConfigSchema.extend({
     .max(10000, 'Issue count must be at most 10000'),
 });
 
-// Legacy format schema (object with count)
-const legacyProjectsSchema = z.object({
-  count: z.number().int().min(1).max(100),
-  issuesPerProject: z.number().int().min(1).max(10000),
-});
-
-// New format schema (array of projects)
-const projectsArraySchema = z.array(projectConfigWithKeySchema)
-  .min(1, 'At least one project is required')
-  .refine(
-    (projects) => {
-      const keys = projects.map(p => p.projectKey);
-      return keys.length === new Set(keys).size;
-    },
-    { message: 'Project keys must be unique' }
-  );
-
-// Main config schema - supports both formats
+// Main config schema
 const configSchema = z.object({
   version: z.literal('1.0'),
   globalDefaults: projectConfigSchema.optional(),
-  projects: z.union([legacyProjectsSchema, projectsArraySchema]),
-  // Legacy fields (for backward compatibility with object format)
-  seed: z.number().optional(),
-  general: generalConfigSchema.optional(),
-  statusDistribution: statusDistributionSchema.optional(),
-  issueTypes: issueTypesConfigSchema.optional(),
-  sprints: sprintsConfigSchema.optional(),
-  versions: versionsConfigSchema.optional(),
-  worklogs: worklogsConfigSchema.optional(),
-  data: dataConfigSchema.optional(),
-}).refine(
-  (config) => {
-    // If using array format, legacy fields should not be present (or should be in globalDefaults)
-    if (Array.isArray(config.projects)) {
-      return true; // Additional validation can be added here
-    }
-    return true;
-  },
-  { message: 'Invalid configuration format' }
-);
+  projects: z.array(projectConfigWithKeySchema)
+    .min(1, 'At least one project is required')
+    .refine(
+      (projects) => {
+        const keys = projects.map(p => p.projectKey);
+        return keys.length === new Set(keys).size;
+      },
+      { message: 'Project keys must be unique' }
+    ),
+});
 ```
 
 **New Default Merging** (`src/config/defaults.ts`):
@@ -250,63 +196,42 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
   const dataStore = new DataStore();
   const queryEngine = new QueryEngine(dataStore);
 
-  // 3. Detect format and generate accordingly
-  if (Array.isArray(validConfig.projects)) {
-    // New array format - per-project configuration
-    generateWithProjectArray(validConfig, dataStore, queryEngine);
-  } else {
-    // Legacy object format - global configuration
-    generateWithLegacyFormat(validConfig, dataStore, queryEngine);
-  }
-
-  return { dataStore, queryEngine };
-}
-
-function generateWithProjectArray(
-  config: JiraMockConfig,
-  dataStore: DataStore,
-  queryEngine: QueryEngine
-) {
-  // 1. Generate global metadata (statuses, priorities, issue types)
+  // 3. Generate global metadata (statuses, priorities, issue types)
   //    These are still global as they're shared across Jira instance
+  generateGlobalMetadata(dataStore);
 
-  // 2. Generate users (aggregate from all projects' data.assignees)
-  const allAssignees = aggregateAssignees(config);
+  // 4. Generate users (aggregate from all projects' data.assignees)
+  const allAssignees = aggregateAssignees(validConfig);
+  const users = generateUsers(allAssignees, dataStore);
 
-  // 3. For each project:
-  for (const projectConfig of config.projects as ProjectsArrayConfig) {
+  // 5. For each project:
+  for (const projectConfig of validConfig.projects) {
     // Merge with global defaults
     const mergedConfig = mergeProjectWithDefaults(
       projectConfig,
-      config.globalDefaults
+      validConfig.globalDefaults
     );
 
     // Create generation context for this project
-    const context = createProjectContext(mergedConfig);
+    const context = createProjectContext(mergedConfig, users);
 
     // Generate project
-    const project = generateProject(projectConfig, context);
+    const project = generateProject(projectConfig, context, dataStore);
 
     // Generate components, versions, sprints for this project
-    generateProjectMetadata(project, context);
+    generateProjectMetadata(project, mergedConfig, context, dataStore);
 
     // Generate issues for this project
-    generateIssuesForProject(project, projectConfig.issueCount, context);
+    generateIssuesForProject(project, projectConfig.issueCount, mergedConfig, context, dataStore);
 
     // Generate worklogs, comments, attachments for this project's issues
-    generateIssueMetadata(project, context);
+    generateIssueMetadata(project, mergedConfig, context, dataStore);
   }
 
-  // 4. Generate cross-project issue links (if needed)
-}
+  // 6. Generate cross-project issue links (if needed)
+  // generateCrossProjectLinks(dataStore);
 
-function generateWithLegacyFormat(
-  config: JiraMockConfig,
-  dataStore: DataStore,
-  queryEngine: QueryEngine
-) {
-  // Existing generation logic for legacy format
-  // (current implementation remains unchanged)
+  return { dataStore, queryEngine };
 }
 ```
 
@@ -530,27 +455,6 @@ export function loadConfig(): JiraMockConfig | null {
   return null;
 }
 
-// Migration helper - convert legacy object format to array format
-export function migrateLegacyToArray(legacyConfig: JiraMockConfig): JiraMockConfig {
-  // Check if already in array format
-  if (Array.isArray(legacyConfig.projects)) {
-    return legacyConfig;
-  }
-
-  const { projects, ...restConfig } = legacyConfig;
-  const legacyProjects = projects as LegacyProjectsConfig;
-
-  return {
-    version: '1.0',
-    globalDefaults: restConfig,
-    projects: Array.from({ length: legacyProjects.count }, (_, i) => ({
-      projectKey: `PROJ${i + 1}`,
-      projectName: `Project ${i + 1}`,
-      issueCount: legacyProjects.issuesPerProject,
-      // Projects inherit from globalDefaults
-    })),
-  };
-}
 ```
 
 ### 3. MSW-Integration Package (`packages/msw-integration`)
@@ -564,7 +468,7 @@ The MSW integration package mostly just passes the config to the core package, s
 export function setupJiraMock(options: SetupJiraMockOptions): SetupJiraMockResult {
   const { config, baseUrl = 'https://your-domain.atlassian.net' } = options;
 
-  // Core package handles both legacy and array format configs
+  // Core package handles the new per-project config format
   const { dataStore, queryEngine } = generateMockData(config);
 
   const handlers = createHandlers(dataStore, queryEngine, baseUrl);
@@ -580,7 +484,7 @@ export function setupJiraMock(options: SetupJiraMockOptions): SetupJiraMockResul
 import type { JiraMockConfig } from '@jira-mock/core';
 
 export interface SetupJiraMockOptions {
-  config: JiraMockConfig;  // Supports both legacy object and array formats
+  config: JiraMockConfig;  // Per-project configuration
   baseUrl?: string;
 }
 ```
@@ -591,15 +495,13 @@ export interface SetupJiraMockOptions {
 
 ```
 examples/configs/
-├── array-format/
-│   ├── multi-project.json          # Multiple projects with different configs
-│   ├── inheritance-demo.json       # Demonstrates global defaults + overrides
-│   ├── minimal-array.json          # Minimal array format config
-│   └── realistic-workspace.json    # Realistic multi-project workspace
-└── (keep existing legacy configs for backward compatibility)
+├── multi-project.json          # Multiple projects with different configs
+├── inheritance-demo.json       # Demonstrates global defaults + overrides
+├── minimal.json                # Minimal config (1 project, no defaults)
+└── realistic-workspace.json    # Realistic multi-project workspace
 ```
 
-**Example: Multi-Project Config** (`examples/configs/array-format/multi-project.json`):
+**Example: Multi-Project Config** (`examples/configs/multi-project.json`):
 
 ```json
 {
@@ -698,38 +600,56 @@ expect(test2Issues).toHaveLength(5);
 expect(test2Issues.every(issue => issue.fields.status.name === 'Done')).toBe(true);
 ```
 
-## Migration Strategy
+## Migration from Old Configuration
 
-### Backward Compatibility
+**Breaking Change Notice:**
 
-**Support Both Formats:**
-- Core package validates and handles both legacy object and array formats
-- Legacy configs continue to work without changes
-- Config UI can import legacy configs and migrate them to array format
-- Both formats use `version: "1.0"` - no version increment
+This is a **breaking change** from the previous configuration format. Users will need to update their configurations.
 
-**Migration Path:**
+**Old Format (No Longer Supported):**
+```json
+{
+  "version": "1.0",
+  "seed": 12345,
+  "statusDistribution": { ... },
+  "projects": {
+    "count": 3,
+    "issuesPerProject": 10
+  }
+}
+```
 
-1. **Automatic Migration:**
-   - Config UI detects legacy format (object with count/issuesPerProject)
-   - Offers to migrate to array format
-   - Shows preview of migrated config
+**New Format (Required):**
+```json
+{
+  "version": "1.0",
+  "globalDefaults": {
+    "seed": 12345,
+    "statusDistribution": { ... }
+  },
+  "projects": [
+    {
+      "projectKey": "PROJ1",
+      "issueCount": 10
+    },
+    {
+      "projectKey": "PROJ2",
+      "issueCount": 10
+    },
+    {
+      "projectKey": "PROJ3",
+      "issueCount": 10
+    }
+  ]
+}
+```
 
-2. **Manual Migration:**
-   - Users can continue using legacy format indefinitely
-   - Documentation shows migration examples
-   - Migration helper function available in core package
+**Migration Steps:**
 
-3. **Format Detection:**
-   - `Array.isArray(config.projects)` determines format
-   - No version bump needed
-   - Seamless backward compatibility
-
-### Deprecation Timeline
-
-- **Phase 1 (Current):** Support both legacy object and array formats
-- **Phase 2 (6 months):** Mark legacy object format as deprecated in docs
-- **Phase 3 (12+ months):** Consider removing legacy format support in next major version
+1. Move global config fields to `globalDefaults` object
+2. Replace `projects: { count, issuesPerProject }` with `projects: []` array
+3. Create one object per project with unique `projectKey` and `issueCount`
+4. Test the new configuration
 
 ## Benefits of New Approach
 
