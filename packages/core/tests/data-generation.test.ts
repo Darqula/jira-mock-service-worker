@@ -7,8 +7,14 @@ describe('Data Generation', () => {
     const config: JiraMockConfig = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 10 },
-        { projectKey: 'PROJ2', issueCount: 10 },
+        {
+          projectKey: 'TEST1',
+          issueCount: 10,
+        },
+        {
+          projectKey: 'TEST2',
+          issueCount: 10,
+        },
       ],
     };
 
@@ -22,9 +28,18 @@ describe('Data Generation', () => {
     const config: JiraMockConfig = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 5 },
-        { projectKey: 'PROJ2', issueCount: 5 },
-        { projectKey: 'PROJ3', issueCount: 5 },
+        {
+          projectKey: 'TEST1',
+          issueCount: 5,
+        },
+        {
+          projectKey: 'TEST2',
+          issueCount: 5,
+        },
+        {
+          projectKey: 'TEST3',
+          issueCount: 5,
+        },
       ],
     };
 
@@ -37,15 +52,28 @@ describe('Data Generation', () => {
   it('should generate correct number of issues per project', () => {
     const config: JiraMockConfig = {
       version: '1.0',
+      globalDefaults: {
+        issueTypes: {
+          epic: {
+            count: 0, // Disable epic-based generation
+          },
+        },
+      },
       projects: [
-        { projectKey: 'PROJ1', issueCount: 15 },
-        { projectKey: 'PROJ2', issueCount: 15 },
+        {
+          projectKey: 'TEST1',
+          issueCount: 15,
+        },
+        {
+          projectKey: 'TEST2',
+          issueCount: 15,
+        },
       ],
     };
 
     const { dataStore } = generateMockData(config);
-    const proj1Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'PROJ1');
-    const proj2Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'PROJ2');
+    const proj1Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'TEST1');
+    const proj2Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'TEST2');
 
     // Each project should have the specified number of base issues (may have more due to epics/subtasks)
     expect(proj1Issues.length).toBeGreaterThanOrEqual(15);
@@ -56,7 +84,10 @@ describe('Data Generation', () => {
     const config: JiraMockConfig = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 5 },
+        {
+          projectKey: 'TEST',
+          issueCount: 5,
+        },
       ],
     };
 
@@ -70,7 +101,10 @@ describe('Data Generation', () => {
     const config: JiraMockConfig = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 5 },
+        {
+          projectKey: 'TEST',
+          issueCount: 5,
+        },
       ],
     };
 
@@ -86,7 +120,10 @@ describe('Data Generation', () => {
     const config: JiraMockConfig = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 5 },
+        {
+          projectKey: 'TEST',
+          issueCount: 5,
+        },
       ],
     };
 
@@ -100,11 +137,12 @@ describe('Data Generation', () => {
   it('should generate consistent data with same seed', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      globalDefaults: {
-        seed: 99999,
-      },
       projects: [
-        { projectKey: 'PROJ1', issueCount: 5 },
+        {
+          projectKey: 'TEST',
+          issueCount: 5,
+          seed: 99999,
+        },
       ],
     };
 
@@ -122,8 +160,14 @@ describe('Data Generation', () => {
     const config: JiraMockConfig = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 10 },
-        { projectKey: 'PROJ2', issueCount: 10 },
+        {
+          projectKey: 'TEST1',
+          issueCount: 10,
+        },
+        {
+          projectKey: 'TEST2',
+          issueCount: 10,
+        },
       ],
     };
 
@@ -146,7 +190,10 @@ describe('Data Generation', () => {
     const config: JiraMockConfig = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 10 },
+        {
+          projectKey: 'TEST',
+          issueCount: 10,
+        },
       ],
     };
 

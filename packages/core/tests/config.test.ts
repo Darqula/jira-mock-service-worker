@@ -7,11 +7,10 @@ describe('Config Validation', () => {
     const config: JiraMockConfig = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 100 },
-        { projectKey: 'PROJ2', issueCount: 100 },
-        { projectKey: 'PROJ3', issueCount: 100 },
-        { projectKey: 'PROJ4', issueCount: 100 },
-        { projectKey: 'PROJ5', issueCount: 100 },
+        {
+          projectKey: 'TEST',
+          issueCount: 100,
+        },
       ],
     };
 
@@ -22,11 +21,18 @@ describe('Config Validation', () => {
   it('should validate config with seed', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      seed: 12345,
+      globalDefaults: {
+        seed: 12345,
+      },
       projects: [
-        { projectKey: 'PROJ1', issueCount: 50 },
-        { projectKey: 'PROJ2', issueCount: 50 },
-        { projectKey: 'PROJ3', issueCount: 50 },
+        {
+          projectKey: 'TEST1',
+          issueCount: 50,
+        },
+        {
+          projectKey: 'TEST2',
+          issueCount: 50,
+        },
       ],
     };
 
@@ -38,7 +44,10 @@ describe('Config Validation', () => {
     const config = {
       version: '2.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 100 },
+        {
+          projectKey: 'TEST',
+          issueCount: 100,
+        },
       ],
     };
 
@@ -46,7 +55,7 @@ describe('Config Validation', () => {
     expect(isValidConfig(config)).toBe(false);
   });
 
-  it('should reject project count < 1', () => {
+  it('should reject empty projects array', () => {
     const config = {
       version: '1.0',
       projects: [],
@@ -60,8 +69,14 @@ describe('Config Validation', () => {
     const config = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 100 },
-        { projectKey: 'PROJ1', issueCount: 50 }, // Duplicate key
+        {
+          projectKey: 'TEST',
+          issueCount: 100,
+        },
+        {
+          projectKey: 'TEST',
+          issueCount: 50,
+        },
       ],
     };
 
@@ -69,11 +84,14 @@ describe('Config Validation', () => {
     expect(isValidConfig(config)).toBe(false);
   });
 
-  it('should reject issues per project < 1', () => {
+  it('should reject issue count < 1', () => {
     const config = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 0 },
+        {
+          projectKey: 'TEST',
+          issueCount: 0,
+        },
       ],
     };
 
@@ -81,11 +99,14 @@ describe('Config Validation', () => {
     expect(isValidConfig(config)).toBe(false);
   });
 
-  it('should reject issues per project > 10000', () => {
+  it('should reject issue count > 10000', () => {
     const config = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 10001 },
+        {
+          projectKey: 'TEST',
+          issueCount: 10001,
+        },
       ],
     };
 
@@ -97,7 +118,10 @@ describe('Config Validation', () => {
     const config = {
       version: '1.0',
       projects: [
-        { projectKey: 'PROJ1', issueCount: 0 },
+        {
+          projectKey: 'TEST',
+          issueCount: 0,
+        },
       ],
     };
 
