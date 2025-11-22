@@ -1,28 +1,30 @@
 {
   "version": "1.0",
-  "globalDefaults": {
-    "seed": 42
-  },
   "projects": [
     {
       "projectKey": "PROJ1",
-      "issueCount": 20
+      "issueCount": 20,
+      "seed": 42
     },
     {
       "projectKey": "PROJ2",
-      "issueCount": 20
+      "issueCount": 20,
+      "seed": 42
     },
     {
       "projectKey": "PROJ3",
-      "issueCount": 20
+      "issueCount": 20,
+      "seed": 42
     },
     {
       "projectKey": "PROJ4",
-      "issueCount": 20
+      "issueCount": 20,
+      "seed": 42
     },
     {
       "projectKey": "PROJ5",
-      "issueCount": 20
+      "issueCount": 20,
+      "seed": 42
     }
   ]
 }

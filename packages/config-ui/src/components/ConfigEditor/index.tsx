@@ -5,18 +5,10 @@ import type { JiraMockConfig } from '@jira-mock/core';
 import { validateConfig, getConfigErrors } from '@jira-mock/core';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { ProjectsManager } from './ProjectsManager';
-import { StatusSection } from './StatusSection';
-import { IssueTypesSection } from './IssueTypesSection';
-import { SprintsSection } from './SprintsSection';
-import { VersionsSection } from './VersionsSection';
-import { WorklogsSection } from './WorklogsSection';
-import { DataSection } from './DataSection';
 import { PreviewSection } from './PreviewSection';
 import { saveConfig, loadConfig, downloadConfig, uploadConfig } from '@/lib/config-manager';
-import { Download, Upload, Save, FileJson, Globe } from 'lucide-react';
+import { Download, Upload, Save, FileJson } from 'lucide-react';
 
 export function ConfigEditor() {
   const [config, setConfig] = useState<JiraMockConfig>({
@@ -144,78 +136,14 @@ export function ConfigEditor() {
         <CardHeader>
           <CardTitle>Projects</CardTitle>
           <CardDescription>
-            Configure individual projects with unique keys, issue counts, and project-specific settings
+            Configure individual projects with unique keys, issue counts, and project-specific settings.
+            All configuration is done at the project level.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ProjectsManager config={config} onChange={setConfig} />
         </CardContent>
       </Card>
-
-      {/* Global Defaults Header */}
-      <Card className="bg-muted/50 border-2 border-primary/20">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Globe className="h-5 w-5 text-primary" />
-            <CardTitle>Global Defaults</CardTitle>
-          </div>
-          <CardDescription>
-            These settings apply to all projects unless overridden at the project level.
-            Configure shared settings once and let individual projects inherit or customize them.
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
-      {/* Global Seed */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Global Random Seed</CardTitle>
-          <CardDescription>
-            Optional seed for reproducible data generation across all projects
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <Label htmlFor="global-seed">Global Seed (optional)</Label>
-            <Input
-              id="global-seed"
-              type="number"
-              value={config.globalDefaults?.seed || ''}
-              onChange={(e) =>
-                setConfig({
-                  ...config,
-                  globalDefaults: {
-                    ...config.globalDefaults,
-                    seed: e.target.value ? parseInt(e.target.value) : undefined,
-                  },
-                })
-              }
-              placeholder="Leave empty for random data"
-            />
-            <p className="text-xs text-muted-foreground">
-              Use the same seed to generate identical data across runs. Can be overridden per project.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Status Distribution */}
-      <StatusSection config={config} onChange={setConfig} />
-
-      {/* Issue Types */}
-      <IssueTypesSection config={config} onChange={setConfig} />
-
-      {/* Sprints */}
-      <SprintsSection config={config} onChange={setConfig} />
-
-      {/* Versions */}
-      <VersionsSection config={config} onChange={setConfig} />
-
-      {/* Worklogs */}
-      <WorklogsSection config={config} onChange={setConfig} />
-
-      {/* Data Options */}
-      <DataSection config={config} onChange={setConfig} />
 
       {/* Preview Section */}
       {isValid && <PreviewSection config={config} />}

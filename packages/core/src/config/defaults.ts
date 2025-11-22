@@ -160,27 +160,20 @@ export function getBuiltInDefaults(): Required<Omit<ProjectConfig, 'seed'>> {
 }
 
 /**
- * Merges project configuration with global defaults and built-in defaults
- * Performs 3-level merge: built-in defaults → global defaults → project config
+ * Merges project configuration with built-in defaults
+ * Performs 2-level merge: built-in defaults → project config
  *
  * @param projectConfig - Project-specific configuration
- * @param globalDefaults - Global default configuration (optional)
  * @returns Fully merged project configuration
  */
 export function mergeProjectWithDefaults(
-  projectConfig: ProjectConfigWithKey,
-  globalDefaults?: ProjectConfig
+  projectConfig: ProjectConfigWithKey
 ): ProjectConfigWithKey {
   // 1. Start with built-in defaults
   const builtInDefaults = getBuiltInDefaults();
 
-  // 2. Merge with global defaults if provided
-  const baseConfig = globalDefaults
-    ? deepMerge(builtInDefaults, globalDefaults)
-    : builtInDefaults;
-
-  // 3. Merge with project-specific config (preserve required fields)
-  const merged = deepMerge(baseConfig, projectConfig);
+  // 2. Merge with project-specific config (preserve required fields)
+  const merged = deepMerge(builtInDefaults, projectConfig);
 
   // Ensure required fields are preserved
   return {
@@ -206,16 +199,14 @@ export function mergeWithDefaults(config: JiraMockConfig): JiraMockConfig {
  * Gets a specific configuration value with fallback to default
  *
  * @param projectConfig - Project configuration
- * @param globalDefaults - Global defaults (optional)
  * @param path - Path to configuration value (e.g., 'statusDistribution.toDo')
  * @returns Configuration value or default
  */
 export function getConfigValue<T>(
   projectConfig: ProjectConfigWithKey,
-  globalDefaults: ProjectConfig | undefined,
   path: string
 ): T | undefined {
-  const merged = mergeProjectWithDefaults(projectConfig, globalDefaults);
+  const merged = mergeProjectWithDefaults(projectConfig);
   const parts = path.split('.');
   let value: any = merged;
 

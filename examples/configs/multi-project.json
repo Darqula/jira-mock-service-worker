@@ -1,22 +1,20 @@
 {
   "version": "1.0",
-  "globalDefaults": {
-    "seed": 12345,
-    "statusDistribution": {
-      "toDo": 0.4,
-      "inProgress": 0.3,
-      "done": 0.3
-    },
-    "worklogs": {
-      "probability": 0.5
-    }
-  },
   "projects": [
     {
       "projectKey": "BACKEND",
       "projectName": "Backend Services",
       "projectType": "company-managed",
       "issueCount": 150,
+      "seed": 12345,
+      "statusDistribution": {
+        "toDo": 0.4,
+        "inProgress": 0.3,
+        "done": 0.3
+      },
+      "worklogs": {
+        "probability": 0.5
+      },
       "issueTypes": {
         "epic": {
           "count": 5,
@@ -33,10 +31,14 @@
       "projectName": "Frontend Application",
       "projectType": "team-managed",
       "issueCount": 100,
+      "seed": 12345,
       "statusDistribution": {
         "toDo": 0.5,
         "inProgress": 0.4,
         "done": 0.1
+      },
+      "worklogs": {
+        "probability": 0.5
       },
       "data": {
         "assignees": ["frontend-dev1@example.com", "frontend-dev2@example.com"],
@@ -48,6 +50,15 @@
       "projectName": "Infrastructure",
       "projectType": "company-managed",
       "issueCount": 50,
+      "seed": 12345,
+      "statusDistribution": {
+        "toDo": 0.4,
+        "inProgress": 0.3,
+        "done": 0.3
+      },
+      "worklogs": {
+        "probability": 0.5
+      },
       "data": {
         "assignees": ["devops1@example.com"],
         "labels": ["aws", "kubernetes", "monitoring"]

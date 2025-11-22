@@ -177,11 +177,11 @@ export const ProjectConfigWithKeySchema = z.object({
 );
 
 /**
- * Main Jira Mock configuration schema with per-project support
+ * Main Jira Mock configuration schema with per-project configuration
+ * All configuration must be specified at the project level.
  */
 export const JiraMockConfigSchema = z.object({
   version: z.literal('1.0'),
-  globalDefaults: ProjectConfigSchema,
   projects: z
     .array(ProjectConfigWithKeySchema)
     .min(1, 'At least one project is required')

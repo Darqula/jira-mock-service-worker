@@ -36,11 +36,6 @@ export interface GenerateMockDataResult {
 function aggregateAssignees(config: JiraMockConfig): string[] {
   const allAssignees = new Set<string>();
 
-  // Add assignees from global defaults
-  if (config.globalDefaults?.data?.assignees) {
-    config.globalDefaults.data.assignees.forEach((email) => allAssignees.add(email));
-  }
-
   // Add assignees from each project
   config.projects.forEach((project) => {
     if (project.data?.assignees) {
@@ -59,9 +54,9 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
   const dataStore = new DataStore();
   const queryEngine = new QueryEngine(dataStore);
 
-  // Setup generation context with global seed
-  const globalSeed = validConfig.globalDefaults?.seed || Date.now();
-  const faker = createFaker(globalSeed);
+  // Setup generation context with base seed
+  const baseSeed = Date.now();
+  const faker = createFaker(baseSeed);
   const idGenerator = new IdGenerator();
   const dateGenerator = new DateGenerator(faker);
 
@@ -70,7 +65,7 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
     faker,
     idGenerator,
     dateGenerator,
-    seed: globalSeed,
+    seed: baseSeed,
   };
 
   // Initialize generators
@@ -125,14 +120,11 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
   for (let projectIndex = 0; projectIndex < validConfig.projects.length; projectIndex++) {
     const projectConfig = validConfig.projects[projectIndex];
 
-    // Merge project config with global defaults
-    const mergedProjectConfig = mergeProjectWithDefaults(
-      projectConfig,
-      validConfig.globalDefaults
-    );
+    // Merge project config with built-in defaults
+    const mergedProjectConfig = mergeProjectWithDefaults(projectConfig);
 
     // Create project-specific context
-    const projectSeed = mergedProjectConfig.seed || globalSeed;
+    const projectSeed = mergedProjectConfig.seed || Date.now();
     const projectFaker = createFaker(projectSeed);
     const projectContext: GenerationContext = {
       ...context,

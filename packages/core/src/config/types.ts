@@ -181,13 +181,13 @@ export interface ProjectConfigWithKey extends ProjectConfig {
 }
 
 /**
- * Main Jira Mock configuration interface with per-project support
+ * Main Jira Mock configuration interface with per-project configuration
+ * All configuration must be specified at the project level.
+ * Built-in defaults apply when project-level configuration is not specified.
  */
 export interface JiraMockConfig {
   /** Configuration version */
   version: '1.0';
-  /** Global defaults inherited by all projects (optional) */
-  globalDefaults?: ProjectConfig;
   /** Array of project-specific configurations (required, min 1 item) */
   projects: ProjectConfigWithKey[];
 }

@@ -17,14 +17,12 @@ export async function GET() {
     // Return default config if file not found
     const defaultConfig: JiraMockConfig = {
       version: '1.0',
-      globalDefaults: {
-        seed: 42,
-      },
       projects: [
         {
           projectKey: 'DEMO',
           projectName: 'Demo Project',
           issueCount: 100,
+          seed: 42,
         },
       ],
     };
