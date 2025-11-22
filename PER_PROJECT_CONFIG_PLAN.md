@@ -39,7 +39,7 @@ Currently, the system uses a **single monolithic configuration** that applies to
 
 ```json
 {
-  "version": "2.0",
+  "version": "1.0",
   "globalDefaults": {
     "seed": 12345,
     "statusDistribution": { ... },
@@ -80,10 +80,15 @@ Currently, the system uses a **single monolithic configuration** that applies to
 
 **Key Features:**
 - `globalDefaults`: Optional default settings inherited by all projects
-- `projects`: Array of project-specific configurations
+- `projects`: Array of project-specific configurations (instead of object with count/issuesPerProject)
 - Each project can override any setting from globalDefaults
 - Each project has its own `issueCount` instead of global `issuesPerProject`
 - Each project must specify `projectKey` (required, unique identifier)
+
+**Format Detection:**
+- Legacy format: `projects` is an object with `{ count, issuesPerProject }`
+- New format: `projects` is an array of project configurations
+- Both formats use `version: "1.0"` - no version increment needed
 
 ## Architecture Changes
 
@@ -94,12 +99,6 @@ Currently, the system uses a **single monolithic configuration** that applies to
 **New Types** (`src/config/types.ts`):
 
 ```typescript
-interface JiraMockConfigV2 {
-  version: '2.0';
-  globalDefaults?: ProjectConfig;  // Optional defaults for all projects
-  projects: ProjectConfigWithKey[]; // Array of project configs
-}
-
 interface ProjectConfig {
   // All the current config fields EXCEPT projectKey
   seed?: number;
@@ -118,12 +117,34 @@ interface ProjectConfigWithKey extends ProjectConfig {
   issueCount: number;           // Required, 1-10000
 }
 
-// Union type for backward compatibility
-type JiraMockConfig = JiraMockConfigV1 | JiraMockConfigV2;
+// Legacy format (object with count)
+interface LegacyProjectsConfig {
+  count: number;
+  issuesPerProject: number;
+}
 
-interface JiraMockConfigV1 {
+// New format (array of projects)
+type ProjectsArrayConfig = ProjectConfigWithKey[];
+
+// Main config interface - supports both formats
+interface JiraMockConfig {
   version: '1.0';
-  // ... current structure
+  globalDefaults?: ProjectConfig;  // Optional defaults (only used with array format)
+  projects: LegacyProjectsConfig | ProjectsArrayConfig; // Can be object or array
+  // ... other fields for backward compatibility
+  seed?: number;
+  general?: GeneralConfig;
+  statusDistribution?: StatusDistribution;
+  issueTypes?: IssueTypesConfig;
+  sprints?: SprintsConfig;
+  versions?: VersionsConfig;
+  worklogs?: WorklogsConfig;
+  data?: DataConfig;
+}
+
+// Type guard to detect format
+function isProjectArray(projects: unknown): projects is ProjectsArrayConfig {
+  return Array.isArray(projects);
 }
 ```
 
@@ -153,21 +174,47 @@ const projectConfigWithKeySchema = projectConfigSchema.extend({
     .max(10000, 'Issue count must be at most 10000'),
 });
 
-const configSchemaV2 = z.object({
-  version: z.literal('2.0'),
-  globalDefaults: projectConfigSchema.optional(),
-  projects: z.array(projectConfigWithKeySchema)
-    .min(1, 'At least one project is required')
-    .refine(
-      (projects) => {
-        const keys = projects.map(p => p.projectKey);
-        return keys.length === new Set(keys).size;
-      },
-      { message: 'Project keys must be unique' }
-    ),
+// Legacy format schema (object with count)
+const legacyProjectsSchema = z.object({
+  count: z.number().int().min(1).max(100),
+  issuesPerProject: z.number().int().min(1).max(10000),
 });
 
-const configSchema = z.union([configSchemaV1, configSchemaV2]);
+// New format schema (array of projects)
+const projectsArraySchema = z.array(projectConfigWithKeySchema)
+  .min(1, 'At least one project is required')
+  .refine(
+    (projects) => {
+      const keys = projects.map(p => p.projectKey);
+      return keys.length === new Set(keys).size;
+    },
+    { message: 'Project keys must be unique' }
+  );
+
+// Main config schema - supports both formats
+const configSchema = z.object({
+  version: z.literal('1.0'),
+  globalDefaults: projectConfigSchema.optional(),
+  projects: z.union([legacyProjectsSchema, projectsArraySchema]),
+  // Legacy fields (for backward compatibility with object format)
+  seed: z.number().optional(),
+  general: generalConfigSchema.optional(),
+  statusDistribution: statusDistributionSchema.optional(),
+  issueTypes: issueTypesConfigSchema.optional(),
+  sprints: sprintsConfigSchema.optional(),
+  versions: versionsConfigSchema.optional(),
+  worklogs: worklogsConfigSchema.optional(),
+  data: dataConfigSchema.optional(),
+}).refine(
+  (config) => {
+    // If using array format, legacy fields should not be present (or should be in globalDefaults)
+    if (Array.isArray(config.projects)) {
+      return true; // Additional validation can be added here
+    }
+    return true;
+  },
+  { message: 'Invalid configuration format' }
+);
 ```
 
 **New Default Merging** (`src/config/defaults.ts`):
@@ -196,25 +243,27 @@ function mergeProjectWithDefaults(
 
 ```typescript
 export function generateMockData(config: unknown): GenerateMockDataResult {
-  // 1. Validate and determine version
+  // 1. Validate configuration
   const validConfig = validateConfig(config);
 
   // 2. Initialize data store
   const dataStore = new DataStore();
   const queryEngine = new QueryEngine(dataStore);
 
-  // 3. Handle version-specific generation
-  if (validConfig.version === '2.0') {
-    generateMockDataV2(validConfig, dataStore, queryEngine);
+  // 3. Detect format and generate accordingly
+  if (Array.isArray(validConfig.projects)) {
+    // New array format - per-project configuration
+    generateWithProjectArray(validConfig, dataStore, queryEngine);
   } else {
-    generateMockDataV1(validConfig, dataStore, queryEngine);
+    // Legacy object format - global configuration
+    generateWithLegacyFormat(validConfig, dataStore, queryEngine);
   }
 
   return { dataStore, queryEngine };
 }
 
-function generateMockDataV2(
-  config: JiraMockConfigV2,
+function generateWithProjectArray(
+  config: JiraMockConfig,
   dataStore: DataStore,
   queryEngine: QueryEngine
 ) {
@@ -225,7 +274,7 @@ function generateMockDataV2(
   const allAssignees = aggregateAssignees(config);
 
   // 3. For each project:
-  for (const projectConfig of config.projects) {
+  for (const projectConfig of config.projects as ProjectsArrayConfig) {
     // Merge with global defaults
     const mergedConfig = mergeProjectWithDefaults(
       projectConfig,
@@ -250,6 +299,15 @@ function generateMockDataV2(
 
   // 4. Generate cross-project issue links (if needed)
 }
+
+function generateWithLegacyFormat(
+  config: JiraMockConfig,
+  dataStore: DataStore,
+  queryEngine: QueryEngine
+) {
+  // Existing generation logic for legacy format
+  // (current implementation remains unchanged)
+}
 ```
 
 ### 2. Config-UI Package (`packages/config-ui`)
@@ -272,7 +330,7 @@ src/components/ConfigEditor/
 
 ```typescript
 interface ConfigEditorState {
-  version: '2.0';
+  version: '1.0';
   globalDefaults?: ProjectConfig;
   projects: ProjectConfigWithKey[];
   selectedProjectIndex: number | null;
@@ -281,7 +339,7 @@ interface ConfigEditorState {
 
 function ConfigEditor() {
   const [state, setState] = useState<ConfigEditorState>({
-    version: '2.0',
+    version: '1.0',
     projects: [],
     selectedProjectIndex: null,
     editingGlobalDefaults: false,
@@ -447,15 +505,15 @@ function ProjectEditor({ config, globalDefaults, onChange }: ProjectEditorProps)
 **Updated Config Manager** (`lib/config-manager.ts`):
 
 ```typescript
-const CONFIG_STORAGE_KEY = 'jira-mock-config-v2';
+const CONFIG_STORAGE_KEY = 'jira-mock-config';
 
-export function saveConfig(config: JiraMockConfigV2) {
+export function saveConfig(config: JiraMockConfig) {
   if (typeof window !== 'undefined') {
     localStorage.setItem(CONFIG_STORAGE_KEY, JSON.stringify(config, null, 2));
   }
 }
 
-export function loadConfig(): JiraMockConfigV2 | null {
+export function loadConfig(): JiraMockConfig | null {
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem(CONFIG_STORAGE_KEY);
     if (stored) {
@@ -472,17 +530,23 @@ export function loadConfig(): JiraMockConfigV2 | null {
   return null;
 }
 
-// Migration helper
-export function migrateV1ToV2(configV1: JiraMockConfigV1): JiraMockConfigV2 {
-  const { version, projects, ...projectConfig } = configV1;
+// Migration helper - convert legacy object format to array format
+export function migrateLegacyToArray(legacyConfig: JiraMockConfig): JiraMockConfig {
+  // Check if already in array format
+  if (Array.isArray(legacyConfig.projects)) {
+    return legacyConfig;
+  }
+
+  const { projects, ...restConfig } = legacyConfig;
+  const legacyProjects = projects as LegacyProjectsConfig;
 
   return {
-    version: '2.0',
-    globalDefaults: projectConfig,
-    projects: Array.from({ length: projects.count }, (_, i) => ({
+    version: '1.0',
+    globalDefaults: restConfig,
+    projects: Array.from({ length: legacyProjects.count }, (_, i) => ({
       projectKey: `PROJ${i + 1}`,
       projectName: `Project ${i + 1}`,
-      issueCount: projects.issuesPerProject,
+      issueCount: legacyProjects.issuesPerProject,
       // Projects inherit from globalDefaults
     })),
   };
@@ -500,7 +564,7 @@ The MSW integration package mostly just passes the config to the core package, s
 export function setupJiraMock(options: SetupJiraMockOptions): SetupJiraMockResult {
   const { config, baseUrl = 'https://your-domain.atlassian.net' } = options;
 
-  // Core package handles both v1 and v2 configs
+  // Core package handles both legacy and array format configs
   const { dataStore, queryEngine } = generateMockData(config);
 
   const handlers = createHandlers(dataStore, queryEngine, baseUrl);
@@ -516,7 +580,7 @@ export function setupJiraMock(options: SetupJiraMockOptions): SetupJiraMockResul
 import type { JiraMockConfig } from '@jira-mock/core';
 
 export interface SetupJiraMockOptions {
-  config: JiraMockConfig;  // Now supports both v1 and v2
+  config: JiraMockConfig;  // Supports both legacy object and array formats
   baseUrl?: string;
 }
 ```
@@ -527,19 +591,19 @@ export interface SetupJiraMockOptions {
 
 ```
 examples/configs/
-├── v2/
+├── array-format/
 │   ├── multi-project.json          # Multiple projects with different configs
 │   ├── inheritance-demo.json       # Demonstrates global defaults + overrides
-│   ├── minimal-v2.json             # Minimal v2 config
+│   ├── minimal-array.json          # Minimal array format config
 │   └── realistic-workspace.json    # Realistic multi-project workspace
-└── (keep existing v1 configs for backward compatibility)
+└── (keep existing legacy configs for backward compatibility)
 ```
 
-**Example: Multi-Project Config** (`examples/configs/v2/multi-project.json`):
+**Example: Multi-Project Config** (`examples/configs/array-format/multi-project.json`):
 
 ```json
 {
-  "version": "2.0",
+  "version": "1.0",
   "globalDefaults": {
     "seed": 12345,
     "statusDistribution": {
@@ -603,7 +667,7 @@ examples/configs/
 // examples/vitest-example/jira-api.test.ts
 const { server, dataStore } = setupJiraMockServer({
   config: {
-    version: '2.0',
+    version: '1.0',
     globalDefaults: {
       seed: 12345,
     },
@@ -638,28 +702,34 @@ expect(test2Issues.every(issue => issue.fields.status.name === 'Done')).toBe(tru
 
 ### Backward Compatibility
 
-**Support Both Versions:**
-- Core package validates and handles both v1 and v2 configs
-- V1 configs continue to work without changes
-- Config UI can import v1 configs and migrate them
+**Support Both Formats:**
+- Core package validates and handles both legacy object and array formats
+- Legacy configs continue to work without changes
+- Config UI can import legacy configs and migrate them to array format
+- Both formats use `version: "1.0"` - no version increment
 
 **Migration Path:**
 
 1. **Automatic Migration:**
-   - Config UI detects v1 format on upload
-   - Offers to migrate to v2
+   - Config UI detects legacy format (object with count/issuesPerProject)
+   - Offers to migrate to array format
    - Shows preview of migrated config
 
 2. **Manual Migration:**
-   - Users can continue using v1 indefinitely
+   - Users can continue using legacy format indefinitely
    - Documentation shows migration examples
-   - CLI tool for batch migration (future enhancement)
+   - Migration helper function available in core package
+
+3. **Format Detection:**
+   - `Array.isArray(config.projects)` determines format
+   - No version bump needed
+   - Seamless backward compatibility
 
 ### Deprecation Timeline
 
-- **Phase 1 (Current):** Support both v1 and v2
-- **Phase 2 (6 months):** Mark v1 as deprecated in docs
-- **Phase 3 (12 months):** Consider removing v1 support in next major version
+- **Phase 1 (Current):** Support both legacy object and array formats
+- **Phase 2 (6 months):** Mark legacy object format as deprecated in docs
+- **Phase 3 (12+ months):** Consider removing legacy format support in next major version
 
 ## Benefits of New Approach
 

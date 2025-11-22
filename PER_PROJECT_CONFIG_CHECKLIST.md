@@ -36,12 +36,14 @@
   - [ ] Add `projectName?: string` (optional display name)
   - [ ] Add `projectType?: 'company-managed' | 'team-managed'`
   - [ ] Add `issueCount: number` (required, 1-10000)
-- [ ] Create `JiraMockConfigV2` interface
-  - [ ] Add `version: '2.0'` literal
-  - [ ] Add `globalDefaults?: ProjectConfig`
-  - [ ] Add `projects: ProjectConfigWithKey[]`
-- [ ] Keep existing `JiraMockConfigV1` interface (rename current type)
-- [ ] Create union type: `type JiraMockConfig = JiraMockConfigV1 | JiraMockConfigV2`
+- [ ] Create `LegacyProjectsConfig` interface (object with count/issuesPerProject)
+- [ ] Create `ProjectsArrayConfig` type (array of ProjectConfigWithKey)
+- [ ] Update `JiraMockConfig` interface
+  - [ ] Keep `version: '1.0'` (no version increment)
+  - [ ] Add `globalDefaults?: ProjectConfig` (optional)
+  - [ ] Update `projects` to union: `LegacyProjectsConfig | ProjectsArrayConfig`
+  - [ ] Keep other fields for backward compatibility
+- [ ] Create type guard: `isProjectArray()` function
 - [ ] Update exports to include new types
 - [ ] Add JSDoc comments for all new types
 
@@ -54,21 +56,24 @@
   - [ ] Add `projectName` validation (optional string)
   - [ ] Add `projectType` validation (optional enum)
   - [ ] Add `issueCount` validation (required, 1-10000)
-- [ ] Create `configSchemaV2`
-  - [ ] Add `version: '2.0'` literal validation
+- [ ] Create `legacyProjectsSchema` (object with count/issuesPerProject)
+- [ ] Create `projectsArraySchema` (array with uniqueness check)
+  - [ ] Add array validation (min 1 item)
+  - [ ] Add refinement check for unique projectKey
+- [ ] Update main `configSchema`
+  - [ ] Keep `version: '1.0'` literal validation
   - [ ] Add `globalDefaults` (optional ProjectConfig)
-  - [ ] Add `projects` array validation (min 1 item)
-  - [ ] Add refinement check for unique projectKey across all projects
-- [ ] Create union schema: `z.union([configSchemaV1, configSchemaV2])`
-- [ ] Update `validateConfig()` function to handle both versions
+  - [ ] Update `projects` to union: `z.union([legacyProjectsSchema, projectsArraySchema])`
+  - [ ] Keep other fields for backward compatibility
+- [ ] Update `validateConfig()` function to handle both formats
 
 **File:** `packages/core/src/config/validation.ts`
 
-- [ ] Update `getConfigErrors()` to handle v2 structure
-- [ ] Update `getConfigWarnings()` to handle v2 structure
+- [ ] Update `getConfigErrors()` to handle array format
+- [ ] Update `getConfigWarnings()` to handle array format
 - [ ] Add project-level validation warnings
 - [ ] Add aggregate validation (e.g., total issues across all projects)
-- [ ] Add helpful error messages for v2-specific issues
+- [ ] Add helpful error messages for format-specific issues
 
 ### 1.2 Configuration Defaults & Merging
 
@@ -80,7 +85,7 @@
   - [ ] Implement 3-level merge: built-in → global → project
   - [ ] Handle deep merge for nested objects
   - [ ] Preserve project-specific overrides
-- [ ] Update `mergeWithDefaults()` to handle both v1 and v2
+- [ ] Update `mergeWithDefaults()` to handle both legacy and array formats
 - [ ] Add unit tests for 3-level merge
 - [ ] Add unit tests for override behavior
 
@@ -88,16 +93,16 @@
 
 **File:** `packages/core/src/index.ts`
 
-- [ ] Add version detection logic in `generateMockData()`
-- [ ] Refactor existing logic into `generateMockDataV1()` function
-- [ ] Delegate to `generateMockDataV1()` for v1 configs
-- [ ] Delegate to `generateMockDataV2()` for v2 configs
-- [ ] Ensure backward compatibility for v1 configs
+- [ ] Add format detection logic in `generateMockData()`
+- [ ] Refactor existing logic into `generateWithLegacyFormat()` function
+- [ ] Delegate to `generateWithLegacyFormat()` for legacy object format
+- [ ] Delegate to `generateWithProjectArray()` for array format
+- [ ] Ensure backward compatibility for legacy configs
 
-**File:** `packages/core/src/generation-v2.ts` (new file)
+**File:** `packages/core/src/generation-array.ts` (new file)
 
 - [ ] Create new file and export structure
-- [ ] Create `generateMockDataV2()` function
+- [ ] Create `generateWithProjectArray()` function
 - [ ] Aggregate user emails from all projects' `data.assignees`
 - [ ] Generate global metadata (statuses, priorities, issue types)
 - [ ] Implement project iteration logic
@@ -129,7 +134,7 @@
 ### 1.4 Testing
 
 - [ ] **Update existing tests** (`config/validation.test.ts`)
-  - [ ] Add v2 config validation tests
+  - [ ] Add array format validation tests
   - [ ] Test unique projectKey validation
   - [ ] Test project array validation (min 1 item)
   - [ ] Test globalDefaults validation
@@ -137,28 +142,28 @@
   - [ ] Add multi-level merge tests
   - [ ] Test built-in → global → project merge order
   - [ ] Test project-specific overrides
-- [ ] **Create new test file** (`generation-v2.test.ts`)
+- [ ] **Create new test file** (`generation-array.test.ts`)
   - [ ] Test multi-project generation
   - [ ] Test global defaults inheritance
   - [ ] Test project-specific overrides
   - [ ] Test cross-project data consistency
   - [ ] Test with varying project counts (1, 3, 10)
 - [ ] **Backward compatibility tests**
-  - [ ] Test all existing v1 configs still work
-  - [ ] Test v1 and v2 can be validated in same codebase
+  - [ ] Test all existing legacy configs still work
+  - [ ] Test legacy and array formats can be validated in same codebase
 
 ### 1.5 Documentation
 
 - [ ] **Update README** (`packages/core/README.md`)
-  - [ ] Document v2 configuration structure
-  - [ ] Add migration guide from v1 to v2
-  - [ ] Update examples to show both v1 and v2
+  - [ ] Document array format configuration structure
+  - [ ] Add migration guide from legacy to array format
+  - [ ] Update examples to show both legacy and array formats
   - [ ] Document inheritance behavior (built-in → global → project)
   - [ ] Add example of globalDefaults usage
 - [ ] **Update API documentation**
   - [ ] Document new types and interfaces
   - [ ] Update JSDoc comments
-  - [ ] Add examples of v2 usage
+  - [ ] Add examples of array format usage
 
 ---
 
@@ -197,17 +202,17 @@
   - [ ] Call-to-action to add first project
   - [ ] Illustration or icon
 - [ ] `components/ConfigEditor/MigrationDialog.tsx`
-  - [ ] Dialog for migrating v1 to v2
+  - [ ] Dialog for migrating legacy to array format
   - [ ] Show preview of migration
-  - [ ] Explain changes
+  - [ ] Explain changes (no version increment)
   - [ ] Confirm/cancel buttons
 
 ### 2.2 State Management
 
 **File:** `components/ConfigEditor/index.tsx`
 
-- [ ] Update state structure for v2
-  - [ ] `version: '2.0'`
+- [ ] Update state structure for array format
+  - [ ] `version: '1.0'` (no version increment)
   - [ ] `globalDefaults?: ProjectConfig`
   - [ ] `projects: ProjectConfigWithKey[]`
   - [ ] `selectedProjectIndex: number | null`
@@ -282,30 +287,31 @@
 
 **File:** `lib/config-manager.ts`
 
-- [ ] Update `saveConfig()` to handle v2
-- [ ] Update `loadConfig()` to handle both v1 and v2
-- [ ] Create `migrateV1ToV2()` migration function
-  - [ ] Convert single config to globalDefaults
+- [ ] Update `saveConfig()` to handle array format
+- [ ] Update `loadConfig()` to handle both legacy and array formats
+- [ ] Create `migrateLegacyToArray()` migration function
+  - [ ] Detect format using `Array.isArray(config.projects)`
+  - [ ] Convert legacy config to globalDefaults
   - [ ] Generate projects array from `projects.count`
   - [ ] Generate projectKey (PROJ1, PROJ2, etc.)
   - [ ] Set issueCount from `issuesPerProject`
-- [ ] Update `downloadConfig()` to use v2 format
-- [ ] Update `uploadConfig()` to detect and migrate v1 configs
-  - [ ] Detect version from config
-  - [ ] Offer migration dialog if v1
+- [ ] Update `downloadConfig()` to preserve format
+- [ ] Update `uploadConfig()` to detect and offer migration
+  - [ ] Detect format from projects field
+  - [ ] Offer migration dialog if legacy format
   - [ ] Auto-migrate or ask user
 
 ### 2.5 API Routes
 
 **File:** `app/api/config/validate/route.ts`
 
-- [ ] Support v2 config validation
+- [ ] Support array format validation
 - [ ] Return project-specific errors with project index
 - [ ] Return global errors (duplicate keys, etc.)
 
 **File:** `app/api/config/preview/route.ts`
 
-- [ ] Support v2 config
+- [ ] Support array format config
 - [ ] Allow selecting which project to preview (query param)
 - [ ] Show aggregated preview across all projects (optional)
 - [ ] Limit preview to 1 project, 5 issues per project
@@ -357,13 +363,13 @@
 **File:** `packages/msw-integration/src/types.ts`
 
 - [ ] Import updated `JiraMockConfig` type from core
-- [ ] Verify `SetupJiraMockOptions` accepts both v1 and v2
+- [ ] Verify `SetupJiraMockOptions` accepts both legacy and array formats
 - [ ] Update JSDoc comments
 
 ### 3.2 Testing
 
-- [ ] Test with v2 config
-- [ ] Test backward compatibility with v1
+- [ ] Test with array format config
+- [ ] Test backward compatibility with legacy format
 - [ ] Test multi-project scenarios
   - [ ] Verify issues from different projects are separate
   - [ ] Verify project-specific settings apply correctly
@@ -380,14 +386,14 @@
 
 ## Phase 4: Examples Updates
 
-**Goal:** Update examples to demonstrate v2 configuration
+**Goal:** Update examples to demonstrate array format configuration
 
 ### 4.1 Configuration Files
 
-**Create new v2 example configs** (`examples/configs/v2/`):
+**Create new array format example configs** (`examples/configs/array-format/`):
 
-- [ ] Create `v2/` directory
-- [ ] `minimal-v2.json` - Simplest v2 config (1 project, no defaults)
+- [ ] Create `array-format/` directory
+- [ ] `minimal-array.json` - Simplest array format config (1 project, no defaults)
 - [ ] `multi-project.json` - 3 projects with different settings
 - [ ] `inheritance-demo.json` - Demonstrates global defaults + overrides
 - [ ] `realistic-workspace.json` - Realistic workspace (3-5 projects)
@@ -395,33 +401,33 @@
 
 **Keep existing configs:**
 
-- [ ] Keep v1 configs for backward compatibility
-- [ ] Add note about v1 deprecation
+- [ ] Keep legacy configs for backward compatibility
+- [ ] Add note about legacy format deprecation
 - [ ] Link to migration guide
 
 ### 4.2 Vitest Example
 
 **File:** `examples/vitest-example/jira-api.test.ts`
 
-- [ ] Create new test file: `jira-api-v2.test.ts`
-- [ ] Update to use v2 config
+- [ ] Create new test file: `jira-api-array.test.ts`
+- [ ] Update to use array format config
 - [ ] Add tests for multi-project scenarios
   - [ ] Test fetching issues from specific project
   - [ ] Test project-specific status distribution
   - [ ] Test project-specific assignees
-- [ ] Keep v1 example for reference
+- [ ] Keep legacy example for reference
 
 ### 4.3 Next.js Example
 
 **File:** `examples/nextjs-openapi-tester/jira-mock-config.json`
 
-- [ ] Update to v2 format
+- [ ] Update to array format
 - [ ] Use 2-3 projects with different configs
 - [ ] Demonstrate inheritance
 
 **File:** `examples/nextjs-openapi-tester/src/app/api/config/route.ts`
 
-- [ ] Verify it handles v2 config correctly
+- [ ] Verify it handles array format config correctly
 
 **UI updates** (`examples/nextjs-openapi-tester/src/`):
 
@@ -447,16 +453,16 @@
 
 **File:** `README.md`
 
-- [ ] Update Quick Start with v2 example
-- [ ] Document both v1 and v2 support
+- [ ] Update Quick Start with array format example
+- [ ] Document both legacy and array format support
 - [ ] Add migration guide section
 - [ ] Update feature list to mention per-project config
 - [ ] Update screenshots/demos
 
-**File:** `MIGRATION_V1_TO_V2.md` (new file)
+**File:** `MIGRATION_LEGACY_TO_ARRAY.md` (new file)
 
 - [ ] Create migration guide
-- [ ] Explain differences between v1 and v2
+- [ ] Explain differences between legacy and array formats
 - [ ] Step-by-step migration instructions
 - [ ] Before/after config examples
 - [ ] Common migration scenarios
@@ -465,22 +471,22 @@
 
 **File:** `CHANGELOG.md`
 
-- [ ] Document v2 configuration format
-- [ ] Mark as major version bump (breaking changes)
-- [ ] Note backward compatibility
+- [ ] Document new array format for projects configuration
+- [ ] Note backward compatibility (no version bump)
 - [ ] List all new features
+- [ ] Mark legacy format as deprecated (optional)
 
 ### 5.2 Package Documentation
 
 - [ ] Update `package.json` descriptions
-- [ ] Update version to next major (if breaking)
 - [ ] Update keywords to include "multi-project", "per-project"
+- [ ] No version bump needed (backward compatible)
 
 ### 5.3 TypeScript Documentation
 
 - [ ] Add JSDoc comments to all new types
-- [ ] Add `@example` tags showing v2 usage
-- [ ] Add `@deprecated` tags for v1-specific APIs (if any)
+- [ ] Add `@example` tags showing array format usage
+- [ ] Add `@deprecated` tags for legacy-specific APIs (if any)
 
 ---
 
@@ -521,10 +527,10 @@
 
 ### 6.4 Backward Compatibility Testing
 
-- [ ] Verify all existing v1 configs still work
-- [ ] Test v1 with all packages
-- [ ] Verify no breaking changes for v1 users
-- [ ] Test migration of all example v1 configs
+- [ ] Verify all existing legacy configs still work
+- [ ] Test legacy format with all packages
+- [ ] Verify no breaking changes for legacy format users
+- [ ] Test migration of all example legacy configs
 
 ---
 
@@ -596,10 +602,10 @@
 
 - [ ] All Phase 1 tasks completed
 - [ ] All new types have JSDoc comments
-- [ ] Schema validation covers all v2 fields
+- [ ] Schema validation covers all new fields
 - [ ] Multi-level merge working correctly
 - [ ] Unit tests passing for Phase 1
-- [ ] V1 backward compatibility verified
+- [ ] Legacy format backward compatibility verified
 
 ### Before Phase 3
 
@@ -607,7 +613,7 @@
 - [ ] All UI components implemented
 - [ ] Project management working (add/remove/edit)
 - [ ] Inheritance indicators working
-- [ ] Migration from v1 working
+- [ ] Migration from legacy format working
 - [ ] Component tests passing
 
 ### Before Phase 4
@@ -646,8 +652,8 @@
 - [ ] Zero linting errors
 - [ ] Documentation complete and reviewed
 - [ ] Example configurations tested
-- [ ] Backward compatibility verified (v1 configs work)
-- [ ] Migration path tested (v1 → v2)
+- [ ] Backward compatibility verified (legacy configs work)
+- [ ] Migration path tested (legacy → array format)
 - [ ] Performance acceptable (<10s generation for 10k total issues)
 - [ ] UI responsive with 10+ projects
 
@@ -657,19 +663,21 @@
 
 ### Key Decisions
 
-- **Version Number**: v2.0 (breaking change in config structure)
-- **Backward Compatibility**: Support both v1 and v2 indefinitely
+- **Version Number**: Keep v1.0 (no version increment - backward compatible)
+- **Format Detection**: Use `Array.isArray(config.projects)` to detect format
+- **Backward Compatibility**: Support both legacy object and array formats indefinitely
 - **Migration Strategy**: Automatic migration offered in UI, manual migration via guide
 - **Inheritance Levels**: Built-in defaults → Global defaults → Project config
 - **Project Key Format**: Uppercase letters and numbers, starts with letter, max 10 chars
 
 ### Open Questions
 
-1. **Should we support nested inheritance?** (e.g., project groups) - **Decision: No, keep it simple for v2.0**
+1. **Should we support nested inheritance?** (e.g., project groups) - **Decision: No, keep it simple**
 2. **Should global defaults be required or optional?** - **Decision: Optional, projects can work without it**
 3. **How should we handle cross-project issue links?** - **Decision: Defer to future version**
 4. **Should we support project-level seeds?** - **Decision: Yes, per-project seed with global seed as fallback**
 5. **Should we validate total issue count across all projects?** - **Decision: Yes, warn if >5000 total**
+6. **Should we increment config version?** - **Decision: No, keep v1.0 and detect format programmatically**
 
 ### Blockers
 
