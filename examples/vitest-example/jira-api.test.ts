@@ -7,11 +7,30 @@ describe('Jira API Integration Example', () => {
   const { server, dataStore } = setupJiraMockServer({
     config: {
       version: '1.0',
-      seed: 12345, // Reproducible data
-      projects: {
-        count: 3,
-        issuesPerProject: 10,
+      globalDefaults: {
+        issueTypes: {
+          epic: {
+            count: 0, // Disable epic-based generation for predictable issue counts
+          },
+        },
       },
+      projects: [
+        {
+          projectKey: 'PROJ1',
+          issueCount: 10,
+          seed: 12345, // Reproducible data
+        },
+        {
+          projectKey: 'PROJ2',
+          issueCount: 10,
+          seed: 12345,
+        },
+        {
+          projectKey: 'PROJ3',
+          issueCount: 10,
+          seed: 12345,
+        },
+      ],
     },
     baseUrl,
   });
