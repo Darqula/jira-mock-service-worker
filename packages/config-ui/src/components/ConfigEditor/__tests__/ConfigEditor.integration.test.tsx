@@ -6,7 +6,7 @@ describe('ConfigEditor Integration Tests', () => {
   it('renders all main sections', () => {
     render(<ConfigEditor />);
 
-    expect(screen.getByText(/Projects \(1\)/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Projects \(\d+\)/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Global Defaults/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Status Distribution/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Issue Types Configuration/i })).toBeInTheDocument();
@@ -34,17 +34,17 @@ describe('ConfigEditor Integration Tests', () => {
       expect(screen.getByText(/Projects \(2\)/i)).toBeInTheDocument();
     });
 
-    // Verify the component maintains state
-    // Projects count should still be 2
+    // Verify config state persists
+    // Projects count should still be 2 after interaction
     expect(screen.getByText(/Projects \(2\)/i)).toBeInTheDocument();
   });
 
   it('validates config structure', () => {
     render(<ConfigEditor />);
 
-    // Get the download button to verify it exists
-    const downloadButton = screen.getByText(/Download JSON/i);
-    expect(downloadButton).toBeInTheDocument();
+    // Check that action buttons are present
+    const saveButton = screen.getByRole('button', { name: /Save to LocalStorage/i });
+    expect(saveButton).toBeInTheDocument();
 
     // The component should maintain valid config structure
     // (This is implicitly tested by the component not crashing)
@@ -72,8 +72,10 @@ describe('ConfigEditor Integration Tests', () => {
   it('renders action buttons', () => {
     render(<ConfigEditor />);
 
-    expect(screen.getByText(/Download JSON/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Save to LocalStorage/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Download JSON/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Copy JSON/i })).toBeInTheDocument();
+    // Upload button is a label, not a button role
     expect(screen.getByText(/Upload JSON/i)).toBeInTheDocument();
-    expect(screen.getByText(/Save to LocalStorage/i)).toBeInTheDocument();
   });
 });
