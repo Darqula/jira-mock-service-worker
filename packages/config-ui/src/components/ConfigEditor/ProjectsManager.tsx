@@ -118,6 +118,7 @@ export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
                   size="sm"
                   onClick={() => removeProject(index)}
                   className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  aria-label={`Remove project ${project.projectKey}`}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
