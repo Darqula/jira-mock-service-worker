@@ -17,9 +17,12 @@ export function WorklogsSection({ config, onChange }: WorklogsSectionProps) {
   const updateWorklogs = (updates: Partial<typeof worklogs>) => {
     onChange({
       ...config,
-      worklogs: {
-        ...worklogs,
-        ...updates,
+      globalDefaults: {
+        ...config.globalDefaults,
+        worklogs: {
+          ...worklogs,
+          ...updates,
+        },
       },
     });
   };

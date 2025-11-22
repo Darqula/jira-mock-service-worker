@@ -17,9 +17,12 @@ export function SprintsSection({ config, onChange }: SprintsSectionProps) {
   const updateSprints = (updates: Partial<typeof sprints>) => {
     onChange({
       ...config,
-      sprints: {
-        ...sprints,
-        ...updates,
+      globalDefaults: {
+        ...config.globalDefaults,
+        sprints: {
+          ...sprints,
+          ...updates,
+        },
       },
     });
   };
