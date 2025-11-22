@@ -12,7 +12,7 @@ interface WorklogsSectionProps {
 }
 
 export function WorklogsSection({ config, onChange }: WorklogsSectionProps) {
-  const worklogs = config.worklogs || {};
+  const worklogs = config.globalDefaults?.worklogs || {};
 
   const updateWorklogs = (updates: Partial<typeof worklogs>) => {
     onChange({
