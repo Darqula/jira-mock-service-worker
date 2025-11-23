@@ -9,7 +9,6 @@ describe('Config Validation', () => {
       projects: [
         {
           projectKey: 'TEST',
-          issueCount: 100,
         },
       ],
     };
@@ -27,11 +26,9 @@ describe('Config Validation', () => {
       projects: [
         {
           projectKey: 'TEST1',
-          issueCount: 50,
         },
         {
           projectKey: 'TEST2',
-          issueCount: 50,
         },
       ],
     };
@@ -46,7 +43,6 @@ describe('Config Validation', () => {
       projects: [
         {
           projectKey: 'TEST',
-          issueCount: 100,
         },
       ],
     };
@@ -71,11 +67,9 @@ describe('Config Validation', () => {
       projects: [
         {
           projectKey: 'TEST',
-          issueCount: 100,
         },
         {
           projectKey: 'TEST',
-          issueCount: 50,
         },
       ],
     };
@@ -84,49 +78,6 @@ describe('Config Validation', () => {
     expect(isValidConfig(config)).toBe(false);
   });
 
-  it('should reject issue count < 1', () => {
-    const config = {
-      version: '1.0',
-      projects: [
-        {
-          projectKey: 'TEST',
-          issueCount: 0,
-        },
-      ],
-    };
-
-    expect(() => validateConfig(config)).toThrow();
-    expect(isValidConfig(config)).toBe(false);
-  });
-
-  it('should reject issue count > 10000', () => {
-    const config = {
-      version: '1.0',
-      projects: [
-        {
-          projectKey: 'TEST',
-          issueCount: 10001,
-        },
-      ],
-    };
-
-    expect(() => validateConfig(config)).toThrow();
-    expect(isValidConfig(config)).toBe(false);
-  });
-
-  it('should return error messages for invalid config', () => {
-    const config = {
-      version: '1.0',
-      projects: [
-        {
-          projectKey: 'TEST',
-          issueCount: 0,
-        },
-      ],
-    };
-
-    const errors = getConfigErrors(config);
-    expect(errors.length).toBeGreaterThan(0);
-    expect(errors.some((e) => e.includes('issueCount'))).toBe(true);
-  });
+  // Note: issueCount is no longer a field in the config.
+  // It's now calculated automatically from issue types configuration.
 });

@@ -10,22 +10,25 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 interface IssueTypesSectionProps {
   config: JiraMockConfig;
   onChange: (config: JiraMockConfig) => void;
+  projectIndex: number;
 }
 
-export function IssueTypesSection({ config, onChange }: IssueTypesSectionProps) {
+export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypesSectionProps) {
   const [activeTab, setActiveTab] = useState<'epic' | 'story' | 'task' | 'bug'>('epic');
-  const issueTypes = config.globalDefaults?.issueTypes || {};
+  const issueTypes = config.projects[projectIndex]?.issueTypes || {};
 
   const updateIssueTypes = (updates: Partial<typeof issueTypes>) => {
+    const newProjects = [...config.projects];
+    newProjects[projectIndex] = {
+      ...newProjects[projectIndex],
+      issueTypes: {
+        ...issueTypes,
+        ...updates,
+      },
+    };
     onChange({
       ...config,
-      globalDefaults: {
-        ...config.globalDefaults,
-        issueTypes: {
-          ...issueTypes,
-          ...updates,
-        },
-      },
+      projects: newProjects,
     });
   };
 

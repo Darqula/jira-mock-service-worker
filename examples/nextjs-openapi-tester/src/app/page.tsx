@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { initMocks } from '@/lib/msw';
 import type { JiraMockConfig } from '@jira-mock/core';
+import { calculateIssueCount } from '@jira-mock/core';
 
 // Dynamically import SwaggerUI to avoid SSR issues
 const SwaggerUI = dynamic(() => import('swagger-ui-react'), { ssr: false });
@@ -53,9 +54,8 @@ export default function Home() {
           <div className="config-info">
             <h3>📋 Current Configuration</h3>
             <div>
-              Seed: <code>{config.globalDefaults?.seed || 'random'}</code> |
               Projects: <code>{config.projects.length}</code> |
-              Total Issues: <code>{config.projects.reduce((sum, p) => sum + p.issueCount, 0)}</code>
+              Total Issues: <code>{config.projects.reduce((sum, p) => sum + calculateIssueCount(p), 0)}</code>
             </div>
             {stats && (
               <div style={{ marginTop: '0.5rem' }}>
