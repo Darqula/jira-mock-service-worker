@@ -534,6 +534,208 @@ describe('JQL Enhancements', () => {
       expect(results.issues[0].key).toBe('TEST-1');
     });
   });
+
+  describe('Component Field', () => {
+    it('should filter by component = value', () => {
+      const issue1 = createTestIssue('TEST-1', testProject);
+      (issue1.fields as any).components = [{ name: 'API' }, { name: 'Backend' }];
+
+      const issue2 = createTestIssue('TEST-2', testProject);
+      (issue2.fields as any).components = [{ name: 'Frontend' }];
+
+      const issue3 = createTestIssue('TEST-3', testProject);
+      (issue3.fields as any).components = [];
+
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+      dataStore.addIssue(issue3);
+
+      const results = queryEngine.executeJQL({ jql: 'component = API' });
+
+      expect(results.total).toBe(1);
+      expect(results.issues[0].key).toBe('TEST-1');
+    });
+
+    it('should filter by component IN (...)', () => {
+      const issue1 = createTestIssue('TEST-1', testProject);
+      (issue1.fields as any).components = [{ name: 'API' }];
+
+      const issue2 = createTestIssue('TEST-2', testProject);
+      (issue2.fields as any).components = [{ name: 'Frontend' }];
+
+      const issue3 = createTestIssue('TEST-3', testProject);
+      (issue3.fields as any).components = [{ name: 'Database' }];
+
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+      dataStore.addIssue(issue3);
+
+      const results = queryEngine.executeJQL({ jql: 'component IN (API, Frontend)' });
+
+      expect(results.total).toBe(2);
+      expect(results.issues.map((i) => i.key)).toEqual(['TEST-1', 'TEST-2']);
+    });
+
+    it('should filter by component IS EMPTY', () => {
+      const issue1 = createTestIssue('TEST-1', testProject);
+      (issue1.fields as any).components = [];
+
+      const issue2 = createTestIssue('TEST-2', testProject);
+      (issue2.fields as any).components = [{ name: 'API' }];
+
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+
+      const results = queryEngine.executeJQL({ jql: 'component IS EMPTY' });
+
+      expect(results.total).toBe(1);
+      expect(results.issues[0].key).toBe('TEST-1');
+    });
+  });
+
+  describe('Version Fields', () => {
+    it('should filter by fixVersion = value', () => {
+      const issue1 = createTestIssue('TEST-1', testProject);
+      (issue1.fields as any).fixVersions = [{ name: '1.0.0' }, { name: '1.0.1' }];
+
+      const issue2 = createTestIssue('TEST-2', testProject);
+      (issue2.fields as any).fixVersions = [{ name: '2.0.0' }];
+
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+
+      const results = queryEngine.executeJQL({ jql: 'fixVersion = "1.0.0"' });
+
+      expect(results.total).toBe(1);
+      expect(results.issues[0].key).toBe('TEST-1');
+    });
+
+    it('should filter by fixVersion IN (...)', () => {
+      const issue1 = createTestIssue('TEST-1', testProject);
+      (issue1.fields as any).fixVersions = [{ name: '1.0.0' }];
+
+      const issue2 = createTestIssue('TEST-2', testProject);
+      (issue2.fields as any).fixVersions = [{ name: '2.0.0' }];
+
+      const issue3 = createTestIssue('TEST-3', testProject);
+      (issue3.fields as any).fixVersions = [{ name: '3.0.0' }];
+
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+      dataStore.addIssue(issue3);
+
+      const results = queryEngine.executeJQL({ jql: 'fixVersion IN ("1.0.0", "2.0.0")' });
+
+      expect(results.total).toBe(2);
+      expect(results.issues.map((i) => i.key)).toEqual(['TEST-1', 'TEST-2']);
+    });
+
+    it('should filter by affectedVersion = value', () => {
+      const issue1 = createTestIssue('TEST-1', testProject);
+      (issue1.fields as any).versions = [{ name: '0.9.0' }];
+
+      const issue2 = createTestIssue('TEST-2', testProject);
+      (issue2.fields as any).versions = [{ name: '1.0.0' }];
+
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+
+      const results = queryEngine.executeJQL({ jql: 'affectedVersion = "0.9.0"' });
+
+      expect(results.total).toBe(1);
+      expect(results.issues[0].key).toBe('TEST-1');
+    });
+
+    it('should filter by fixVersion IS EMPTY', () => {
+      const issue1 = createTestIssue('TEST-1', testProject);
+      (issue1.fields as any).fixVersions = [];
+
+      const issue2 = createTestIssue('TEST-2', testProject);
+      (issue2.fields as any).fixVersions = [{ name: '1.0.0' }];
+
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+
+      const results = queryEngine.executeJQL({ jql: 'fixVersion IS EMPTY' });
+
+      expect(results.total).toBe(1);
+      expect(results.issues[0].key).toBe('TEST-1');
+    });
+  });
+
+  describe('Sprint Field', () => {
+    it('should filter by sprint = value', () => {
+      const issue1 = createTestIssue('TEST-1', testProject);
+      (issue1.fields as any).sprint = { name: 'Sprint 1', state: 'active' };
+
+      const issue2 = createTestIssue('TEST-2', testProject);
+      (issue2.fields as any).sprint = { name: 'Sprint 2', state: 'active' };
+
+      const issue3 = createTestIssue('TEST-3', testProject);
+      (issue3.fields as any).sprint = null;
+
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+      dataStore.addIssue(issue3);
+
+      const results = queryEngine.executeJQL({ jql: 'sprint = "Sprint 1"' });
+
+      expect(results.total).toBe(1);
+      expect(results.issues[0].key).toBe('TEST-1');
+    });
+
+    it('should filter by sprint IN (...)', () => {
+      const issue1 = createTestIssue('TEST-1', testProject);
+      (issue1.fields as any).sprint = { name: 'Sprint 1' };
+
+      const issue2 = createTestIssue('TEST-2', testProject);
+      (issue2.fields as any).sprint = { name: 'Sprint 2' };
+
+      const issue3 = createTestIssue('TEST-3', testProject);
+      (issue3.fields as any).sprint = { name: 'Sprint 3' };
+
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+      dataStore.addIssue(issue3);
+
+      const results = queryEngine.executeJQL({ jql: 'sprint IN ("Sprint 1", "Sprint 2")' });
+
+      expect(results.total).toBe(2);
+      expect(results.issues.map((i) => i.key)).toEqual(['TEST-1', 'TEST-2']);
+    });
+
+    it('should filter by sprint IS EMPTY', () => {
+      const issue1 = createTestIssue('TEST-1', testProject);
+      (issue1.fields as any).sprint = null;
+
+      const issue2 = createTestIssue('TEST-2', testProject);
+      (issue2.fields as any).sprint = { name: 'Sprint 1' };
+
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+
+      const results = queryEngine.executeJQL({ jql: 'sprint IS EMPTY' });
+
+      expect(results.total).toBe(1);
+      expect(results.issues[0].key).toBe('TEST-1');
+    });
+
+    it('should filter by sprint IS NOT EMPTY', () => {
+      const issue1 = createTestIssue('TEST-1', testProject);
+      (issue1.fields as any).sprint = { name: 'Sprint 1' };
+
+      const issue2 = createTestIssue('TEST-2', testProject);
+      (issue2.fields as any).sprint = null;
+
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+
+      const results = queryEngine.executeJQL({ jql: 'sprint IS NOT EMPTY' });
+
+      expect(results.total).toBe(1);
+      expect(results.issues[0].key).toBe('TEST-1');
+    });
+  });
 });
 
 // Helper function to create test issues

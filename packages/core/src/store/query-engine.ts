@@ -1,7 +1,7 @@
 import type { DataStore } from './data-store.js';
 import type { IssueFilters, QueryOptions } from './data-store.js';
 import type { SearchResults } from '../types/jira-schemas.js';
-import { parseDateValue, isDateFunction } from '../utils/date-functions.js';
+import { parseDateValue } from '../utils/date-functions.js';
 
 export interface JQLQuery {
   jql: string;
@@ -65,6 +65,15 @@ export class QueryEngine {
 
     // Parse date filters
     this.parseDateFilters(jql, filters);
+
+    // Parse component filters
+    this.parseComponentFilters(jql, filters);
+
+    // Parse version filters
+    this.parseVersionFilters(jql, filters);
+
+    // Parse sprint filters
+    this.parseSprintFilters(jql, filters);
 
     return { filters, orderBy, orderDirection };
   }
@@ -169,8 +178,6 @@ export class QueryEngine {
   }
 
   private parseUserField(jql: string, fieldName: 'assignee' | 'reporter', filters: IssueFilters): void {
-    const capitalizedField = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
-
     // Check for NOT IN
     const notInMatch = jql.match(new RegExp(`${fieldName}\\s+not\\s+in\\s*\\(([^)]+)\\)`, 'i'));
     if (notInMatch) {
@@ -394,10 +401,96 @@ export class QueryEngine {
     return value.trim().replace(/["']/g, '');
   }
 
-  private capitalize(str: string): string {
-    return str
-      .split(' ')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
+  private parseComponentFilters(jql: string, filters: IssueFilters): void {
+    // Check for IS EMPTY / IS NOT EMPTY
+    if (/component\s+is\s+empty/i.test(jql)) {
+      filters.componentIsEmpty = true;
+      return;
+    }
+    if (/component\s+is\s+not\s+empty/i.test(jql)) {
+      filters.componentIsNotEmpty = true;
+      return;
+    }
+
+    // Check for IN
+    const inMatch = jql.match(/component\s+in\s*\(([^)]+)\)/i);
+    if (inMatch) {
+      filters.components = inMatch[1]
+        .split(',')
+        .map((v) => this.cleanValue(v));
+      return;
+    }
+
+    // Check for =
+    const equalsMatch = jql.match(/component\s*=\s*["']?([^"'\s,]+(?:\s+[^"'\s,]+)*)["']?/i);
+    if (equalsMatch) {
+      const quotedMatch = jql.match(/component\s*=\s*["']([^"']+)["']/i);
+      filters.component = quotedMatch ? quotedMatch[1] : equalsMatch[1];
+    }
+  }
+
+  private parseVersionFilters(jql: string, filters: IssueFilters): void {
+    // Fix version filters
+    if (/fixversion\s+is\s+empty/i.test(jql)) {
+      filters.fixVersionIsEmpty = true;
+    }
+    if (/fixversion\s+is\s+not\s+empty/i.test(jql)) {
+      filters.fixVersionIsNotEmpty = true;
+    }
+
+    const fixVersionInMatch = jql.match(/fixversion\s+in\s*\(([^)]+)\)/i);
+    if (fixVersionInMatch) {
+      filters.fixVersions = fixVersionInMatch[1]
+        .split(',')
+        .map((v) => this.cleanValue(v));
+    } else {
+      const fixVersionMatch = jql.match(/fixversion\s*=\s*["']?([^"'\s,]+(?:\s+[^"'\s,]+)*)["']?/i);
+      if (fixVersionMatch) {
+        const quotedMatch = jql.match(/fixversion\s*=\s*["']([^"']+)["']/i);
+        filters.fixVersion = quotedMatch ? quotedMatch[1] : fixVersionMatch[1];
+      }
+    }
+
+    // Affected version filters
+    const affectedVersionInMatch = jql.match(/affectedversion\s+in\s*\(([^)]+)\)/i);
+    if (affectedVersionInMatch) {
+      filters.affectedVersions = affectedVersionInMatch[1]
+        .split(',')
+        .map((v) => this.cleanValue(v));
+    } else {
+      const affectedVersionMatch = jql.match(/affectedversion\s*=\s*["']?([^"'\s,]+(?:\s+[^"'\s,]+)*)["']?/i);
+      if (affectedVersionMatch) {
+        const quotedMatch = jql.match(/affectedversion\s*=\s*["']([^"']+)["']/i);
+        filters.affectedVersion = quotedMatch ? quotedMatch[1] : affectedVersionMatch[1];
+      }
+    }
+  }
+
+  private parseSprintFilters(jql: string, filters: IssueFilters): void {
+    // Check for IS EMPTY / IS NOT EMPTY
+    if (/sprint\s+is\s+empty/i.test(jql)) {
+      filters.sprintIsEmpty = true;
+      return;
+    }
+    if (/sprint\s+is\s+not\s+empty/i.test(jql)) {
+      filters.sprintIsNotEmpty = true;
+      return;
+    }
+
+    // Check for IN
+    const inMatch = jql.match(/sprint\s+in\s*\(([^)]+)\)/i);
+    if (inMatch) {
+      filters.sprints = inMatch[1]
+        .split(',')
+        .map((v) => this.cleanValue(v));
+      return;
+    }
+
+    // Check for =
+    const equalsMatch = jql.match(/sprint\s*=\s*["']?([^"'\s,]+(?:\s+[^"'\s,]+)*)["']?/i);
+    if (equalsMatch) {
+      const quotedMatch = jql.match(/sprint\s*=\s*["']([^"']+)["']/i);
+      filters.sprint = quotedMatch ? quotedMatch[1] : equalsMatch[1];
+    }
   }
 }
