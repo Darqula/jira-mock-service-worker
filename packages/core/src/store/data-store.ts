@@ -82,6 +82,20 @@ export interface IssueFilters {
   resolvedBefore?: string;
   dueAfter?: string;
   dueBefore?: string;
+  component?: string;
+  components?: string[];
+  componentIsEmpty?: boolean;
+  componentIsNotEmpty?: boolean;
+  fixVersion?: string;
+  fixVersions?: string[];
+  fixVersionIsEmpty?: boolean;
+  fixVersionIsNotEmpty?: boolean;
+  affectedVersion?: string;
+  affectedVersions?: string[];
+  sprint?: string;
+  sprints?: string[];
+  sprintIsEmpty?: boolean;
+  sprintIsNotEmpty?: boolean;
 }
 
 export class DataStore {
@@ -512,6 +526,108 @@ export class DataStore {
       results = results.filter((issue) => {
         const due = (issue.fields as any).duedate;
         return due && new Date(due).getTime() <= beforeDate;
+      });
+    }
+
+    // Component filters
+    if (filters.component) {
+      results = results.filter((issue) => {
+        const components = (issue.fields as any).components;
+        return components && components.some((c: any) => c.name === filters.component);
+      });
+    }
+
+    if (filters.components && filters.components.length > 0) {
+      results = results.filter((issue) => {
+        const components = (issue.fields as any).components;
+        return components && components.some((c: any) => filters.components!.includes(c.name));
+      });
+    }
+
+    if (filters.componentIsEmpty) {
+      results = results.filter((issue) => {
+        const components = (issue.fields as any).components;
+        return !components || components.length === 0;
+      });
+    }
+
+    if (filters.componentIsNotEmpty) {
+      results = results.filter((issue) => {
+        const components = (issue.fields as any).components;
+        return components && components.length > 0;
+      });
+    }
+
+    // Fix version filters
+    if (filters.fixVersion) {
+      results = results.filter((issue) => {
+        const fixVersions = (issue.fields as any).fixVersions;
+        return fixVersions && fixVersions.some((v: any) => v.name === filters.fixVersion);
+      });
+    }
+
+    if (filters.fixVersions && filters.fixVersions.length > 0) {
+      results = results.filter((issue) => {
+        const fixVersions = (issue.fields as any).fixVersions;
+        return fixVersions && fixVersions.some((v: any) => filters.fixVersions!.includes(v.name));
+      });
+    }
+
+    if (filters.fixVersionIsEmpty) {
+      results = results.filter((issue) => {
+        const fixVersions = (issue.fields as any).fixVersions;
+        return !fixVersions || fixVersions.length === 0;
+      });
+    }
+
+    if (filters.fixVersionIsNotEmpty) {
+      results = results.filter((issue) => {
+        const fixVersions = (issue.fields as any).fixVersions;
+        return fixVersions && fixVersions.length > 0;
+      });
+    }
+
+    // Affected version filters
+    if (filters.affectedVersion) {
+      results = results.filter((issue) => {
+        const versions = (issue.fields as any).versions;
+        return versions && versions.some((v: any) => v.name === filters.affectedVersion);
+      });
+    }
+
+    if (filters.affectedVersions && filters.affectedVersions.length > 0) {
+      results = results.filter((issue) => {
+        const versions = (issue.fields as any).versions;
+        return versions && versions.some((v: any) => filters.affectedVersions!.includes(v.name));
+      });
+    }
+
+    // Sprint filters
+    if (filters.sprint) {
+      results = results.filter((issue) => {
+        const sprint = (issue.fields as any).sprint;
+        return sprint && sprint.name === filters.sprint;
+      });
+    }
+
+    if (filters.sprints && filters.sprints.length > 0) {
+      results = results.filter((issue) => {
+        const sprint = (issue.fields as any).sprint;
+        return sprint && filters.sprints!.includes(sprint.name);
+      });
+    }
+
+    if (filters.sprintIsEmpty) {
+      results = results.filter((issue) => {
+        const sprint = (issue.fields as any).sprint;
+        return !sprint;
+      });
+    }
+
+    if (filters.sprintIsNotEmpty) {
+      results = results.filter((issue) => {
+        const sprint = (issue.fields as any).sprint;
+        return !!sprint;
       });
     }
 
