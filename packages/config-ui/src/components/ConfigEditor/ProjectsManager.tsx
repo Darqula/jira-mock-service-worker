@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { Plus, Trash2, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, ChevronRight, Copy } from 'lucide-react';
 import { StatusSection } from './StatusSection';
 import { IssueTypesSection } from './IssueTypesSection';
 import { SprintsSection } from './SprintsSection';
@@ -66,6 +66,51 @@ export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
     setExpandedProjects(newExpanded);
   };
 
+  const cloneProject = (index: number) => {
+    const sourceProject = config.projects[index];
+
+    // Generate a unique project key
+    let newProjectKey = `${sourceProject.projectKey}_COPY`;
+    let counter = 1;
+
+    // Ensure the project key is unique
+    while (config.projects.some(p => p.projectKey === newProjectKey)) {
+      counter++;
+      newProjectKey = `${sourceProject.projectKey}_COPY${counter}`;
+    }
+
+    // Deep clone the project configuration
+    const clonedProject: ProjectConfigWithKey = {
+      ...JSON.parse(JSON.stringify(sourceProject)),
+      projectKey: newProjectKey,
+      projectName: sourceProject.projectName ? `Copy of ${sourceProject.projectName}` : undefined,
+    };
+
+    // Insert the cloned project after the source project
+    const newProjects = [
+      ...config.projects.slice(0, index + 1),
+      clonedProject,
+      ...config.projects.slice(index + 1),
+    ];
+
+    onChange({
+      ...config,
+      projects: newProjects,
+    });
+
+    // Expand the newly cloned project and adjust indices
+    const newExpanded = new Set<number>();
+    expandedProjects.forEach(expandedIndex => {
+      if (expandedIndex <= index) {
+        newExpanded.add(expandedIndex);
+      } else {
+        newExpanded.add(expandedIndex + 1);
+      }
+    });
+    newExpanded.add(index + 1);
+    setExpandedProjects(newExpanded);
+  };
+
   const updateProject = (index: number, updates: Partial<ProjectConfigWithKey>) => {
     const newProjects = [...config.projects];
     newProjects[index] = { ...newProjects[index], ...updates };
@@ -119,15 +164,26 @@ export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
                     </CardDescription>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => removeProject(index)}
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                  aria-label={`Remove project ${project.projectKey}`}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => cloneProject(index)}
+                    className="hover:bg-accent"
+                    aria-label={`Clone project ${project.projectKey}`}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeProject(index)}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    aria-label={`Remove project ${project.projectKey}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </CardHeader>
 
