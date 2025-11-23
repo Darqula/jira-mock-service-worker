@@ -11,24 +11,27 @@ import { X, Plus } from 'lucide-react';
 interface DataSectionProps {
   config: JiraMockConfig;
   onChange: (config: JiraMockConfig) => void;
+  projectIndex: number;
 }
 
-export function DataSection({ config, onChange }: DataSectionProps) {
-  const data = config.globalDefaults?.data || {};
+export function DataSection({ config, onChange, projectIndex }: DataSectionProps) {
+  const data = config.projects[projectIndex]?.data || {};
   const [newAssignee, setNewAssignee] = useState('');
   const [newPriority, setNewPriority] = useState('');
   const [newLabel, setNewLabel] = useState('');
 
   const updateData = (updates: Partial<typeof data>) => {
+    const newProjects = [...config.projects];
+    newProjects[projectIndex] = {
+      ...newProjects[projectIndex],
+      data: {
+        ...data,
+        ...updates,
+      },
+    };
     onChange({
       ...config,
-      globalDefaults: {
-        ...config.globalDefaults,
-        data: {
-          ...data,
-          ...updates,
-        },
-      },
+      projects: newProjects,
     });
   };
 
