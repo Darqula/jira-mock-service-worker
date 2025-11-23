@@ -72,7 +72,7 @@ describe('QueryEngine', () => {
   describe('Basic JQL queries', () => {
     it('should filter by project key', () => {
       const issue1: IssueBean = createTestIssue('TEST-1', testProject);
-      const issue2: IssueBean = createTestIssue('OTHER-2', { ...testProject, key: 'OTHER' }); // Use OTHER-2 to avoid ID collision
+      const issue2: IssueBean = createTestIssue('OTHER-2', { ...testProject, id: '2', key: 'OTHER' }); // Use OTHER-2 to avoid ID collision
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -81,6 +81,87 @@ describe('QueryEngine', () => {
 
       expect(results.total).toBe(1);
       expect(results.issues[0].key).toBe('TEST-1');
+    });
+
+    it('should filter by project ID', () => {
+      const project1 = { ...testProject, id: '1001', key: 'PROJ1' };
+      const project2 = { ...testProject, id: '1002', key: 'PROJ2' };
+      const issue1: IssueBean = { ...createTestIssue('PROJ1-10', project1), id: '10' };
+      const issue2: IssueBean = { ...createTestIssue('PROJ2-20', project2), id: '20' };
+
+      dataStore.addProject(project1);
+      dataStore.addProject(project2);
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+
+      const results = queryEngine.executeJQL({ jql: 'project = 1001' });
+
+      expect(results.total).toBe(1);
+      expect(results.issues[0].key).toBe('PROJ1-10');
+      expect(results.issues[0].fields.project.id).toBe('1001');
+    });
+
+    it('should filter by project ID using IN clause', () => {
+      const project1 = { ...testProject, id: '1001', key: 'PROJ1' };
+      const project2 = { ...testProject, id: '1002', key: 'PROJ2' };
+      const project3 = { ...testProject, id: '1003', key: 'PROJ3' };
+      const issue1: IssueBean = { ...createTestIssue('PROJ1-10', project1), id: '10' };
+      const issue2: IssueBean = { ...createTestIssue('PROJ2-20', project2), id: '20' };
+      const issue3: IssueBean = { ...createTestIssue('PROJ3-30', project3), id: '30' };
+
+      dataStore.addProject(project1);
+      dataStore.addProject(project2);
+      dataStore.addProject(project3);
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+      dataStore.addIssue(issue3);
+
+      const results = queryEngine.executeJQL({ jql: 'project in (1001, 1003)' });
+
+      expect(results.total).toBe(2);
+      expect(results.issues.map(i => i.key)).toEqual(['PROJ1-10', 'PROJ3-30']);
+    });
+
+    it('should filter by project KEY using IN clause', () => {
+      const project1 = { ...testProject, id: '1001', key: 'PROJ1' };
+      const project2 = { ...testProject, id: '1002', key: 'PROJ2' };
+      const project3 = { ...testProject, id: '1003', key: 'PROJ3' };
+      const issue1: IssueBean = { ...createTestIssue('PROJ1-10', project1), id: '10' };
+      const issue2: IssueBean = { ...createTestIssue('PROJ2-20', project2), id: '20' };
+      const issue3: IssueBean = { ...createTestIssue('PROJ3-30', project3), id: '30' };
+
+      dataStore.addProject(project1);
+      dataStore.addProject(project2);
+      dataStore.addProject(project3);
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+      dataStore.addIssue(issue3);
+
+      const results = queryEngine.executeJQL({ jql: 'project in (PROJ1, PROJ3)' });
+
+      expect(results.total).toBe(2);
+      expect(results.issues.map(i => i.key)).toEqual(['PROJ1-10', 'PROJ3-30']);
+    });
+
+    it('should filter by mixed project IDs and KEYs using IN clause', () => {
+      const project1 = { ...testProject, id: '1001', key: 'PROJ1' };
+      const project2 = { ...testProject, id: '1002', key: 'PROJ2' };
+      const project3 = { ...testProject, id: '1003', key: 'PROJ3' };
+      const issue1: IssueBean = { ...createTestIssue('PROJ1-10', project1), id: '10' };
+      const issue2: IssueBean = { ...createTestIssue('PROJ2-20', project2), id: '20' };
+      const issue3: IssueBean = { ...createTestIssue('PROJ3-30', project3), id: '30' };
+
+      dataStore.addProject(project1);
+      dataStore.addProject(project2);
+      dataStore.addProject(project3);
+      dataStore.addIssue(issue1);
+      dataStore.addIssue(issue2);
+      dataStore.addIssue(issue3);
+
+      const results = queryEngine.executeJQL({ jql: 'project in (1001, PROJ3)' });
+
+      expect(results.total).toBe(2);
+      expect(results.issues.map(i => i.key)).toEqual(['PROJ1-10', 'PROJ3-30']);
     });
 
     it('should filter by status', () => {
