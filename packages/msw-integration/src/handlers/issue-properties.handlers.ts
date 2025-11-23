@@ -37,17 +37,20 @@ export function createIssuePropertiesHandlers(dataStore: DataStore, baseUrl: str
 
       const result: any = {};
 
+      // Convert propertyKeys to Set for O(1) lookup
+      const propertyKeySet = body.propertyKeys && body.propertyKeys.length > 0
+        ? new Set(body.propertyKeys)
+        : null;
+
       body.issueIds.forEach((issueId) => {
         const issue = dataStore.getIssue(issueId);
         if (issue) {
           const allProperties = dataStore.getAllIssueProperties(issue.id);
 
-          // Filter by property keys if provided
+          // Filter by property keys if provided (using Set for O(1) lookup)
           let properties = allProperties;
-          if (body.propertyKeys && body.propertyKeys.length > 0) {
-            properties = allProperties.filter((p) =>
-              body.propertyKeys!.includes(p.key)
-            );
+          if (propertyKeySet) {
+            properties = allProperties.filter((p) => propertyKeySet.has(p.key));
           }
 
           if (properties.length > 0) {

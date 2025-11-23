@@ -123,18 +123,21 @@ export function createMetadataHandlers(dataStore: DataStore, baseUrl: string) {
 
       let projects = dataStore.getAllProjects();
 
-      // Filter by project IDs or keys if provided
+      // Filter by project IDs or keys if provided (using Set for O(1) lookup)
       if (projectIds) {
-        projects = projects.filter((p) => projectIds.includes(p.id));
+        const projectIdSet = new Set(projectIds);
+        projects = projects.filter((p) => projectIdSet.has(p.id));
       } else if (projectKeys) {
-        projects = projects.filter((p) => projectKeys.includes(p.key));
+        const projectKeySet = new Set(projectKeys);
+        projects = projects.filter((p) => projectKeySet.has(p.key));
       }
 
       let issueTypes = dataStore.getAllIssueTypes();
 
-      // Filter by issue type IDs if provided
+      // Filter by issue type IDs if provided (using Set for O(1) lookup)
       if (issueTypeIds) {
-        issueTypes = issueTypes.filter((it) => issueTypeIds.includes(it.id));
+        const issueTypeIdSet = new Set(issueTypeIds);
+        issueTypes = issueTypes.filter((it) => issueTypeIdSet.has(it.id));
       }
 
       const priorities = dataStore.getAllPriorities();
