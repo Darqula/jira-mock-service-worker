@@ -10,7 +10,21 @@ export function createGenerationContext(seed?: number): GenerationContext {
   }
 
   return {
-    config: { version: '1.0', projects: [{ projectKey: 'TEST', issueCount: 1 }] },
+    config: {
+      version: '1.0',
+      projects: [
+        {
+          projectKey: 'TEST',
+          // Configure issue types to generate exactly 1 issue
+          issueTypes: {
+            epic: { count: 1, childrenPerEpic: 0 },
+            story: { standaloneCount: 0 },
+            task: { standaloneCount: 0 },
+            bug: { standaloneCount: 0 },
+          },
+        },
+      ],
+    },
     faker,
     idGenerator: new IdGenerator(),
     dateGenerator: new DateGenerator(faker),
