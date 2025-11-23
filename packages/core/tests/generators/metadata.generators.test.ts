@@ -249,7 +249,6 @@ describe('Metadata Generators', () => {
       it('should generate project with specified key', () => {
         const projectConfig = {
           projectKey: 'TEST',
-          issueCount: 100,
         };
 
         const project = generator.generateProject(projectConfig, testUsers, context);
@@ -261,7 +260,6 @@ describe('Metadata Generators', () => {
         const projectConfig = {
           projectKey: 'TEST',
           projectName: 'Test Project',
-          issueCount: 100,
         };
 
         const project = generator.generateProject(projectConfig, testUsers, context);
@@ -272,7 +270,6 @@ describe('Metadata Generators', () => {
       it('should generate project name if not specified', () => {
         const projectConfig = {
           projectKey: 'TEST',
-          issueCount: 100,
         };
 
         const project = generator.generateProject(projectConfig, testUsers, context);
@@ -285,13 +282,11 @@ describe('Metadata Generators', () => {
         const companyConfig = {
           projectKey: 'COMP',
           projectType: 'company-managed' as const,
-          issueCount: 100,
         };
 
         const teamConfig = {
           projectKey: 'TEAM',
           projectType: 'team-managed' as const,
-          issueCount: 100,
         };
 
         const companyProject = generator.generateProject(companyConfig, testUsers, context);
@@ -304,7 +299,6 @@ describe('Metadata Generators', () => {
       it('should assign a lead from available users', () => {
         const projectConfig = {
           projectKey: 'TEST',
-          issueCount: 100,
         };
 
         const project = generator.generateProject(projectConfig, testUsers, context);
@@ -316,7 +310,6 @@ describe('Metadata Generators', () => {
       it('should include self URL', () => {
         const projectConfig = {
           projectKey: 'TEST',
-          issueCount: 100,
         };
 
         const project = generator.generateProject(projectConfig, testUsers, context);
@@ -327,8 +320,8 @@ describe('Metadata Generators', () => {
       });
 
       it('should generate unique IDs for different projects', () => {
-        const config1 = { projectKey: 'PROJ1', issueCount: 100 };
-        const config2 = { projectKey: 'PROJ2', issueCount: 100 };
+        const config1 = { projectKey: 'PROJ1' };
+        const config2 = { projectKey: 'PROJ2' };
 
         const project1 = generator.generateProject(config1, testUsers, context);
         const project2 = generator.generateProject(config2, testUsers, context);

@@ -9,11 +9,9 @@ describe('Data Generation', () => {
       projects: [
         {
           projectKey: 'TEST1',
-          issueCount: 10,
         },
         {
           projectKey: 'TEST2',
-          issueCount: 10,
         },
       ],
     };
@@ -30,15 +28,12 @@ describe('Data Generation', () => {
       projects: [
         {
           projectKey: 'TEST1',
-          issueCount: 5,
         },
         {
           projectKey: 'TEST2',
-          issueCount: 5,
         },
         {
           projectKey: 'TEST3',
-          issueCount: 5,
         },
       ],
     };
@@ -62,11 +57,9 @@ describe('Data Generation', () => {
       projects: [
         {
           projectKey: 'TEST1',
-          issueCount: 15,
         },
         {
           projectKey: 'TEST2',
-          issueCount: 15,
         },
       ],
     };
@@ -75,9 +68,9 @@ describe('Data Generation', () => {
     const proj1Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'TEST1');
     const proj2Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'TEST2');
 
-    // Each project should have the specified number of base issues (may have more due to epics/subtasks)
-    expect(proj1Issues.length).toBeGreaterThanOrEqual(15);
-    expect(proj2Issues.length).toBeGreaterThanOrEqual(15);
+    // Each project should have issues generated from issue types configuration
+    expect(proj1Issues.length).toBeGreaterThan(0);
+    expect(proj2Issues.length).toBeGreaterThan(0);
   });
 
   it('should generate users', () => {
@@ -86,7 +79,6 @@ describe('Data Generation', () => {
       projects: [
         {
           projectKey: 'TEST',
-          issueCount: 5,
         },
       ],
     };
@@ -103,7 +95,6 @@ describe('Data Generation', () => {
       projects: [
         {
           projectKey: 'TEST',
-          issueCount: 5,
         },
       ],
     };
@@ -122,7 +113,6 @@ describe('Data Generation', () => {
       projects: [
         {
           projectKey: 'TEST',
-          issueCount: 5,
         },
       ],
     };
@@ -140,7 +130,6 @@ describe('Data Generation', () => {
       projects: [
         {
           projectKey: 'TEST',
-          issueCount: 5,
           seed: 99999,
         },
       ],
@@ -162,11 +151,9 @@ describe('Data Generation', () => {
       projects: [
         {
           projectKey: 'TEST1',
-          issueCount: 10,
         },
         {
           projectKey: 'TEST2',
-          issueCount: 10,
         },
       ],
     };
@@ -192,7 +179,6 @@ describe('Data Generation', () => {
       projects: [
         {
           projectKey: 'TEST',
-          issueCount: 10,
         },
       ],
     };

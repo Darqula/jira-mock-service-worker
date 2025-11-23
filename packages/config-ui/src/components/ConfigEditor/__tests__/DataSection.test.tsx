@@ -8,14 +8,15 @@ describe('DataSection', () => {
 
   const defaultConfig: JiraMockConfig = {
     version: '1.0',
-    projects: [{ projectKey: 'TEST', issueCount: 50 }],
-    globalDefaults: {
+    projects: [{
+      projectKey: 'TEST',
+      issueCount: 50,
       data: {
         assignees: ['user1@example.com', 'user2@example.com'],
         priorities: ['Low', 'Medium', 'High'],
         labels: ['bug', 'feature'],
       },
-    },
+    }],
   };
 
   beforeEach(() => {
@@ -24,14 +25,14 @@ describe('DataSection', () => {
 
   describe('Assignees', () => {
     it('renders existing assignees', () => {
-      render(<DataSection config={defaultConfig} onChange={mockOnChange} />);
+      render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
       expect(screen.getByText('user1@example.com')).toBeInTheDocument();
       expect(screen.getByText('user2@example.com')).toBeInTheDocument();
     });
 
     it('adds a new assignee', () => {
-      render(<DataSection config={defaultConfig} onChange={mockOnChange} />);
+      render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
       const input = screen.getByPlaceholderText('user@example.com');
       fireEvent.change(input, { target: { value: 'newuser@example.com' } });
@@ -42,18 +43,18 @@ describe('DataSection', () => {
 
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultConfig,
-        globalDefaults: {
-          ...defaultConfig.globalDefaults,
+        projects: [{
+          ...defaultConfig.projects[0],
           data: {
-            ...defaultConfig.globalDefaults?.data,
+            ...defaultConfig.projects[0].data,
             assignees: ['user1@example.com', 'user2@example.com', 'newuser@example.com'],
           },
-        },
+        }],
       });
     });
 
     it('does not add duplicate assignees', () => {
-      render(<DataSection config={defaultConfig} onChange={mockOnChange} />);
+      render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
       const input = screen.getByPlaceholderText('user@example.com');
       fireEvent.change(input, { target: { value: 'user1@example.com' } });
@@ -65,7 +66,7 @@ describe('DataSection', () => {
     });
 
     it('removes an assignee', () => {
-      render(<DataSection config={defaultConfig} onChange={mockOnChange} />);
+      render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
       const removeButtons = screen.getAllByRole('button').filter(button =>
         button.querySelector('.lucide-x')
@@ -75,20 +76,20 @@ describe('DataSection', () => {
 
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultConfig,
-        globalDefaults: {
-          ...defaultConfig.globalDefaults,
+        projects: [{
+          ...defaultConfig.projects[0],
           data: {
-            ...defaultConfig.globalDefaults?.data,
+            ...defaultConfig.projects[0].data,
             assignees: ['user2@example.com'],
           },
-        },
+        }],
       });
     });
   });
 
   describe('Priorities', () => {
     it('renders existing priorities', () => {
-      render(<DataSection config={defaultConfig} onChange={mockOnChange} />);
+      render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
       expect(screen.getByText('Low')).toBeInTheDocument();
       expect(screen.getByText('Medium')).toBeInTheDocument();
@@ -96,7 +97,7 @@ describe('DataSection', () => {
     });
 
     it('adds a new priority', () => {
-      render(<DataSection config={defaultConfig} onChange={mockOnChange} />);
+      render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
       const input = screen.getByPlaceholderText('Critical');
       fireEvent.change(input, { target: { value: 'Urgent' } });
@@ -107,18 +108,18 @@ describe('DataSection', () => {
 
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultConfig,
-        globalDefaults: {
-          ...defaultConfig.globalDefaults,
+        projects: [{
+          ...defaultConfig.projects[0],
           data: {
-            ...defaultConfig.globalDefaults?.data,
+            ...defaultConfig.projects[0].data,
             priorities: ['Low', 'Medium', 'High', 'Urgent'],
           },
-        },
+        }],
       });
     });
 
     it('removes a priority', () => {
-      render(<DataSection config={defaultConfig} onChange={mockOnChange} />);
+      render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
       const removeButtons = screen.getAllByRole('button').filter(button =>
         button.querySelector('.lucide-x')
@@ -128,27 +129,27 @@ describe('DataSection', () => {
 
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultConfig,
-        globalDefaults: {
-          ...defaultConfig.globalDefaults,
+        projects: [{
+          ...defaultConfig.projects[0],
           data: {
-            ...defaultConfig.globalDefaults?.data,
+            ...defaultConfig.projects[0].data,
             priorities: ['Medium', 'High'],
           },
-        },
+        }],
       });
     });
   });
 
   describe('Labels', () => {
     it('renders existing labels', () => {
-      render(<DataSection config={defaultConfig} onChange={mockOnChange} />);
+      render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
       expect(screen.getByText('bug')).toBeInTheDocument();
       expect(screen.getByText('feature')).toBeInTheDocument();
     });
 
     it('adds a new label', () => {
-      render(<DataSection config={defaultConfig} onChange={mockOnChange} />);
+      render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
       const input = screen.getByPlaceholderText('bug-fix');
       fireEvent.change(input, { target: { value: 'enhancement' } });
@@ -162,18 +163,18 @@ describe('DataSection', () => {
 
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultConfig,
-        globalDefaults: {
-          ...defaultConfig.globalDefaults,
+        projects: [{
+          ...defaultConfig.projects[0],
           data: {
-            ...defaultConfig.globalDefaults?.data,
+            ...defaultConfig.projects[0].data,
             labels: ['bug', 'feature', 'enhancement'],
           },
-        },
+        }],
       });
     });
 
     it('removes a label', () => {
-      render(<DataSection config={defaultConfig} onChange={mockOnChange} />);
+      render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
       const removeButtons = screen.getAllByRole('button').filter(button =>
         button.querySelector('.lucide-x')
@@ -183,13 +184,13 @@ describe('DataSection', () => {
 
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultConfig,
-        globalDefaults: {
-          ...defaultConfig.globalDefaults,
+        projects: [{
+          ...defaultConfig.projects[0],
           data: {
-            ...defaultConfig.globalDefaults?.data,
+            ...defaultConfig.projects[0].data,
             labels: ['bug'],
           },
-        },
+        }],
       });
     });
   });
@@ -200,7 +201,7 @@ describe('DataSection', () => {
       projects: [{ projectKey: 'TEST', issueCount: 50 }],
     };
 
-    render(<DataSection config={emptyConfig} onChange={mockOnChange} />);
+    render(<DataSection config={emptyConfig} onChange={mockOnChange} projectIndex={0} />);
 
     // Should still render the component without errors
     expect(screen.getByText('Data Options')).toBeInTheDocument();

@@ -7,7 +7,6 @@ describe('ConfigEditor Integration Tests', () => {
     render(<ConfigEditor />);
 
     expect(screen.getByRole('heading', { name: /Projects \(\d+\)/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /Global Defaults/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Status Distribution/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Issue Types Configuration/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Sprints Configuration/i })).toBeInTheDocument();
@@ -48,25 +47,6 @@ describe('ConfigEditor Integration Tests', () => {
 
     // The component should maintain valid config structure
     // (This is implicitly tested by the component not crashing)
-  });
-
-  it('handles global defaults independently from projects', async () => {
-    render(<ConfigEditor />);
-
-    // Update global seed
-    const seedInput = screen.getByLabelText(/Global Seed/i);
-    fireEvent.change(seedInput, { target: { value: '12345' } });
-
-    // Add a project
-    const addProjectButton = screen.getByRole('button', { name: /Add Project/i });
-    fireEvent.click(addProjectButton);
-
-    await waitFor(() => {
-      expect(screen.getByText(/Projects \(2\)/i)).toBeInTheDocument();
-    });
-
-    // Seed should still be set
-    expect(seedInput).toHaveValue(12345);
   });
 
   it('renders action buttons', () => {

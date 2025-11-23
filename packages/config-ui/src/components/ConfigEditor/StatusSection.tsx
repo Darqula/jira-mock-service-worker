@@ -8,21 +8,24 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 interface StatusSectionProps {
   config: JiraMockConfig;
   onChange: (config: JiraMockConfig) => void;
+  projectIndex: number;
 }
 
-export function StatusSection({ config, onChange }: StatusSectionProps) {
-  const status = config.globalDefaults?.statusDistribution || {};
+export function StatusSection({ config, onChange, projectIndex }: StatusSectionProps) {
+  const status = config.projects[projectIndex]?.statusDistribution || {};
 
   const updateStatus = (updates: Partial<typeof status>) => {
+    const newProjects = [...config.projects];
+    newProjects[projectIndex] = {
+      ...newProjects[projectIndex],
+      statusDistribution: {
+        ...status,
+        ...updates,
+      },
+    };
     onChange({
       ...config,
-      globalDefaults: {
-        ...config.globalDefaults,
-        statusDistribution: {
-          ...status,
-          ...updates,
-        },
-      },
+      projects: newProjects,
     });
   };
 

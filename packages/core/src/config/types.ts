@@ -168,6 +168,7 @@ export interface ProjectConfig {
 
 /**
  * Project configuration with required project-specific fields
+ * Issue count is automatically calculated from issue types configuration
  */
 export interface ProjectConfigWithKey extends ProjectConfig {
   /** Project key (e.g., "PROJ", "DEMO") - Required and must be unique */
@@ -176,18 +177,39 @@ export interface ProjectConfigWithKey extends ProjectConfig {
   projectName?: string;
   /** Project type. Default: "company-managed" */
   projectType?: ProjectType;
-  /** Number of issues to generate for this project (1-10000) - Required */
-  issueCount: number;
 }
 
 /**
- * Main Jira Mock configuration interface with per-project support
+ * Calculates the total issue count for a project based on its issue types configuration
+ * @param config - Project configuration
+ * @returns Total number of issues that will be generated
+ */
+export function calculateIssueCount(config: ProjectConfig): number {
+  const issueTypes = config.issueTypes;
+
+  if (!issueTypes) {
+    // Default configuration: 10 epics with 100 children each
+    return 10 * (1 + 100);
+  }
+
+  const epicCount = issueTypes.epic?.count ?? 10;
+  const childrenPerEpic = issueTypes.epic?.childrenPerEpic ?? 100;
+  const storyCount = issueTypes.story?.standaloneCount ?? 0;
+  const taskCount = issueTypes.task?.standaloneCount ?? 0;
+  const bugCount = issueTypes.bug?.standaloneCount ?? 0;
+
+  // Total = epics + (children per epic * number of epics) + standalone stories + standalone tasks + standalone bugs
+  return epicCount + (childrenPerEpic * epicCount) + storyCount + taskCount + bugCount;
+}
+
+/**
+ * Main Jira Mock configuration interface with per-project configuration
+ * All configuration must be specified at the project level.
+ * Built-in defaults apply when project-level configuration is not specified.
  */
 export interface JiraMockConfig {
   /** Configuration version */
   version: '1.0';
-  /** Global defaults inherited by all projects (optional) */
-  globalDefaults?: ProjectConfig;
   /** Array of project-specific configurations (required, min 1 item) */
   projects: ProjectConfigWithKey[];
 }

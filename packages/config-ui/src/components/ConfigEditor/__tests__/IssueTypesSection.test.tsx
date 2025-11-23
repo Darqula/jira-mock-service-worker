@@ -8,8 +8,9 @@ describe('IssueTypesSection', () => {
 
   const defaultConfig: JiraMockConfig = {
     version: '1.0',
-    projects: [{ projectKey: 'TEST', issueCount: 50 }],
-    globalDefaults: {
+    projects: [{
+      projectKey: 'TEST',
+      issueCount: 50,
       issueTypes: {
         epic: {
           count: 10,
@@ -38,7 +39,7 @@ describe('IssueTypesSection', () => {
           labelProbability: 0.3,
         },
       },
-    },
+    }],
   };
 
   beforeEach(() => {
@@ -46,7 +47,7 @@ describe('IssueTypesSection', () => {
   });
 
   it('renders issue types configuration', () => {
-    render(<IssueTypesSection config={defaultConfig} onChange={mockOnChange} />);
+    render(<IssueTypesSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
     expect(screen.getByText('Issue Types Configuration')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Epic' })).toBeInTheDocument();
@@ -56,7 +57,7 @@ describe('IssueTypesSection', () => {
   });
 
   it('switches between tabs', () => {
-    render(<IssueTypesSection config={defaultConfig} onChange={mockOnChange} />);
+    render(<IssueTypesSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
     // Epic tab should be active by default
     expect(screen.getByDisplayValue('10')).toBeInTheDocument(); // Epic count
@@ -70,49 +71,49 @@ describe('IssueTypesSection', () => {
   });
 
   it('updates epic count', () => {
-    render(<IssueTypesSection config={defaultConfig} onChange={mockOnChange} />);
+    render(<IssueTypesSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
     const epicCountInput = screen.getByDisplayValue('10');
     fireEvent.change(epicCountInput, { target: { value: '15' } });
 
     expect(mockOnChange).toHaveBeenCalledWith({
       ...defaultConfig,
-      globalDefaults: {
-        ...defaultConfig.globalDefaults,
+      projects: [{
+        ...defaultConfig.projects[0],
         issueTypes: {
-          ...defaultConfig.globalDefaults?.issueTypes,
+          ...defaultConfig.projects[0].issueTypes,
           epic: {
-            ...defaultConfig.globalDefaults?.issueTypes?.epic,
+            ...defaultConfig.projects[0].issueTypes?.epic,
             count: 15,
           },
         },
-      },
+      }],
     });
   });
 
   it('updates children per epic', () => {
-    render(<IssueTypesSection config={defaultConfig} onChange={mockOnChange} />);
+    render(<IssueTypesSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
     const childrenInput = screen.getByDisplayValue('100');
     fireEvent.change(childrenInput, { target: { value: '150' } });
 
     expect(mockOnChange).toHaveBeenCalledWith({
       ...defaultConfig,
-      globalDefaults: {
-        ...defaultConfig.globalDefaults,
+      projects: [{
+        ...defaultConfig.projects[0],
         issueTypes: {
-          ...defaultConfig.globalDefaults?.issueTypes,
+          ...defaultConfig.projects[0].issueTypes,
           epic: {
-            ...defaultConfig.globalDefaults?.issueTypes?.epic,
+            ...defaultConfig.projects[0].issueTypes?.epic,
             childrenPerEpic: 150,
           },
         },
-      },
+      }],
     });
   });
 
   it('updates story standalone count', () => {
-    render(<IssueTypesSection config={defaultConfig} onChange={mockOnChange} />);
+    render(<IssueTypesSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
     // Switch to Story tab
     const storyTab = screen.getByRole('button', { name: 'Story' });
@@ -123,16 +124,16 @@ describe('IssueTypesSection', () => {
 
     expect(mockOnChange).toHaveBeenCalledWith({
       ...defaultConfig,
-      globalDefaults: {
-        ...defaultConfig.globalDefaults,
+      projects: [{
+        ...defaultConfig.projects[0],
         issueTypes: {
-          ...defaultConfig.globalDefaults?.issueTypes,
+          ...defaultConfig.projects[0].issueTypes,
           story: {
-            ...defaultConfig.globalDefaults?.issueTypes?.story,
+            ...defaultConfig.projects[0].issueTypes?.story,
             standaloneCount: 20,
           },
         },
-      },
+      }],
     });
   });
 
@@ -142,7 +143,7 @@ describe('IssueTypesSection', () => {
       projects: [{ projectKey: 'TEST', issueCount: 50 }],
     };
 
-    render(<IssueTypesSection config={emptyConfig} onChange={mockOnChange} />);
+    render(<IssueTypesSection config={emptyConfig} onChange={mockOnChange} projectIndex={0} />);
 
     // Should still render without errors with default values
     expect(screen.getByText('Issue Types Configuration')).toBeInTheDocument();
