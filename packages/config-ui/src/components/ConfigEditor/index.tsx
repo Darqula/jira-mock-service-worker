@@ -16,7 +16,7 @@ export function ConfigEditor() {
     projects: [
       {
         projectKey: 'PROJ',
-        issueCount: 50,
+        // issueCount is calculated from issue types configuration
       },
     ],
   });

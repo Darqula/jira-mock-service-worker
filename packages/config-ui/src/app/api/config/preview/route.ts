@@ -7,11 +7,26 @@ export async function POST(request: Request) {
     const config: JiraMockConfig = await request.json();
 
     // Generate a small sample to preview - limit to first project with max 5 issues
+    // Configure issue types to generate approximately 5 issues for preview
     const sampleConfig: JiraMockConfig = {
       ...config,
       projects: config.projects.slice(0, 1).map((project) => ({
         ...project,
-        issueCount: Math.min(project.issueCount, 5),
+        issueTypes: {
+          epic: {
+            count: 1,
+            childrenPerEpic: 4,
+          },
+          story: {
+            standaloneCount: 0,
+          },
+          task: {
+            standaloneCount: 0,
+          },
+          bug: {
+            standaloneCount: 0,
+          },
+        },
       })),
     };
 
