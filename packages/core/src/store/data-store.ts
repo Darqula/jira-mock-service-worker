@@ -31,6 +31,8 @@ export interface QueryOptions {
 export interface IssueFilters {
   projectKey?: string;
   projectId?: string;
+  projectKeys?: string[];
+  projectIds?: string[];
   issueType?: string;
   status?: string;
   assignee?: string;
@@ -184,6 +186,16 @@ export class DataStore {
 
     if (filters.projectId) {
       results = results.filter((issue) => issue.fields.project.id === filters.projectId);
+    }
+
+    // Handle array filters with OR logic (for IN clauses)
+    if ((filters.projectKeys && filters.projectKeys.length > 0) ||
+        (filters.projectIds && filters.projectIds.length > 0)) {
+      results = results.filter((issue) => {
+        const matchesKey = filters.projectKeys?.includes(issue.fields.project.key) ?? false;
+        const matchesId = filters.projectIds?.includes(issue.fields.project.id) ?? false;
+        return matchesKey || matchesId;
+      });
     }
 
     if (filters.issueType) {
