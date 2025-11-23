@@ -26,10 +26,45 @@ export class QueryEngine {
   private parseJQL(jql: string): IssueFilters {
     const filters: IssueFilters = {};
 
-    // Parse project (case-insensitive)
-    const projectMatch = jql.match(/project\s*=\s*([a-z0-9_-]+)/i);
-    if (projectMatch) {
-      filters.projectKey = projectMatch[1].toUpperCase();
+    // Parse project with IN clause
+    const projectInMatch = jql.match(/project\s+in\s*\(([^)]+)\)/i);
+    if (projectInMatch) {
+      const values = projectInMatch[1]
+        .split(',')
+        .map((v) => v.trim().replace(/["']/g, ''));
+
+      const ids: string[] = [];
+      const keys: string[] = [];
+
+      for (const value of values) {
+        if (/^\d+$/.test(value)) {
+          // Purely numeric value - treat as project ID
+          ids.push(value);
+        } else {
+          // Contains letters or special chars - treat as project KEY
+          keys.push(value.toUpperCase());
+        }
+      }
+
+      if (ids.length > 0) {
+        filters.projectIds = ids;
+      }
+      if (keys.length > 0) {
+        filters.projectKeys = keys;
+      }
+    } else {
+      // Parse single project with = operator (case-insensitive)
+      const projectMatch = jql.match(/project\s*=\s*([a-z0-9_-]+)/i);
+      if (projectMatch) {
+        const value = projectMatch[1];
+        if (/^\d+$/.test(value)) {
+          // Purely numeric value - treat as project ID
+          filters.projectId = value;
+        } else {
+          // Contains letters or special chars - treat as project KEY
+          filters.projectKey = value.toUpperCase();
+        }
+      }
     }
 
     // Parse status
