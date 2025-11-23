@@ -108,7 +108,8 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
       // Find issue type (build Map for O(1) lookup)
       const issueTypes = dataStore.getAllIssueTypes();
       const issueTypeMap = new Map(issueTypes.flatMap(it => [[it.id, it], [it.name, it]]));
-      const issueType = issueTypeMap.get(body.fields.issuetype.id) || issueTypeMap.get(body.fields.issuetype.name);
+      const issueType = (body.fields.issuetype.id && issueTypeMap.get(body.fields.issuetype.id)) ||
+                        (body.fields.issuetype.name && issueTypeMap.get(body.fields.issuetype.name));
 
       if (!issueType) {
         return HttpResponse.json(
@@ -122,7 +123,9 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
       const priorityMap = new Map(priorities.flatMap(p => [[p.id, p], [p.name, p]]));
       const priority =
         body.fields.priority
-          ? priorityMap.get(body.fields.priority.id) || priorityMap.get(body.fields.priority.name) || priorities[2]
+          ? (body.fields.priority.id && priorityMap.get(body.fields.priority.id)) ||
+            (body.fields.priority.name && priorityMap.get(body.fields.priority.name)) ||
+            priorities[2]
           : priorities[2];
 
       // Find or default status
