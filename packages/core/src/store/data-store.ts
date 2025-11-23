@@ -34,12 +34,68 @@ export interface IssueFilters {
   projectKeys?: string[];
   projectIds?: string[];
   issueType?: string;
+  issueTypes?: string[];
+  issueTypeExclude?: string;
+  issueTypesExclude?: string[];
   status?: string;
+  statuses?: string[];
+  statusExclude?: string;
+  statusesExclude?: string[];
   assignee?: string;
+  assignees?: string[];
+  assigneeExclude?: string;
+  assigneesExclude?: string[];
+  assigneeIsEmpty?: boolean;
+  assigneeIsNotEmpty?: boolean;
   reporter?: string;
+  reporters?: string[];
+  reporterExclude?: string;
+  reportersExclude?: string[];
+  reporterIsEmpty?: boolean;
+  reporterIsNotEmpty?: boolean;
   priority?: string;
+  priorities?: string[];
+  priorityExclude?: string;
+  prioritiesExclude?: string[];
   labels?: string[];
+  labelsExclude?: string[];
+  labelsIsEmpty?: boolean;
+  labelsIsNotEmpty?: boolean;
   keys?: string[];
+  keysExclude?: string[];
+  resolution?: string;
+  resolutions?: string[];
+  resolutionIsEmpty?: boolean;
+  resolutionIsNotEmpty?: boolean;
+  summaryContains?: string;
+  summaryNotContains?: string;
+  descriptionContains?: string;
+  descriptionNotContains?: string;
+  textContains?: string;
+  createdAfter?: string;
+  createdBefore?: string;
+  createdEquals?: string;
+  updatedAfter?: string;
+  updatedBefore?: string;
+  updatedEquals?: string;
+  resolvedAfter?: string;
+  resolvedBefore?: string;
+  dueAfter?: string;
+  dueBefore?: string;
+  component?: string;
+  components?: string[];
+  componentIsEmpty?: boolean;
+  componentIsNotEmpty?: boolean;
+  fixVersion?: string;
+  fixVersions?: string[];
+  fixVersionIsEmpty?: boolean;
+  fixVersionIsNotEmpty?: boolean;
+  affectedVersion?: string;
+  affectedVersions?: string[];
+  sprint?: string;
+  sprints?: string[];
+  sprintIsEmpty?: boolean;
+  sprintIsNotEmpty?: boolean;
 }
 
 export class DataStore {
@@ -180,6 +236,7 @@ export class DataStore {
     let results = this.getAllIssues();
 
     // Apply filters
+    // Project filters
     if (filters.projectKey) {
       results = results.filter((issue) => issue.fields.project.key === filters.projectKey);
     }
@@ -198,38 +255,380 @@ export class DataStore {
       });
     }
 
+    // Issue type filters
     if (filters.issueType) {
       results = results.filter((issue) => issue.fields.issuetype.name === filters.issueType);
     }
 
+    if (filters.issueTypes && filters.issueTypes.length > 0) {
+      results = results.filter((issue) => filters.issueTypes!.includes(issue.fields.issuetype.name));
+    }
+
+    if (filters.issueTypeExclude) {
+      results = results.filter((issue) => issue.fields.issuetype.name !== filters.issueTypeExclude);
+    }
+
+    if (filters.issueTypesExclude && filters.issueTypesExclude.length > 0) {
+      results = results.filter((issue) => !filters.issueTypesExclude!.includes(issue.fields.issuetype.name));
+    }
+
+    // Status filters
     if (filters.status) {
       results = results.filter((issue) => issue.fields.status.name === filters.status);
     }
 
+    if (filters.statuses && filters.statuses.length > 0) {
+      results = results.filter((issue) => filters.statuses!.includes(issue.fields.status.name));
+    }
+
+    if (filters.statusExclude) {
+      results = results.filter((issue) => issue.fields.status.name !== filters.statusExclude);
+    }
+
+    if (filters.statusesExclude && filters.statusesExclude.length > 0) {
+      results = results.filter((issue) => !filters.statusesExclude!.includes(issue.fields.status.name));
+    }
+
+    // Assignee filters
     if (filters.assignee) {
       results = results.filter(
         (issue) => issue.fields.assignee?.accountId === filters.assignee
       );
     }
 
+    if (filters.assignees && filters.assignees.length > 0) {
+      results = results.filter(
+        (issue) => issue.fields.assignee && filters.assignees!.includes(issue.fields.assignee.accountId)
+      );
+    }
+
+    if (filters.assigneeExclude) {
+      results = results.filter(
+        (issue) => issue.fields.assignee?.accountId !== filters.assigneeExclude
+      );
+    }
+
+    if (filters.assigneesExclude && filters.assigneesExclude.length > 0) {
+      results = results.filter(
+        (issue) => !issue.fields.assignee || !filters.assigneesExclude!.includes(issue.fields.assignee.accountId)
+      );
+    }
+
+    if (filters.assigneeIsEmpty) {
+      results = results.filter((issue) => !issue.fields.assignee);
+    }
+
+    if (filters.assigneeIsNotEmpty) {
+      results = results.filter((issue) => !!issue.fields.assignee);
+    }
+
+    // Reporter filters
     if (filters.reporter) {
       results = results.filter(
         (issue) => issue.fields.reporter?.accountId === filters.reporter
       );
     }
 
+    if (filters.reporters && filters.reporters.length > 0) {
+      results = results.filter(
+        (issue) => issue.fields.reporter && filters.reporters!.includes(issue.fields.reporter.accountId)
+      );
+    }
+
+    if (filters.reporterExclude) {
+      results = results.filter(
+        (issue) => issue.fields.reporter?.accountId !== filters.reporterExclude
+      );
+    }
+
+    if (filters.reportersExclude && filters.reportersExclude.length > 0) {
+      results = results.filter(
+        (issue) => !issue.fields.reporter || !filters.reportersExclude!.includes(issue.fields.reporter.accountId)
+      );
+    }
+
+    if (filters.reporterIsEmpty) {
+      results = results.filter((issue) => !issue.fields.reporter);
+    }
+
+    if (filters.reporterIsNotEmpty) {
+      results = results.filter((issue) => !!issue.fields.reporter);
+    }
+
+    // Priority filters
     if (filters.priority) {
       results = results.filter((issue) => issue.fields.priority.name === filters.priority);
     }
 
+    if (filters.priorities && filters.priorities.length > 0) {
+      results = results.filter((issue) => filters.priorities!.includes(issue.fields.priority.name));
+    }
+
+    if (filters.priorityExclude) {
+      results = results.filter((issue) => issue.fields.priority.name !== filters.priorityExclude);
+    }
+
+    if (filters.prioritiesExclude && filters.prioritiesExclude.length > 0) {
+      results = results.filter((issue) => !filters.prioritiesExclude!.includes(issue.fields.priority.name));
+    }
+
+    // Labels filters
     if (filters.labels && filters.labels.length > 0) {
       results = results.filter((issue) =>
         filters.labels!.some((label) => issue.fields.labels?.includes(label))
       );
     }
 
+    if (filters.labelsExclude && filters.labelsExclude.length > 0) {
+      results = results.filter((issue) =>
+        !filters.labelsExclude!.some((label) => issue.fields.labels?.includes(label))
+      );
+    }
+
+    if (filters.labelsIsEmpty) {
+      results = results.filter((issue) => !issue.fields.labels || issue.fields.labels.length === 0);
+    }
+
+    if (filters.labelsIsNotEmpty) {
+      results = results.filter((issue) => issue.fields.labels && issue.fields.labels.length > 0);
+    }
+
+    // Key filters
     if (filters.keys && filters.keys.length > 0) {
       results = results.filter((issue) => filters.keys!.includes(issue.key));
+    }
+
+    if (filters.keysExclude && filters.keysExclude.length > 0) {
+      results = results.filter((issue) => !filters.keysExclude!.includes(issue.key));
+    }
+
+    // Resolution filters
+    if (filters.resolution) {
+      results = results.filter((issue) => (issue.fields as any).resolution?.name === filters.resolution);
+    }
+
+    if (filters.resolutions && filters.resolutions.length > 0) {
+      results = results.filter((issue) => {
+        const resolution = (issue.fields as any).resolution;
+        return resolution && filters.resolutions!.includes(resolution.name);
+      });
+    }
+
+    if (filters.resolutionIsEmpty) {
+      results = results.filter((issue) => !(issue.fields as any).resolution);
+    }
+
+    if (filters.resolutionIsNotEmpty) {
+      results = results.filter((issue) => !!(issue.fields as any).resolution);
+    }
+
+    // Text search filters
+    if (filters.summaryContains) {
+      const searchTerm = filters.summaryContains.toLowerCase();
+      results = results.filter((issue) =>
+        issue.fields.summary?.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    if (filters.summaryNotContains) {
+      const searchTerm = filters.summaryNotContains.toLowerCase();
+      results = results.filter((issue) =>
+        !issue.fields.summary?.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    if (filters.descriptionContains) {
+      const searchTerm = filters.descriptionContains.toLowerCase();
+      results = results.filter((issue) =>
+        issue.fields.description?.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    if (filters.descriptionNotContains) {
+      const searchTerm = filters.descriptionNotContains.toLowerCase();
+      results = results.filter((issue) =>
+        !issue.fields.description?.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    if (filters.textContains) {
+      const searchTerm = filters.textContains.toLowerCase();
+      results = results.filter((issue) => {
+        const summary = issue.fields.summary?.toLowerCase() || '';
+        const description = issue.fields.description?.toLowerCase() || '';
+        return summary.includes(searchTerm) || description.includes(searchTerm);
+      });
+    }
+
+    // Date filters
+    if (filters.createdAfter) {
+      const afterDate = new Date(filters.createdAfter).getTime();
+      results = results.filter((issue) => new Date(issue.fields.created).getTime() >= afterDate);
+    }
+
+    if (filters.createdBefore) {
+      const beforeDate = new Date(filters.createdBefore).getTime();
+      results = results.filter((issue) => new Date(issue.fields.created).getTime() <= beforeDate);
+    }
+
+    if (filters.createdEquals) {
+      const equalsDate = new Date(filters.createdEquals).toISOString().split('T')[0];
+      results = results.filter((issue) => {
+        const issueDate = new Date(issue.fields.created).toISOString().split('T')[0];
+        return issueDate === equalsDate;
+      });
+    }
+
+    if (filters.updatedAfter) {
+      const afterDate = new Date(filters.updatedAfter).getTime();
+      results = results.filter((issue) => new Date(issue.fields.updated).getTime() >= afterDate);
+    }
+
+    if (filters.updatedBefore) {
+      const beforeDate = new Date(filters.updatedBefore).getTime();
+      results = results.filter((issue) => new Date(issue.fields.updated).getTime() <= beforeDate);
+    }
+
+    if (filters.updatedEquals) {
+      const equalsDate = new Date(filters.updatedEquals).toISOString().split('T')[0];
+      results = results.filter((issue) => {
+        const issueDate = new Date(issue.fields.updated).toISOString().split('T')[0];
+        return issueDate === equalsDate;
+      });
+    }
+
+    if (filters.resolvedAfter) {
+      const afterDate = new Date(filters.resolvedAfter).getTime();
+      results = results.filter((issue) => {
+        const resolved = (issue.fields as any).resolutiondate;
+        return resolved && new Date(resolved).getTime() >= afterDate;
+      });
+    }
+
+    if (filters.resolvedBefore) {
+      const beforeDate = new Date(filters.resolvedBefore).getTime();
+      results = results.filter((issue) => {
+        const resolved = (issue.fields as any).resolutiondate;
+        return resolved && new Date(resolved).getTime() <= beforeDate;
+      });
+    }
+
+    if (filters.dueAfter) {
+      const afterDate = new Date(filters.dueAfter).getTime();
+      results = results.filter((issue) => {
+        const due = (issue.fields as any).duedate;
+        return due && new Date(due).getTime() >= afterDate;
+      });
+    }
+
+    if (filters.dueBefore) {
+      const beforeDate = new Date(filters.dueBefore).getTime();
+      results = results.filter((issue) => {
+        const due = (issue.fields as any).duedate;
+        return due && new Date(due).getTime() <= beforeDate;
+      });
+    }
+
+    // Component filters
+    if (filters.component) {
+      results = results.filter((issue) => {
+        const components = (issue.fields as any).components;
+        return components && components.some((c: any) => c.name === filters.component);
+      });
+    }
+
+    if (filters.components && filters.components.length > 0) {
+      results = results.filter((issue) => {
+        const components = (issue.fields as any).components;
+        return components && components.some((c: any) => filters.components!.includes(c.name));
+      });
+    }
+
+    if (filters.componentIsEmpty) {
+      results = results.filter((issue) => {
+        const components = (issue.fields as any).components;
+        return !components || components.length === 0;
+      });
+    }
+
+    if (filters.componentIsNotEmpty) {
+      results = results.filter((issue) => {
+        const components = (issue.fields as any).components;
+        return components && components.length > 0;
+      });
+    }
+
+    // Fix version filters
+    if (filters.fixVersion) {
+      results = results.filter((issue) => {
+        const fixVersions = (issue.fields as any).fixVersions;
+        return fixVersions && fixVersions.some((v: any) => v.name === filters.fixVersion);
+      });
+    }
+
+    if (filters.fixVersions && filters.fixVersions.length > 0) {
+      results = results.filter((issue) => {
+        const fixVersions = (issue.fields as any).fixVersions;
+        return fixVersions && fixVersions.some((v: any) => filters.fixVersions!.includes(v.name));
+      });
+    }
+
+    if (filters.fixVersionIsEmpty) {
+      results = results.filter((issue) => {
+        const fixVersions = (issue.fields as any).fixVersions;
+        return !fixVersions || fixVersions.length === 0;
+      });
+    }
+
+    if (filters.fixVersionIsNotEmpty) {
+      results = results.filter((issue) => {
+        const fixVersions = (issue.fields as any).fixVersions;
+        return fixVersions && fixVersions.length > 0;
+      });
+    }
+
+    // Affected version filters
+    if (filters.affectedVersion) {
+      results = results.filter((issue) => {
+        const versions = (issue.fields as any).versions;
+        return versions && versions.some((v: any) => v.name === filters.affectedVersion);
+      });
+    }
+
+    if (filters.affectedVersions && filters.affectedVersions.length > 0) {
+      results = results.filter((issue) => {
+        const versions = (issue.fields as any).versions;
+        return versions && versions.some((v: any) => filters.affectedVersions!.includes(v.name));
+      });
+    }
+
+    // Sprint filters
+    if (filters.sprint) {
+      results = results.filter((issue) => {
+        const sprint = (issue.fields as any).sprint;
+        return sprint && sprint.name === filters.sprint;
+      });
+    }
+
+    if (filters.sprints && filters.sprints.length > 0) {
+      results = results.filter((issue) => {
+        const sprint = (issue.fields as any).sprint;
+        return sprint && filters.sprints!.includes(sprint.name);
+      });
+    }
+
+    if (filters.sprintIsEmpty) {
+      results = results.filter((issue) => {
+        const sprint = (issue.fields as any).sprint;
+        return !sprint;
+      });
+    }
+
+    if (filters.sprintIsNotEmpty) {
+      results = results.filter((issue) => {
+        const sprint = (issue.fields as any).sprint;
+        return !!sprint;
+      });
     }
 
     // Apply sorting
