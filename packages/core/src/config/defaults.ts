@@ -93,7 +93,7 @@ export const DEFAULT_DATA_CONFIG: Required<DataConfig> = {
  * Built-in default project configuration
  * These are the baseline defaults that apply if no overrides are specified
  */
-export const DEFAULT_PROJECT_CONFIG: Required<Omit<ProjectConfig, 'seed'>> = {
+export const DEFAULT_PROJECT_CONFIG: Required<Omit<ProjectConfig, 'seed' | 'issueCount'>> = {
   statusDistribution: DEFAULT_STATUS_DISTRIBUTION,
   issueTypes: DEFAULT_ISSUE_TYPES_CONFIG,
   sprints: DEFAULT_SPRINTS_CONFIG,
@@ -155,7 +155,7 @@ function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>)
  * Gets the built-in default project configuration
  * @returns Built-in default configuration
  */
-export function getBuiltInDefaults(): Required<Omit<ProjectConfig, 'seed'>> {
+export function getBuiltInDefaults(): Required<Omit<ProjectConfig, 'seed' | 'issueCount'>> {
   return DEFAULT_PROJECT_CONFIG;
 }
 

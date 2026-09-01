@@ -146,6 +146,14 @@ export interface DataConfig {
 export interface ProjectConfig {
   /** Random seed for reproducibility */
   seed?: number;
+  /**
+   * Exact number of issues to generate for this project (1-10000).
+   * When omitted, the count is derived from the issue types configuration
+   * (see calculateIssueCount). When set but lower than the epic count,
+   * all epics are kept and children are reduced so the total equals
+   * max(issueCount, epicCount).
+   */
+  issueCount?: number;
   /** Status distribution */
   statusDistribution?: StatusDistribution;
   /** Issue types configuration */
@@ -168,7 +176,8 @@ export interface ProjectConfig {
 
 /**
  * Project configuration with required project-specific fields
- * Issue count is automatically calculated from issue types configuration
+ * Issue count is taken from `issueCount` when set, otherwise calculated
+ * from the issue types configuration
  */
 export interface ProjectConfigWithKey extends ProjectConfig {
   /** Project key (e.g., "PROJ", "DEMO") - Required and must be unique */

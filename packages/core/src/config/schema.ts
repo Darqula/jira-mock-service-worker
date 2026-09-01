@@ -96,6 +96,7 @@ export const DataConfigSchema = z.object({
  */
 export const ProjectConfigSchema = z.object({
   seed: z.number().int().optional(),
+  issueCount: z.number().int().min(1).max(10000).optional(),
   statusDistribution: StatusDistributionSchema,
   issueTypes: IssueTypesConfigSchema,
   sprints: SprintsConfigSchema,
@@ -109,7 +110,8 @@ export const ProjectConfigSchema = z.object({
 
 /**
  * Project configuration with key schema
- * Issue count is calculated automatically from issue types configuration
+ * Issue count is taken from `issueCount` when set, otherwise calculated
+ * automatically from the issue types configuration
  */
 export const ProjectConfigWithKeySchema = z.object({
   projectKey: z
@@ -123,6 +125,7 @@ export const ProjectConfigWithKeySchema = z.object({
   projectName: z.string().optional(),
   projectType: ProjectTypeSchema.optional(),
   seed: z.number().int().optional(),
+  issueCount: z.number().int().min(1).max(10000).optional(),
   statusDistribution: StatusDistributionSchema,
   issueTypes: IssueTypesConfigSchema,
   sprints: SprintsConfigSchema,
