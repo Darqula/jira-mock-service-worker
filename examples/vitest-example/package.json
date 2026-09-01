@@ -8,8 +8,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@jira-mock/core": "*",
-    "@jira-mock/msw-integration": "*"
+    "@jira-mock/core": "1.0.0",
+    "@jira-mock/msw-integration": "1.0.0"
   },
   "devDependencies": {
     "msw": "^2.6.4",

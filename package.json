@@ -38,6 +38,14 @@
     "api",
     "mock-service-worker"
   ],
-  "author": "",
-  "license": "MIT"
+  "author": "Darqula",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Darqula/jira-mock-service-worker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Darqula/jira-mock-service-worker/issues"
+  },
+  "homepage": "https://github.com/Darqula/jira-mock-service-worker#readme"
 }
