@@ -62,7 +62,7 @@ export function StatusSection({ config, onChange, projectIndex }: StatusSectionP
             formatValue={(v) => `${Math.round(v * 100)}%`}
           />
           <p className="text-xs text-muted-foreground">
-            Probability of issues being in "To Do" status
+            Probability of issues being in &quot;To Do&quot; status
           </p>
         </div>
 
@@ -82,7 +82,7 @@ export function StatusSection({ config, onChange, projectIndex }: StatusSectionP
             formatValue={(v) => `${Math.round(v * 100)}%`}
           />
           <p className="text-xs text-muted-foreground">
-            Probability of issues being in "In Progress" status
+            Probability of issues being in &quot;In Progress&quot; status
           </p>
         </div>
 
@@ -100,7 +100,7 @@ export function StatusSection({ config, onChange, projectIndex }: StatusSectionP
             formatValue={(v) => `${Math.round(v * 100)}%`}
           />
           <p className="text-xs text-muted-foreground">
-            Probability of issues being in "Done" status
+            Probability of issues being in &quot;Done&quot; status
           </p>
         </div>
       </CardContent>

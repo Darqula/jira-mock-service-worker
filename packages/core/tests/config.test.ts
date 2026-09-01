@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateConfig, isValidConfig, getConfigErrors } from '../src/config/validator.js';
+import { validateConfig, isValidConfig } from '../src/config/validator.js';
 import type { JiraMockConfig } from '../src/config/types.js';
 
 describe('Config Validation', () => {

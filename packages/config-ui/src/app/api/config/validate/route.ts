@@ -11,7 +11,7 @@ export async function POST(request: Request) {
       valid: errors.length === 0,
       errors,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       {
         valid: false,

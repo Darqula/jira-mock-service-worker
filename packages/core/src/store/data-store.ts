@@ -1111,7 +1111,7 @@ export class DataStore {
 
   getUpdatedWorklogs(since: number): Worklog[] {
     const updates: Worklog[] = [];
-    for (const [_, entry] of this.worklogUpdates.entries()) {
+    for (const entry of this.worklogUpdates.values()) {
       if (entry.timestamp >= since) {
         updates.push(entry.worklog);
       }

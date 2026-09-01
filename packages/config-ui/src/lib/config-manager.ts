@@ -47,7 +47,7 @@ export function uploadConfig(file: File): Promise<JiraMockConfig> {
       try {
         const config = JSON.parse(e.target?.result as string);
         resolve(config);
-      } catch (error) {
+      } catch {
         reject(new Error('Invalid JSON file'));
       }
     };

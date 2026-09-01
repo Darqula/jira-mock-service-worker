@@ -228,7 +228,6 @@ describe('SprintGenerator', () => {
       const endDate = new Date('2024-03-31');
 
       const sprints = generator.generateSprints(startDate, endDate, context);
-      const names = sprints.map((s) => s.name);
 
       // All names should include the sprint number
       sprints.forEach((sprint, index) => {

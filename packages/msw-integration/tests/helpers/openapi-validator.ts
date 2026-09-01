@@ -1,7 +1,6 @@
 import Ajv, { type ValidateFunction } from 'ajv';
 import addFormats from 'ajv-formats';
 import { readFileSync } from 'fs';
-import { join } from 'path';
 import type { OpenAPIV3 } from 'openapi-types';
 
 interface ValidationError {
