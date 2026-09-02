@@ -92,7 +92,9 @@ interface JiraMockConfig {
   };
   projects: Array<{           // Required: array of project configurations
     projectKey: string;       // Required: unique project identifier (e.g., "PROJ")
-    issueCount: number;       // Required: number of issues for this project (1-10000)
+    issueCount?: number;      // Optional: exact number of issues for this project (1-10000).
+                              // When omitted, the count is derived from the issue types
+                              // configuration (see Epic Hierarchy below).
     projectName?: string;     // Optional: project display name
     projectType?: 'company-managed' | 'team-managed';
     // ... any configuration can be overridden per project
@@ -256,23 +258,43 @@ const config = {
 
 See the `examples/configs/` directory for ready-to-use configuration examples:
 
-- **minimal.json** - Simplest configuration with defaults (50 issues)
+- **minimal.json** - Simplest configuration with defaults (~1,010 issues from the built-in epic defaults)
 - **small-project.json** - Small team project with customization (~58 issues)
 - **team-managed.json** - Team-managed (Next-Gen) project example (~123 issues)
 - **large-project.json** - Large enterprise project (~1,200 issues)
-- **full-featured.json** - Comprehensive feature showcase (~360 issues)
+- **full-featured.json** - Comprehensive feature showcase (~350 issues)
 
-Each example includes detailed comments and demonstrates different use cases. See `examples/configs/README.md` for complete documentation.
+JSON files cannot contain comments, so each file is intentionally small and the accompanying `examples/configs/README.md` explains the fields. See `examples/configs/README.md` for complete documentation.
 
 ### Key Configuration Features
 
-#### Epic Hierarchy
-When using epics, the total issue count is calculated automatically:
+#### Epic Hierarchy and Issue Count
+
+Every project's issue count is controlled by `issueCount`. When `issueCount` is set, the
+project gets **exactly** that many issues (validated range: 1–10000). When it is omitted,
+the count is derived from the issue types configuration:
+
 ```
-Total Issues = (Epic Count × Children Per Epic) + Standalone Stories + Standalone Tasks + Standalone Bugs
+Total Issues = Epics + (Epic Count × Children Per Epic)
+             + Standalone Stories + Standalone Tasks + Standalone Bugs
 ```
 
+With no `issueTypes` configured at all, the built-in defaults (10 epics × 100 children)
+produce 10 + 1000 = **1,010 issues**.
+
 Example: 10 epics × 30 children + 25 stories + 15 tasks + 10 bugs = 350 total issues
+
+**Clamping:** if `issueCount` is set to a value below the configured epic count, all
+epics are still generated and the total becomes `max(issueCount, epicCount)` — the
+hierarchy is never broken by dropping or orphaning issues. Otherwise, when
+`issueCount` is set, the budget is distributed deterministically:
+
+1. All epics are generated.
+2. Standalone issues keep their configured counts first (in Story → Task → Bug order),
+   truncated only when the budget is too small to fit them all.
+3. The remaining budget is distributed as epic children, evenly across epics (the first
+   epics absorb any indivisible remainder). Children are reduced or padded relative to
+   `childrenPerEpic` as needed.
 
 #### Project Types
 - **Company-managed**: Traditional Jira projects with parent field for epic relationships

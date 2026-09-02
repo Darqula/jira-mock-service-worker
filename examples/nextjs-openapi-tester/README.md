@@ -140,17 +140,17 @@ Controls mock data generation:
 ```json
 {
   "version": "1.0",
-  "globalDefaults": {
-    "seed": 42
-  },
   "projects": [
     {
       "projectKey": "PROJ1",
-      "issueCount": 20
+      "seed": 42
     }
   ]
 }
 ```
+
+Issue count per project can be pinned with `"issueCount": 20` (1–10000); when omitted it
+is derived from the project's `issueTypes` configuration (defaults to ~1,010 issues).
 
 ### mocked-endpoints.json
 

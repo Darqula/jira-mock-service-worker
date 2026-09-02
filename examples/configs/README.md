@@ -25,21 +25,26 @@ A realistic multi-project workspace with three projects (Backend, Frontend, Infr
 
 ### Structure
 
+JSON does not support comments, so the example files are kept comment-free. The shape is:
+
 ```json
 {
   "version": "1.0",
-  "globalDefaults": {
-    // Optional: defaults inherited by all projects
-  },
   "projects": [
     {
-      "projectKey": "PROJ1",  // Required: unique project identifier
-      "issueCount": 100,      // Required: number of issues for this project
-      // Optional: any configuration can be overridden per-project
+      "projectKey": "PROJ1",
+      "issueCount": 100
     }
   ]
 }
 ```
+
+- `version` — required, always `"1.0"`.
+- `projects` — required, array of project configurations.
+- `projectKey` — required, unique project identifier.
+- `issueCount` — optional: exact number of issues for this project (1–10000).
+  When omitted, the count is derived from the `issueTypes` configuration
+  (see the `issueTypes` examples in this directory).
 
 ### Key Features
 
