@@ -10,6 +10,7 @@ import type {
   Version,
 } from '../types/jira-schemas.js';
 import type { IssueContext } from '../types/generator.types.js';
+import type { IssueTypesConfig } from '../config/types.js';
 import { generateSelfUrls } from '../utils/response-builder.js';
 import { getBuiltInDefaults } from '../config/defaults.js';
 import {
@@ -118,7 +119,10 @@ export class IssueGenerator {
    * - Without `issueCount` the plan is the plain issue-types configuration.
    */
   private distributeIssueCounts(
-    projectConfig: any,
+    projectConfig: {
+      issueCount?: number;
+      issueTypes?: IssueTypesConfig;
+    },
     count: number
   ): {
     genericCount: number;
