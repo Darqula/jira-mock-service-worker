@@ -7,14 +7,15 @@ import { join } from 'path';
 describe('OpenAPI Schema Validation', () => {
   const config: JiraMockConfig = {
     version: '1.0',
-    seed: 12345,
     projects: [
       {
         projectKey: 'TEST',
+        seed: 12345,
         issueCount: 10,
       },
       {
         projectKey: 'DEMO',
+        seed: 12345,
         issueCount: 5,
       },
     ],

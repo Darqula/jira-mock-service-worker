@@ -13,7 +13,7 @@ describe('ProjectsManager', () => {
         projectKey: 'PROJ1',
         projectName: 'Project One',
         projectType: 'company-managed',
-        // issueCount is now calculated from issue types (defaults to 1,010)
+        // issueCount omitted: count is derived from issue types (1 epic + 99 children)
         issueTypes: {
           epic: {
             count: 1,
@@ -48,7 +48,7 @@ describe('ProjectsManager', () => {
         ...defaultConfig.projects,
         {
           projectKey: 'PROJ2',
-          // No issueCount - it's calculated from issue types
+          // No issueCount - it falls back to the issue-types-derived count
         },
       ],
     });
@@ -199,7 +199,7 @@ describe('ProjectsManager', () => {
               assignProbability: 0.8,
             },
             story: {
-              count: 20,
+              standaloneCount: 20,
               assignProbability: 0.9,
             },
           },

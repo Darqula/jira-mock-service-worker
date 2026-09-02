@@ -7,28 +7,40 @@ describe('Jira API Integration Example', () => {
   const { server, dataStore } = setupJiraMockServer({
     config: {
       version: '1.0',
-      globalDefaults: {
-        issueTypes: {
-          epic: {
-            count: 0, // Disable epic-based generation for predictable issue counts
-          },
-        },
-      },
       projects: [
         {
           projectKey: 'PROJ1',
+          // issueCount is honored exactly: 2 epics + 8 children = 10 issues
           issueCount: 10,
           seed: 12345, // Reproducible data
+          issueTypes: {
+            epic: {
+              count: 2,
+              childrenPerEpic: 4,
+            },
+          },
         },
         {
           projectKey: 'PROJ2',
           issueCount: 10,
           seed: 12345,
+          issueTypes: {
+            epic: {
+              count: 2,
+              childrenPerEpic: 4,
+            },
+          },
         },
         {
           projectKey: 'PROJ3',
           issueCount: 10,
           seed: 12345,
+          issueTypes: {
+            epic: {
+              count: 2,
+              childrenPerEpic: 4,
+            },
+          },
         },
       ],
     },
@@ -69,8 +81,8 @@ describe('Jira API Integration Example', () => {
       );
       const result = await response.json();
 
-      // Should have at least the configured number of issues (may have more due to epics/subtasks)
-      expect(result.total).toBeGreaterThanOrEqual(10);
+      // issueCount is honored exactly: 10 issues per project
+      expect(result.total).toBe(10);
       result.issues.forEach((issue: any) => {
         expect(issue.fields.project.key).toBe(project.key);
       });
