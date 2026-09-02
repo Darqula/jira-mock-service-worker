@@ -170,8 +170,11 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
       sprints,
     };
 
-    // Calculate issue count from project configuration
-    const issueCount = calculateIssueCount(mergedProjectConfig);
+    // Target issue count: explicit issueCount wins, otherwise derived from the
+    // issue types configuration (epic-based). Values below the epic count are
+    // clamped up by the generator (all epics are always generated).
+    const issueCount =
+      mergedProjectConfig.issueCount ?? calculateIssueCount(mergedProjectConfig);
 
     const issues = issueGenerator.generateIssues(
       project,

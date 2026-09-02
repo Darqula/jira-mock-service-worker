@@ -46,10 +46,17 @@ export class IssueGenerator {
       projectConfig.issueTypes?.epic &&
       (projectConfig.issueTypes.epic.count || 0) > 0;
 
+    // Honor an explicit issueCount by distributing the budget across
+    // standalone issues and epic children; without it this reduces to the
+    // configured issue-types plan.
+    const allocation = this.distributeIssueCounts(projectConfig, count);
+
     if (useEpics) {
       // Generate with epics
       const epics = this.generateEpics(
         project,
+        allocation.childrenPerEpicBase,
+        allocation.childrenPerEpicExtra,
         users,
         issueTypes,
         priorities,
@@ -62,7 +69,7 @@ export class IssueGenerator {
       issues.push(...epics);
     } else {
       // Generate without epics (legacy behavior)
-      for (let i = 0; i < count; i++) {
+      for (let i = 0; i < allocation.genericCount; i++) {
         const issueNumber = startIssueNumber + issues.length;
         const issue = this.generateIssue(
           project,
@@ -83,6 +90,7 @@ export class IssueGenerator {
     this.generateStandaloneIssues(
       issues,
       project,
+      allocation.standaloneCounts,
       users,
       issueTypes,
       priorities,
@@ -97,10 +105,88 @@ export class IssueGenerator {
   }
 
   /**
+   * Distributes the issue budget when an explicit `issueCount` is configured.
+   *
+   * Rules (documented in README):
+   * - All epics are always generated; totals below the epic count are clamped
+   *   up to the epic count (issueCount is treated as max(issueCount, epicCount)).
+   * - Standalone issues keep their configured counts first, in Story → Task →
+   *   Bug order, until the budget runs out.
+   * - The remaining budget goes to epic children, distributed evenly across
+   *   epics (the first `childrenPerEpicExtra` epics receive one additional
+   *   child), both when padding and when truncating.
+   * - Without `issueCount` the plan is the plain issue-types configuration.
+   */
+  private distributeIssueCounts(
+    projectConfig: any,
+    count: number
+  ): {
+    genericCount: number;
+    childrenPerEpicBase: number;
+    childrenPerEpicExtra: number;
+    standaloneCounts: { story: number; task: number; bug: number };
+  } {
+    const issueTypesConfig = projectConfig.issueTypes;
+    const standaloneCounts = {
+      story: issueTypesConfig?.story?.standaloneCount || 0,
+      task: issueTypesConfig?.task?.standaloneCount || 0,
+      bug: issueTypesConfig?.bug?.standaloneCount || 0,
+    };
+    const epicCount = issueTypesConfig?.epic?.count || 0;
+
+    if (projectConfig.issueCount === undefined) {
+      return {
+        genericCount: count,
+        childrenPerEpicBase: issueTypesConfig?.epic?.childrenPerEpic || 0,
+        childrenPerEpicExtra: 0,
+        standaloneCounts,
+      };
+    }
+
+    const total = Math.max(count, epicCount);
+    let budget = total - epicCount;
+
+    const standaloneTotal =
+      standaloneCounts.story + standaloneCounts.task + standaloneCounts.bug;
+    const allowedStandalone = Math.min(budget, standaloneTotal);
+    const cappedCounts = {
+      story: Math.min(standaloneCounts.story, allowedStandalone),
+      task: 0,
+      bug: 0,
+    };
+    let left = allowedStandalone - cappedCounts.story;
+    cappedCounts.task = Math.min(standaloneCounts.task, left);
+    left -= cappedCounts.task;
+    cappedCounts.bug = Math.min(standaloneCounts.bug, left);
+    const usedStandalone =
+      cappedCounts.story + cappedCounts.task + cappedCounts.bug;
+
+    budget -= usedStandalone;
+
+    if (epicCount > 0) {
+      return {
+        genericCount: 0,
+        childrenPerEpicBase: Math.floor(budget / epicCount),
+        childrenPerEpicExtra: budget % epicCount,
+        standaloneCounts: cappedCounts,
+      };
+    }
+
+    return {
+      genericCount: budget,
+      childrenPerEpicBase: 0,
+      childrenPerEpicExtra: 0,
+      standaloneCounts: cappedCounts,
+    };
+  }
+
+  /**
    * Generates epics and their children
    */
   private generateEpics(
     project: Project,
+    childrenPerEpicBase: number,
+    childrenPerEpicExtra: number,
     users: User[],
     issueTypes: IssueType[],
     priorities: Priority[],
@@ -113,7 +199,6 @@ export class IssueGenerator {
     const projectConfig = context.currentProject || getBuiltInDefaults();
     const epicConfig = projectConfig.issueTypes!.epic!;
     const epicCount = epicConfig.count || 0;
-    const childrenPerEpic = epicConfig.childrenPerEpic || 0;
 
     const issues: IssueBean[] = [];
     const epicType = issueTypes.find((t) => t.name === 'Epic');
@@ -141,6 +226,8 @@ export class IssueGenerator {
       issues.push(epic);
 
       // Generate children for this epic
+      const childrenPerEpic =
+        childrenPerEpicBase + (epicIndex < childrenPerEpicExtra ? 1 : 0);
       const children = this.generateEpicChildren(
         project,
         epic,
@@ -303,6 +390,7 @@ export class IssueGenerator {
   private generateStandaloneIssues(
     existingIssues: IssueBean[],
     project: Project,
+    standaloneCounts: { story: number; task: number; bug: number },
     users: User[],
     issueTypes: IssueType[],
     priorities: Priority[],
@@ -312,17 +400,13 @@ export class IssueGenerator {
     context: IssueContext,
     startIssueNumber: number
   ): void {
-    const projectConfig = context.currentProject || getBuiltInDefaults();
-    const issueTypesConfig = projectConfig.issueTypes!;
-
     const standaloneTypes = [
-      { name: 'Story', config: issueTypesConfig.story },
-      { name: 'Task', config: issueTypesConfig.task },
-      { name: 'Bug', config: issueTypesConfig.bug },
+      { name: 'Story', count: standaloneCounts.story },
+      { name: 'Task', count: standaloneCounts.task },
+      { name: 'Bug', count: standaloneCounts.bug },
     ];
 
-    for (const { name, config } of standaloneTypes) {
-      const count = config?.standaloneCount || 0;
+    for (const { name, count } of standaloneTypes) {
       if (count === 0) continue;
 
       const issueType = this.getIssueTypeByName(issueTypes, name);
