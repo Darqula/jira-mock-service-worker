@@ -254,7 +254,6 @@ export {
 export type { ConfigWarning, ValidationResult } from './config/validator.js';
 
 export {
-  DEFAULT_CONFIG,
   DEFAULT_PROJECT_CONFIG,
   DEFAULT_STATUS_DISTRIBUTION,
   DEFAULT_ISSUE_TYPES_CONFIG,
@@ -264,8 +263,6 @@ export {
   DEFAULT_DATA_CONFIG,
   getBuiltInDefaults,
   mergeProjectWithDefaults,
-  mergeWithDefaults,
-  getConfigValue,
 } from './config/defaults.js';
 
 export { DataStore } from './store/data-store.js';

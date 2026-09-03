@@ -4,24 +4,6 @@
 export type ProjectType = 'company-managed' | 'team-managed';
 
 /**
- * General configuration settings
- */
-export interface GeneralConfig {
-  /** Project key (e.g., "PROJ", "DEMO"). Default: "PROJ" */
-  projectKey?: string;
-  /** Project type. Default: "company-managed" */
-  projectType?: ProjectType;
-  /** Starting issue number. Default: 1 */
-  startIssueNumber?: number;
-  /** Start date for issue generation (ISO 8601). Default: 6 months ago */
-  startDate?: string;
-  /** End date for issue generation (ISO 8601). Default: today */
-  endDate?: string;
-  /** Export chunk size (0 = no chunking). Default: 0 */
-  chunkSize?: number;
-}
-
-/**
  * Status distribution configuration
  */
 export interface StatusDistribution {

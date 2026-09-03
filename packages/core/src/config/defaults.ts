@@ -1,5 +1,4 @@
 import type {
-  JiraMockConfig,
   ProjectConfig,
   ProjectConfigWithKey,
   StatusDistribution,
@@ -106,20 +105,6 @@ export const DEFAULT_PROJECT_CONFIG: Required<Omit<ProjectConfig, 'seed' | 'issu
 };
 
 /**
- * Complete default configuration (for backward compatibility)
- * @deprecated Use getBuiltInDefaults() instead
- */
-export const DEFAULT_CONFIG = {
-  version: '1.0' as const,
-  statusDistribution: DEFAULT_STATUS_DISTRIBUTION,
-  issueTypes: DEFAULT_ISSUE_TYPES_CONFIG,
-  sprints: DEFAULT_SPRINTS_CONFIG,
-  versions: DEFAULT_VERSIONS_CONFIG,
-  worklogs: DEFAULT_WORKLOGS_CONFIG,
-  data: DEFAULT_DATA_CONFIG,
-};
-
-/**
  * Deep merge helper function
  * Merges source into target, recursively merging nested objects
  */
@@ -182,40 +167,4 @@ export function mergeProjectWithDefaults(
     projectName: projectConfig.projectName,
     projectType: projectConfig.projectType || 'company-managed',
   };
-}
-
-/**
- * Merges user configuration with default values (for backward compatibility)
- * @deprecated This function is deprecated and will be removed in the next version
- * @param config - User-provided configuration
- * @returns Merged configuration with all defaults applied
- */
-export function mergeWithDefaults(config: JiraMockConfig): JiraMockConfig {
-  return config;
-}
-
-/**
- * Gets a specific configuration value with fallback to default
- *
- * @param projectConfig - Project configuration
- * @param path - Path to configuration value (e.g., 'statusDistribution.toDo')
- * @returns Configuration value or default
- */
-export function getConfigValue<T>(
-  projectConfig: ProjectConfigWithKey,
-  path: string
-): T | undefined {
-  const merged = mergeProjectWithDefaults(projectConfig);
-  const parts = path.split('.');
-  let value: any = merged;
-
-  for (const part of parts) {
-    if (value && typeof value === 'object' && part in value) {
-      value = value[part];
-    } else {
-      return undefined;
-    }
-  }
-
-  return value as T;
 }
