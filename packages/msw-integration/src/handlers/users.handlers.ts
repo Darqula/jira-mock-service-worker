@@ -3,7 +3,11 @@ import type { DataStore } from '@jira-mock/core';
 import { PermissionGenerator } from '@jira-mock/core';
 import { createGenerationContext } from '../utils/generation-context.js';
 
-export function createUsersHandlers(dataStore: DataStore, baseUrl: string) {
+export function createUsersHandlers(
+  dataStore: DataStore,
+  baseUrl: string,
+  generationSeed: number = Date.now()
+) {
   const permissionGenerator = new PermissionGenerator();
 
   return [
@@ -56,7 +60,6 @@ export function createUsersHandlers(dataStore: DataStore, baseUrl: string) {
     http.get(`${baseUrl}/rest/api/2/user/assignable/multiProjectSearch`, ({ request }) => {
       const url = new URL(request.url);
       const query = url.searchParams.get('query') || '';
-      // const projectKeys = url.searchParams.get('projectKeys')?.split(',') || [];
       const maxResults = parseInt(url.searchParams.get('maxResults') || '50', 10);
 
       // For simplicity, return all users that match the query (in real Jira, this would filter by project permissions)
@@ -100,7 +103,7 @@ export function createUsersHandlers(dataStore: DataStore, baseUrl: string) {
 
       if (permissions.length === 0) {
         // Generate permissions if not already stored
-        const context = createGenerationContext();
+        const context = createGenerationContext(generationSeed);
         permissions = permissionGenerator.generateUserPermissions(currentUser, context);
         dataStore.setUserPermissions(currentUser.accountId, permissions);
       }

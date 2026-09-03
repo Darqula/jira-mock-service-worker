@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import type { JiraMockConfig } from '@jira-mock/core';
 import { validateConfig, getConfigErrors } from '@jira-mock/core';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +11,7 @@ import { saveConfig, loadConfig, downloadConfig, uploadConfig } from '@/lib/conf
 import { Download, Upload, Save, FileJson } from 'lucide-react';
 
 export function ConfigEditor() {
-  const [config, setConfig] = useState<JiraMockConfig>({
+  const [config, setConfig] = useState<JiraMockConfig>(() => loadConfig() ?? {
     version: '1.0',
     projects: [
       {
@@ -21,20 +21,9 @@ export function ConfigEditor() {
     ],
   });
 
-  const [errors, setErrors] = useState<string[]>([]);
   const [saved, setSaved] = useState(false);
 
-  useEffect(() => {
-    const loaded = loadConfig();
-    if (loaded) {
-      setConfig(loaded);
-    }
-  }, []);
-
-  useEffect(() => {
-    const validationErrors = getConfigErrors(config);
-    setErrors(validationErrors);
-  }, [config]);
+  const errors = useMemo(() => getConfigErrors(config), [config]);
 
   const handleSave = () => {
     try {

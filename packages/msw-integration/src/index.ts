@@ -20,8 +20,13 @@ export function setupJiraMock(options: SetupJiraMockOptions): SetupJiraMockResul
   // Generate mock data
   const { dataStore, queryEngine } = generateMockData(config);
 
+  // Stable seed for request-time generation contexts (transitions, createmeta,
+  // permissions, ...): derived from the project seed when one is configured so
+  // repeated GETs return identical data. Falls back to one per-setup value.
+  const generationSeed = config.projects.find((p) => p.seed !== undefined)?.seed ?? Date.now();
+
   // Create MSW handlers
-  const handlers = createHandlers(dataStore, queryEngine, baseUrl);
+  const handlers = createHandlers(dataStore, queryEngine, baseUrl, generationSeed);
 
   return {
     handlers,

@@ -19,10 +19,11 @@ import { createVersionsHandlers } from './versions.handlers.js';
 export function createHandlers(
   dataStore: DataStore,
   queryEngine: QueryEngine,
-  baseUrl: string
+  baseUrl: string,
+  generationSeed: number = Date.now()
 ) {
   return [
-    ...createUsersHandlers(dataStore, baseUrl),
+    ...createUsersHandlers(dataStore, baseUrl, generationSeed),
     ...createUserPropertiesHandlers(dataStore, baseUrl),
     ...createProjectsHandlers(dataStore, baseUrl),
     ...createProjectPropertiesHandlers(dataStore, baseUrl),
@@ -30,10 +31,10 @@ export function createHandlers(
     ...createIssuePropertiesHandlers(dataStore, baseUrl),
     ...createSearchHandlers(queryEngine, baseUrl),
     ...createWorklogsHandlers(dataStore, baseUrl),
-    ...createMetadataHandlers(dataStore, baseUrl),
+    ...createMetadataHandlers(dataStore, baseUrl, generationSeed),
     ...createFiltersHandlers(dataStore, baseUrl),
     ...createCommentsHandlers(dataStore, baseUrl),
-    ...createTransitionsHandlers(dataStore, baseUrl),
+    ...createTransitionsHandlers(dataStore, baseUrl, generationSeed),
     ...createIssueLinksHandlers(dataStore, baseUrl),
     ...createAttachmentsHandlers(dataStore, baseUrl),
     ...createComponentsHandlers(dataStore, baseUrl),

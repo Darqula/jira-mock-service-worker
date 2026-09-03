@@ -185,4 +185,65 @@ describe('MSW Integration', () => {
     expect(result.worklogs).toBeDefined();
     expect(Array.isArray(result.worklogs)).toBe(true);
   });
+
+  it('should return identical transitions for repeated GETs', async () => {
+    const issueKey = dataStore.getAllIssues()[0].key;
+
+    const first = await (
+      await fetch(`${baseUrl}/rest/api/2/issue/${issueKey}/transitions`)
+    ).json();
+    const second = await (
+      await fetch(`${baseUrl}/rest/api/2/issue/${issueKey}/transitions`)
+    ).json();
+
+    expect(second).toEqual(first);
+  });
+
+  it('should create collision-free issues after deletions', async () => {
+    const projects = dataStore.getAllProjects();
+    const project = projects[0];
+    const issueTypes = dataStore.getAllIssueTypes();
+    const issueType = issueTypes.find((it) => !it.subtask);
+
+    const create = () =>
+      fetch(`${baseUrl}/rest/api/2/issue`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fields: {
+            project: { key: project.key },
+            summary: 'Created after deletion',
+            issuetype: { id: issueType?.id },
+          },
+        }),
+      });
+
+    const first = await (await create()).json();
+    await fetch(`${baseUrl}/rest/api/2/issue/${first.key}`, { method: 'DELETE' });
+    const second = await (await create()).json();
+
+    expect(second.key).not.toBe(first.key);
+    expect(second.id).not.toBe(first.id);
+
+    const fetched = await fetch(`${baseUrl}/rest/api/2/issue/${second.key}`);
+    expect(fetched.status).toBe(200);
+  });
+
+  it('should echo uploaded file metadata when posting attachments', async () => {
+    const issueKey = dataStore.getAllIssues()[0].key;
+    const form = new FormData();
+    form.append('file', new File(['hello world'], 'report.txt', { type: 'text/plain' }));
+
+    const response = await fetch(
+      `${baseUrl}/rest/api/2/issue/${issueKey}/attachments`,
+      { method: 'POST', body: form }
+    );
+    expect(response.status).toBe(200);
+
+    const result = await response.json();
+    expect(result).toHaveLength(1);
+    expect(result[0].filename).toBe('report.txt');
+    expect(result[0].size).toBe(11);
+    expect(result[0].mimeType).toBe('text/plain');
+  });
 });

@@ -24,6 +24,13 @@ interface ProjectsManagerProps {
 export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
   const [expandedProjects, setExpandedProjects] = useState<Set<number>>(new Set([0]));
 
+  // Mirrors the generation rules: explicit issueCount (clamped up to the
+  // epic count) wins; otherwise the count is derived from the issue types.
+  const projectIssueCount = (project: ProjectConfigWithKey): number =>
+    project.issueCount === undefined
+      ? calculateIssueCount(project)
+      : Math.max(project.issueCount, project.issueTypes?.epic?.count || 0);
+
   const toggleProject = (index: number) => {
     const newExpanded = new Set(expandedProjects);
     if (newExpanded.has(index)) {
@@ -159,7 +166,7 @@ export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
                       {project.projectKey} - {project.projectName || 'Unnamed Project'}
                     </CardTitle>
                     <CardDescription className="text-xs">
-                      {calculateIssueCount(project)} issues
+                      {projectIssueCount(project)} issues
                       {project.projectType && ` • ${project.projectType}`}
                     </CardDescription>
                   </div>

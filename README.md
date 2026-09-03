@@ -473,7 +473,8 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 - `DELETE /rest/api/2/project/{projectIdOrKey}/properties/{propertyKey}` - Delete project property
 
 ### Issues
-- `GET /rest/api/2/issue/{issueIdOrKey}` - Get issue
+- `GET /rest/api/2/issue/{issueIdOrKey}` - Get issue (`expand` is accepted but ignored — all
+  fields are already embedded in the stored issue; `changelog`/`transitions` expansions are not implemented)
 - `POST /rest/api/2/issue` - Create issue
 - `PUT /rest/api/2/issue/{issueIdOrKey}` - Update issue
 - `DELETE /rest/api/2/issue/{issueIdOrKey}` - Delete issue

@@ -87,14 +87,4 @@ export default [
     ...config,
     files: CONFIG_UI_FILES,
   })),
-  {
-    // react-hooks v6's brand-new set-state-in-effect flags two existing
-    // init-from-storage / derive-in-effect patterns in ConfigEditor. A correct
-    // fix requires refactoring how that state is derived, which is out of scope
-    // for this cleanup. Downgraded to warning (acceptable until Phase 3).
-    files: CONFIG_UI_FILES,
-    rules: {
-      'react-hooks/set-state-in-effect': 'warn',
-    },
-  },
 ];

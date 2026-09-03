@@ -137,10 +137,16 @@ export class IssueGenerator {
       bug: issueTypesConfig?.bug?.standaloneCount || 0,
     };
     const epicCount = issueTypesConfig?.epic?.count || 0;
+    const standaloneTotal =
+      standaloneCounts.story + standaloneCounts.task + standaloneCounts.bug;
 
     if (projectConfig.issueCount === undefined) {
+      // Legacy path: without epics, calculateIssueCount's total already
+      // includes the standalone counts, so only the remainder may be
+      // generated as generic issues (previously this double-generated the
+      // standalones).
       return {
-        genericCount: count,
+        genericCount: epicCount === 0 ? Math.max(0, count - standaloneTotal) : count,
         childrenPerEpicBase: issueTypesConfig?.epic?.childrenPerEpic || 0,
         childrenPerEpicExtra: 0,
         standaloneCounts,
@@ -150,8 +156,6 @@ export class IssueGenerator {
     const total = Math.max(count, epicCount);
     let budget = total - epicCount;
 
-    const standaloneTotal =
-      standaloneCounts.story + standaloneCounts.task + standaloneCounts.bug;
     const allowedStandalone = Math.min(budget, standaloneTotal);
     const cappedCounts = {
       story: Math.min(standaloneCounts.story, allowedStandalone),

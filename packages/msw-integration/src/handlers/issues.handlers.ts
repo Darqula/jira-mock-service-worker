@@ -2,6 +2,27 @@ import { http, HttpResponse } from 'msw';
 import type { DataStore, CreateIssueInput, UpdateIssueInput } from '@jira-mock/core';
 
 export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
+  // High-water marks (Jira never reuses an issue number/id after a deletion).
+  // The store is fully populated before handlers are created, so scanning it
+  // once gives the correct starting point; created issues then advance it.
+  const lastIssueNumberByProject = new Map<string, number>();
+  let lastIssueId = 10000;
+  for (const existing of dataStore.getAllIssues()) {
+    const idx = existing.key.lastIndexOf('-');
+    const projectKey = existing.key.slice(0, idx);
+    const suffix = parseInt(existing.key.slice(idx + 1), 10);
+    if (Number.isFinite(suffix)) {
+      lastIssueNumberByProject.set(
+        projectKey,
+        Math.max(lastIssueNumberByProject.get(projectKey) ?? 0, suffix)
+      );
+    }
+    const id = parseInt(existing.id, 10);
+    if (Number.isFinite(id) && id > lastIssueId) {
+      lastIssueId = id;
+    }
+  }
+
   return [
     // GET /rest/api/2/issue/picker - Issue picker suggestions
     // NOTE: This MUST come before /rest/api/2/issue/:issueIdOrKey to avoid route collision
@@ -50,10 +71,8 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
     }),
 
     // GET /rest/api/2/issue/:issueIdOrKey - Get issue
-    http.get(`${baseUrl}/rest/api/2/issue/:issueIdOrKey`, ({ params, request }) => {
+    http.get(`${baseUrl}/rest/api/2/issue/:issueIdOrKey`, ({ params }) => {
       const { issueIdOrKey } = params;
-      const url = new URL(request.url);
-      const expand = url.searchParams.get('expand');
 
       const issue = dataStore.getIssue(issueIdOrKey as string);
 
@@ -64,15 +83,10 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
         );
       }
 
-      // Handle expand parameter (basic implementation)
-      let responseIssue = issue;
-      if (expand) {
-        // In a full implementation, we'd handle various expand options
-        // For now, just return the issue as-is
-        responseIssue = issue;
-      }
-
-      return HttpResponse.json(responseIssue);
+      // Handle expand parameter: not supported — the stored issue already
+      // embeds its fields, so every expand value is ignored (see README
+      // "Supported Endpoints" for this limitation).
+      return HttpResponse.json(issue);
     }),
 
     // POST /rest/api/2/issue - Create issue
@@ -142,11 +156,13 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
       // Get current user as reporter
       const reporter = dataStore.getCurrentUser() || undefined;
 
-      // Generate new issue
-      const issueCount = dataStore.getAllIssues().length;
-      const issueNumber = issueCount + 1;
+      // Generate new issue: advance the high-water marks so keys/ids stay
+      // unique even after deletions.
+      const issueNumber = (lastIssueNumberByProject.get(project.key) ?? 0) + 1;
+      lastIssueNumberByProject.set(project.key, issueNumber);
+      lastIssueId += 1;
       const issueKey = `${project.key}-${issueNumber}`;
-      const issueId = `${10000 + issueCount}`;
+      const issueId = String(lastIssueId);
 
       const newIssue = {
         id: issueId,

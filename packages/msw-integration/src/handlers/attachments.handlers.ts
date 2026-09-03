@@ -53,8 +53,6 @@ export function createAttachmentsHandlers(dataStore: DataStore, baseUrl: string)
         );
       }
 
-      // In a real implementation, we would handle multipart/form-data
-      // For mocking purposes, we'll create a mock attachment
       const contentType = request.headers.get('content-type') || '';
 
       if (!contentType.includes('multipart/form-data')) {
@@ -64,26 +62,49 @@ export function createAttachmentsHandlers(dataStore: DataStore, baseUrl: string)
         );
       }
 
-      // Mock file processing - in reality would parse FormData
+      // Parse the uploaded files so real filename/size/type are echoed back
+      // (Jira returns one attachment per uploaded file). An invented mock
+      // file remains as a fallback for well-formed multipart requests that
+      // carry no parseable File entries.
+      const files: { name: string; size: number; type: string }[] = [];
+      try {
+        const formData = await request.formData();
+        for (const [, value] of formData.entries()) {
+          if (value instanceof File) {
+            files.push({ name: value.name, size: value.size, type: value.type || 'application/octet-stream' });
+          }
+        }
+      } catch {
+        // Body not parseable as multipart form data - fall through to the mock file.
+      }
+
+      if (files.length === 0) {
+        files.push({
+          name: `mock-file-${Date.now()}.txt`,
+          size: Math.floor(Math.random() * 100000) + 1000,
+          type: 'text/plain',
+        });
+      }
+
       const now = new Date().toISOString();
-      const attachmentId = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
-      const filename = `mock-file-${Date.now()}.txt`;
-      const size = Math.floor(Math.random() * 100000) + 1000;
+      const attachments = files.map((file, index) => {
+        const attachmentId = `${Date.now()}${Math.floor(Math.random() * 1000)}${index}`;
 
-      const attachment = {
-        self: `${baseUrl}/rest/api/2/attachment/${attachmentId}`,
-        id: attachmentId,
-        filename,
-        author: currentUser,
-        created: now,
-        size,
-        mimeType: 'text/plain',
-        content: `${baseUrl}/secure/attachment/${attachmentId}/${filename}`,
-      };
+        return {
+          self: `${baseUrl}/rest/api/2/attachment/${attachmentId}`,
+          id: attachmentId,
+          filename: file.name,
+          author: currentUser,
+          created: now,
+          size: file.size,
+          mimeType: file.type,
+          content: `${baseUrl}/secure/attachment/${attachmentId}/${file.name}`,
+        };
+      });
 
-      dataStore.addAttachment(attachment, issueIdOrKey as string);
+      attachments.forEach((attachment) => dataStore.addAttachment(attachment, issueIdOrKey as string));
 
-      return HttpResponse.json([attachment], { status: 200 });
+      return HttpResponse.json(attachments, { status: 200 });
     }),
   ];
 }

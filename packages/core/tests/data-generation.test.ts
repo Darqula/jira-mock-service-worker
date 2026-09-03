@@ -326,3 +326,32 @@ describe('issueCount option', () => {
     expect(dataStore.getAllIssues()).toHaveLength(1010);
   });
 });
+
+describe('issue types without epics', () => {
+  it('generates standalone issues exactly once when issueCount is omitted', () => {
+    const { dataStore } = generateMockData({
+      version: '1.0',
+      projects: [
+        {
+          projectKey: 'LEGACY',
+          seed: 1,
+          issueTypes: {
+            epic: { count: 0 },
+            story: { standaloneCount: 3 },
+            task: { standaloneCount: 2 },
+            bug: { standaloneCount: 1 },
+          },
+        },
+      ],
+    });
+
+    const issues = dataStore.getAllIssues();
+    expect(issues).toHaveLength(6);
+
+    const countByType = (name: string) =>
+      issues.filter((i) => i.fields.issuetype.name === name).length;
+    expect(countByType('Story')).toBe(3);
+    expect(countByType('Task')).toBe(2);
+    expect(countByType('Bug')).toBe(1);
+  });
+});

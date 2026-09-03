@@ -3,7 +3,11 @@ import type { DataStore } from '@jira-mock/core';
 import { CreateMetaGenerator, EditMetaGenerator } from '@jira-mock/core';
 import { createGenerationContext } from '../utils/generation-context.js';
 
-export function createMetadataHandlers(dataStore: DataStore, baseUrl: string) {
+export function createMetadataHandlers(
+  dataStore: DataStore,
+  baseUrl: string,
+  generationSeed: number = Date.now()
+) {
   const createMetaGenerator = new CreateMetaGenerator();
   const editMetaGenerator = new EditMetaGenerator();
 
@@ -13,12 +17,10 @@ export function createMetadataHandlers(dataStore: DataStore, baseUrl: string) {
       const url = new URL(request.url);
       const startAt = parseInt(url.searchParams.get('startAt') || '0', 10);
       const maxResults = parseInt(url.searchParams.get('maxResults') || '50', 10);
-      // const projectIds = url.searchParams.get('projectIds')?.split(',') || [];
 
-      let issueTypes = dataStore.getAllIssueTypes();
-
-      // Filter by project IDs if provided (for now, return all issue types for any project)
-      // In a real implementation, you'd filter based on project-specific issue types
+      // All mock projects share one global issue type scheme, so project
+      // filters are accepted but every issue type is returned.
+      const issueTypes = dataStore.getAllIssueTypes();
 
       const total = issueTypes.length;
       const paginatedTypes = issueTypes.slice(startAt, startAt + maxResults);
@@ -53,6 +55,9 @@ export function createMetadataHandlers(dataStore: DataStore, baseUrl: string) {
         );
       }
 
+      // Every mock project shares one global issue type scheme, so the
+      // project's type set is all generated issue types (same rationale as
+      // /issuetype/page above).
       const issueTypes = dataStore.getAllIssueTypes();
       return HttpResponse.json(issueTypes);
     }),
@@ -144,7 +149,7 @@ export function createMetadataHandlers(dataStore: DataStore, baseUrl: string) {
       const users = dataStore.getAllUsers();
       const allComponents = dataStore.getAllComponents();
       const allVersions = dataStore.getAllVersions();
-      const context = createGenerationContext();
+      const context = createGenerationContext(generationSeed);
 
       const createMeta = createMetaGenerator.generateCreateMeta(
         projects,
@@ -176,7 +181,7 @@ export function createMetadataHandlers(dataStore: DataStore, baseUrl: string) {
       const users = dataStore.getAllUsers();
       const components = dataStore.getComponentsByProject(project.id);
       const versions = dataStore.getVersionsByProject(project.id);
-      const context = createGenerationContext();
+      const context = createGenerationContext(generationSeed);
 
       const metaIssueTypes = issueTypes.map((issueType) =>
         createMetaGenerator.generateIssueTypeFields(
@@ -221,7 +226,7 @@ export function createMetadataHandlers(dataStore: DataStore, baseUrl: string) {
       const users = dataStore.getAllUsers();
       const components = dataStore.getComponentsByProject(project.id);
       const versions = dataStore.getVersionsByProject(project.id);
-      const context = createGenerationContext();
+      const context = createGenerationContext(generationSeed);
 
       const metaIssueType = createMetaGenerator.generateIssueTypeFields(
         issueType,
@@ -253,7 +258,7 @@ export function createMetadataHandlers(dataStore: DataStore, baseUrl: string) {
       const components = dataStore.getComponentsByProject(issue.fields.project.id);
       const versions = dataStore.getVersionsByProject(issue.fields.project.id);
       const statuses = dataStore.getAllStatuses();
-      const context = createGenerationContext();
+      const context = createGenerationContext(generationSeed);
 
       const editMeta = editMetaGenerator.generateEditMeta(
         issue,

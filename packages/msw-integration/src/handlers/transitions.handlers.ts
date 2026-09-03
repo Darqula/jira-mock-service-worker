@@ -3,7 +3,11 @@ import type { DataStore, DoTransitionInput } from '@jira-mock/core';
 import { TransitionGenerator } from '@jira-mock/core';
 import { createGenerationContext } from '../utils/generation-context.js';
 
-export function createTransitionsHandlers(dataStore: DataStore, baseUrl: string) {
+export function createTransitionsHandlers(
+  dataStore: DataStore,
+  baseUrl: string,
+  generationSeed: number = Date.now()
+) {
   const transitionGenerator = new TransitionGenerator();
 
   return [
@@ -21,7 +25,7 @@ export function createTransitionsHandlers(dataStore: DataStore, baseUrl: string)
 
       const currentStatus = issue.fields.status;
       const allStatuses = dataStore.getAllStatuses();
-      const context = createGenerationContext();
+      const context = createGenerationContext(generationSeed);
 
       const transitions = transitionGenerator.generateTransitions(
         currentStatus,
@@ -58,7 +62,7 @@ export function createTransitionsHandlers(dataStore: DataStore, baseUrl: string)
       // Generate available transitions to find the requested one
       const currentStatus = issue.fields.status;
       const allStatuses = dataStore.getAllStatuses();
-      const context = createGenerationContext();
+      const context = createGenerationContext(generationSeed);
 
       const transitions = transitionGenerator.generateTransitions(
         currentStatus,
