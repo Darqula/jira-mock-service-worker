@@ -5,6 +5,21 @@ export function createSearchHandlers(
   queryEngine: QueryEngine,
   baseUrl: string
 ) {
+  const runSearch = (params: {
+    jql: string;
+    startAt: number;
+    maxResults: number;
+    fields?: string[];
+    expand?: string[];
+  }) =>
+    queryEngine.executeJQL({
+      jql: params.jql,
+      startAt: params.startAt,
+      maxResults: params.maxResults,
+      fields: params.fields,
+      expand: params.expand,
+    });
+
   return [
     // POST /rest/api/2/search/jql - Search for issues using JQL
     http.post(`${baseUrl}/rest/api/2/search/jql`, async ({ request }) => {
@@ -23,7 +38,7 @@ export function createSearchHandlers(
         );
       }
 
-      const results = queryEngine.executeJQL({
+      const results = runSearch({
         jql: body.jql,
         startAt: body.startAt || 0,
         maxResults: body.maxResults || 50,
@@ -38,17 +53,35 @@ export function createSearchHandlers(
     http.get(`${baseUrl}/rest/api/2/search`, ({ request }) => {
       const url = new URL(request.url);
       const jql = url.searchParams.get('jql') || '';
-      const startAt = parseInt(url.searchParams.get('startAt') || '0', 10);
-      const maxResults = parseInt(url.searchParams.get('maxResults') || '50', 10);
-      const fields = url.searchParams.get('fields')?.split(',');
-      const expand = url.searchParams.get('expand')?.split(',');
 
-      const results = queryEngine.executeJQL({
+      const results = runSearch({
         jql,
-        startAt,
-        maxResults,
-        fields,
-        expand,
+        startAt: parseInt(url.searchParams.get('startAt') || '0', 10),
+        maxResults: parseInt(url.searchParams.get('maxResults') || '50', 10),
+        fields: url.searchParams.get('fields')?.split(','),
+        expand: url.searchParams.get('expand')?.split(','),
+      });
+
+      return HttpResponse.json(results);
+    }),
+
+    // POST /rest/api/2/search - Search for issues using JQL (JSON body version,
+    // used by many Jira client libraries)
+    http.post(`${baseUrl}/rest/api/2/search`, async ({ request }) => {
+      const body = (await request.json()) as {
+        jql?: string;
+        startAt?: number;
+        maxResults?: number;
+        fields?: string[];
+        expand?: string | string[];
+      };
+
+      const results = runSearch({
+        jql: body.jql || '',
+        startAt: body.startAt || 0,
+        maxResults: body.maxResults || 50,
+        fields: body.fields,
+        expand: typeof body.expand === 'string' ? body.expand.split(',') : body.expand,
       });
 
       return HttpResponse.json(results);

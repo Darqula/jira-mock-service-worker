@@ -98,6 +98,14 @@
       "methods": ["get"]
     },
     {
+      "path": "/rest/api/2/resolution",
+      "methods": ["get"]
+    },
+    {
+      "path": "/rest/api/2/resolution/{id}",
+      "methods": ["get"]
+    },
+    {
       "path": "/rest/api/2/status",
       "methods": ["get"]
     },
@@ -151,7 +159,7 @@
     },
     {
       "path": "/rest/api/2/search",
-      "methods": ["get"]
+      "methods": ["get", "post"]
     },
     {
       "path": "/rest/api/2/search/jql",
@@ -202,7 +210,7 @@
       "methods": ["get"]
     },
     {
-      "path": "/rest/api/2/project/{projectIdOrKey}/version",
+      "path": "/rest/api/2/project/{projectIdOrKey}/versions",
       "methods": ["get"]
     },
     {

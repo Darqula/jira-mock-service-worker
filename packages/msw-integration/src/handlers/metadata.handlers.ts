@@ -11,6 +11,19 @@ export function createMetadataHandlers(
   const createMetaGenerator = new CreateMetaGenerator();
   const editMetaGenerator = new EditMetaGenerator();
 
+  // Standard Jira Cloud resolutions (same values the JQL autocomplete
+  // suggestions advertise for the `resolution` field).
+  const resolutions = [
+    { id: '1', name: 'Fixed', description: 'A fix has been implemented and verified.' },
+    { id: '2', name: "Won't Fix", description: 'The described work will not be done.' },
+    { id: '3', name: 'Duplicate', description: 'The issue is a duplicate of a previous issue.' },
+    { id: '4', name: 'Incomplete', description: 'The issue was not completed correctly.' },
+    { id: '5', name: 'Cannot Reproduce', description: 'The problem could not be reproduced.' },
+  ].map((resolution) => ({
+    ...resolution,
+    self: `${baseUrl}/rest/api/2/resolution/${resolution.id}`,
+  }));
+
   return [
     // GET /rest/api/2/issuetype/page - Get issue types with pagination
     http.get(`${baseUrl}/rest/api/2/issuetype/page`, ({ request }) => {
@@ -78,6 +91,23 @@ export function createMetadataHandlers(
     http.get(`${baseUrl}/rest/api/2/priority`, () => {
       const priorities = dataStore.getAllPriorities();
       return HttpResponse.json(priorities);
+    }),
+
+    // GET /rest/api/2/resolution - Get all resolutions
+    http.get(`${baseUrl}/rest/api/2/resolution`, () => {
+      return HttpResponse.json(resolutions);
+    }),
+
+    // GET /rest/api/2/resolution/:id - Get resolution by id
+    http.get(`${baseUrl}/rest/api/2/resolution/:id`, ({ params }) => {
+      const resolution = resolutions.find((r) => r.id === params.id);
+      if (!resolution) {
+        return HttpResponse.json(
+          { errorMessages: ['Resolution not found'] },
+          { status: 404 }
+        );
+      }
+      return HttpResponse.json(resolution);
     }),
 
     // GET /rest/api/2/status - Get all statuses

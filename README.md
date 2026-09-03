@@ -447,6 +447,12 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 
 77 handlers are registered; all paths use the `/rest/api/2/` prefix.
 
+> **API version support:** only `/rest/api/2/` paths are mocked. Requests to the
+> Jira Cloud `/rest/api/3/` prefix are **not intercepted** and fall through to the
+> network (or to your MSW `onUnhandledRequest` policy). Point clients that default
+> to v3 at `/rest/api/2/` (e.g. configure the API version in the client) or add
+> your own handlers.
+
 ### Users & Permissions
 - `GET /rest/api/2/myself` - Get current user
 - `GET /rest/api/2/user` - Get user by accountId

@@ -229,6 +229,43 @@ describe('MSW Integration', () => {
     expect(fetched.status).toBe(200);
   });
 
+  it('should search issues via POST /rest/api/2/search', async () => {
+    const projects = dataStore.getAllProjects();
+    const projectKey = projects[0].key;
+
+    const response = await fetch(`${baseUrl}/rest/api/2/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jql: `project=${projectKey}`, maxResults: 3 }),
+    });
+    expect(response.status).toBe(200);
+
+    const result = await response.json();
+    expect(result.total).toBeGreaterThan(0);
+    expect(result.issues).toHaveLength(3);
+    result.issues.forEach((issue: any) => {
+      expect(issue.fields.project.key).toBe(projectKey);
+    });
+  });
+
+  it('should list and fetch resolutions', async () => {
+    const listResponse = await fetch(`${baseUrl}/rest/api/2/resolution`);
+    expect(listResponse.status).toBe(200);
+    const resolutions = await listResponse.json();
+    expect(resolutions.length).toBeGreaterThan(0);
+    expect(resolutions[0].id).toBeDefined();
+    expect(resolutions[0].name).toBeDefined();
+
+    const singleResponse = await fetch(
+      `${baseUrl}/rest/api/2/resolution/${resolutions[0].id}`
+    );
+    expect(singleResponse.status).toBe(200);
+    expect((await singleResponse.json()).id).toBe(resolutions[0].id);
+
+    const missingResponse = await fetch(`${baseUrl}/rest/api/2/resolution/999999`);
+    expect(missingResponse.status).toBe(404);
+  });
+
   it('should echo uploaded file metadata when posting attachments', async () => {
     const issueKey = dataStore.getAllIssues()[0].key;
     const form = new FormData();
