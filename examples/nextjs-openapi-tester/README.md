@@ -23,22 +23,25 @@ npm install
 
 ### Configuration
 
-Edit `jira-mock-config.json` to customize the mock data:
+Edit `jira-mock-config.json` to customize the mock data. It uses the standard
+**array format** — the only supported shape (see the "Configuration Files" section
+below and the root README for the full schema):
 
 ```json
 {
   "version": "1.0",
-  "seed": 42,
-  "projects": {
-    "count": 5,
-    "issuesPerProject": 20
-  }
+  "projects": [
+    {
+      "projectKey": "PROJ1",
+      "seed": 42
+    }
+  ]
 }
 ```
 
-- `seed`: Controls random data generation (same seed = same data)
-- `projects.count`: Number of projects to generate (1-100)
-- `projects.issuesPerProject`: Issues per project (1-10000)
+- `seed` (per project): Controls random data generation (same seed = same issues)
+- `issueCount` (per project, optional): Exact number of issues (1-10000); when omitted
+  the count is derived from the project's `issueTypes` configuration
 
 ### Run Development Server
 
@@ -135,19 +138,9 @@ The new endpoint will now appear in the OpenAPI UI!
 
 ### jira-mock-config.json
 
-Controls mock data generation:
-
-```json
-{
-  "version": "1.0",
-  "projects": [
-    {
-      "projectKey": "PROJ1",
-      "seed": 42
-    }
-  ]
-}
-```
+Controls mock data generation. Uses the array format shown in the Configuration
+section above (the checked-in file defines five projects, `PROJ1`–`PROJ5`, each with
+`"seed": 42`).
 
 Issue count per project can be pinned with `"issueCount": 20` (1–10000); when omitted it
 is derived from the project's `issueTypes` configuration (defaults to ~1,010 issues).
