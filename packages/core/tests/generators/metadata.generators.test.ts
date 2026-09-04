@@ -31,6 +31,13 @@ describe('Metadata Generators', () => {
         accountId: 'user-1',
         displayName: 'John Doe',
         emailAddress: 'john@example.com',
+        accountType: 'atlassian',
+        avatarUrls: {
+          '48x48': 'https://test.atlassian.net/avatars/user-1/48.png',
+          '24x24': 'https://test.atlassian.net/avatars/user-1/24.png',
+          '16x16': 'https://test.atlassian.net/avatars/user-1/16.png',
+          '32x32': 'https://test.atlassian.net/avatars/user-1/32.png',
+        },
         active: true,
         self: 'https://test.atlassian.net/rest/api/2/user?accountId=user-1',
       },
@@ -38,6 +45,13 @@ describe('Metadata Generators', () => {
         accountId: 'user-2',
         displayName: 'Jane Smith',
         emailAddress: 'jane@example.com',
+        accountType: 'atlassian',
+        avatarUrls: {
+          '48x48': 'https://test.atlassian.net/avatars/user-2/48.png',
+          '24x24': 'https://test.atlassian.net/avatars/user-2/24.png',
+          '16x16': 'https://test.atlassian.net/avatars/user-2/16.png',
+          '32x32': 'https://test.atlassian.net/avatars/user-2/32.png',
+        },
         active: true,
         self: 'https://test.atlassian.net/rest/api/2/user?accountId=user-2',
       },
@@ -304,7 +318,7 @@ describe('Metadata Generators', () => {
         const project = generator.generateProject(projectConfig, testUsers, context);
 
         expect(project.lead).toBeDefined();
-        expect(testUsers.map((u) => u.accountId)).toContain(project.lead.accountId);
+        expect(testUsers.map((u) => u.accountId)).toContain(project.lead?.accountId);
       });
 
       it('should include self URL', () => {

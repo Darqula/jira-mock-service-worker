@@ -28,6 +28,13 @@ describe('JQL Enhancements', () => {
       accountId: 'user-123',
       displayName: 'Test User',
       emailAddress: 'test@example.com',
+      accountType: 'atlassian',
+      avatarUrls: {
+        '48x48': 'https://test.atlassian.net/avatars/user-123/48.png',
+        '24x24': 'https://test.atlassian.net/avatars/user-123/24.png',
+        '16x16': 'https://test.atlassian.net/avatars/user-123/16.png',
+        '32x32': 'https://test.atlassian.net/avatars/user-123/32.png',
+      },
       active: true,
       self: 'https://test.atlassian.net/rest/api/2/user?accountId=user-123',
     };
@@ -37,12 +44,22 @@ describe('JQL Enhancements', () => {
       key: 'TEST',
       name: 'Test Project',
       projectTypeKey: 'software',
+      simplified: false,
+      style: 'classic',
+      avatarUrls: {
+        '48x48': 'https://test.atlassian.net/avatars/project/1/48.png',
+        '24x24': 'https://test.atlassian.net/avatars/project/1/24.png',
+        '16x16': 'https://test.atlassian.net/avatars/project/1/16.png',
+        '32x32': 'https://test.atlassian.net/avatars/project/1/32.png',
+      },
       self: 'https://test.atlassian.net/rest/api/2/project/1',
     };
 
     testStatus = {
       id: '1',
       name: 'To Do',
+      description: 'The issue is ready to be worked on.',
+      iconUrl: 'https://test.atlassian.net/images/icons/statuses/generic.png',
       statusCategory: {
         id: 1,
         key: 'new',
@@ -63,6 +80,7 @@ describe('JQL Enhancements', () => {
     testIssueType = {
       id: '1',
       name: 'Bug',
+      description: 'A problem or defect that impairs function.',
       subtask: false,
       iconUrl: 'https://test.atlassian.net/images/icons/issuetypes/bug.svg',
       self: 'https://test.atlassian.net/rest/api/2/issuetype/1',
@@ -240,7 +258,7 @@ describe('JQL Enhancements', () => {
   describe('IS EMPTY / IS NOT EMPTY Operators', () => {
     it('should filter by assignee IS EMPTY', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      issue1.fields.assignee = null;
+      issue1.fields.assignee = undefined;
 
       const issue2 = createTestIssue('TEST-2', testProject);
       issue2.fields.assignee = testUser;
@@ -259,7 +277,7 @@ describe('JQL Enhancements', () => {
       issue1.fields.assignee = testUser;
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      issue2.fields.assignee = null;
+      issue2.fields.assignee = undefined;
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -758,12 +776,16 @@ function createTestIssue(key: string, project: Project): IssueBean {
       issuetype: {
         id: '1',
         name: 'Task',
+        description: 'A task to be completed.',
         subtask: false,
+        iconUrl: 'https://test.atlassian.net/images/icons/issuetypes/task.svg',
         self: 'https://test.atlassian.net/rest/api/2/issuetype/1',
       },
       status: {
         id: '1',
         name: 'To Do',
+        description: 'The issue is ready to be worked on.',
+        iconUrl: 'https://test.atlassian.net/images/icons/statuses/generic.png',
         statusCategory: {
           id: 1,
           key: 'new',
@@ -776,13 +798,21 @@ function createTestIssue(key: string, project: Project): IssueBean {
       priority: {
         id: '3',
         name: 'Medium',
+        iconUrl: 'https://test.atlassian.net/images/icons/priorities/medium.svg',
         self: 'https://test.atlassian.net/rest/api/2/priority/3',
       },
-      assignee: null,
+      assignee: undefined,
       reporter: {
         accountId: 'reporter-123',
         displayName: 'Reporter User',
         emailAddress: 'reporter@example.com',
+        accountType: 'atlassian',
+        avatarUrls: {
+          '48x48': 'https://test.atlassian.net/avatars/reporter-123/48.png',
+          '24x24': 'https://test.atlassian.net/avatars/reporter-123/24.png',
+          '16x16': 'https://test.atlassian.net/avatars/reporter-123/16.png',
+          '32x32': 'https://test.atlassian.net/avatars/reporter-123/32.png',
+        },
         active: true,
         self: 'https://test.atlassian.net/rest/api/2/user?accountId=reporter-123',
       },

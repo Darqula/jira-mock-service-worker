@@ -204,19 +204,3 @@ export interface JiraMockConfig {
   /** Array of project-specific configurations (required, min 1 item) */
   projects: ProjectConfigWithKey[];
 }
-
-/**
- * Context for data generation
- */
-export interface GenerationContext {
-  /** The full configuration */
-  config: JiraMockConfig;
-  /** Random seed for reproducibility */
-  seed: number;
-  /** Current project being generated (optional) */
-  currentProject?: ProjectConfigWithKey;
-  /** Project index (for backward compatibility) */
-  projectIndex?: number;
-  /** Issue index (for backward compatibility) */
-  issueIndex?: number;
-}

@@ -18,7 +18,7 @@ describe('UserGenerator', () => {
     context = {
       config: {
         version: '1.0',
-        projects: { count: 1, issuesPerProject: 10 },
+        projects: [],
       },
       faker,
       idGenerator,

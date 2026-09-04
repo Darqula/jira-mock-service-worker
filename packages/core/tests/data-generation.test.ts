@@ -47,19 +47,25 @@ describe('Data Generation', () => {
   it('should generate correct number of issues per project', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      globalDefaults: {
-        issueTypes: {
-          epic: {
-            count: 0, // Disable epic-based generation
-          },
-        },
-      },
       projects: [
         {
           projectKey: 'TEST1',
+          issueTypes: {
+            epic: {
+              count: 0, // Disable epic-based generation
+            },
+            story: { standaloneCount: 7 },
+            task: { standaloneCount: 3 },
+          },
         },
         {
           projectKey: 'TEST2',
+          issueTypes: {
+            epic: {
+              count: 0,
+            },
+            bug: { standaloneCount: 5 },
+          },
         },
       ],
     };
@@ -68,9 +74,10 @@ describe('Data Generation', () => {
     const proj1Issues = dataStore.getAllIssues().filter((i) => i.fields.project.key === 'TEST1');
     const proj2Issues = dataStore.getAllIssues().filter((i) => i.fields.project.key === 'TEST2');
 
-    // Each project should have issues generated from issue types configuration
-    expect(proj1Issues.length).toBeGreaterThan(0);
-    expect(proj2Issues.length).toBeGreaterThan(0);
+    // Standalone-only configs (epic count 0, no issueCount) generate exactly
+    // the sum of their configured standalone counts.
+    expect(proj1Issues).toHaveLength(10);
+    expect(proj2Issues).toHaveLength(5);
   });
 
   it('should generate users', () => {

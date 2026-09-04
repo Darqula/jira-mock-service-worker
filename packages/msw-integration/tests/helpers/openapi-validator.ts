@@ -217,6 +217,9 @@ export class OpenAPIValidator {
     }
 
     for (const [path, pathItem] of Object.entries(this.spec.paths)) {
+      if (!pathItem) {
+        continue;
+      }
       const methods = ['get', 'post', 'put', 'delete', 'patch'] as const;
 
       for (const method of methods) {
