@@ -4,7 +4,13 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "noEmit": false,
-    "composite": true
+    // Deliberate: `composite` + `declaration` make this package a valid project
+    // reference target (packages/msw-integration and packages/config-ui list it
+    // under `references`, enabling `tsc -b` and editor cross-project go-to-def).
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests"]
