@@ -10,7 +10,7 @@ published to npm; everything is built from source.
 ```bash
 git clone https://github.com/Darqula/jira-mock-service-worker.git
 cd jira-mock-service-worker
-npm install     # requires Node.js >= 18, npm >= 9
+npm install     # requires Node.js >= 20.19, npm >= 10
 npm run build
 ```
 

@@ -6,6 +6,9 @@ const createJestConfig = nextJest({
 })
 
 // Add any custom config to be passed to Jest
+// Note: @faker-js/faker 10 is ESM-only; it is transformed by jest because it is
+// listed in next.config.js transpilePackages (next/jest builds the ignore
+// pattern from that list — custom transformIgnorePatterns only append).
 const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jest-environment-jsdom',

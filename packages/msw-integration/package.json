@@ -28,7 +28,7 @@
     "typecheck": "tsc -p tsconfig.test.json"
   },
   "dependencies": {
-    "@faker-js/faker": "^9.0.3",
+    "@faker-js/faker": "^10.6.0",
     "@jira-mock/core": "1.0.0",
     "msw": "^2.6.4"
   },
