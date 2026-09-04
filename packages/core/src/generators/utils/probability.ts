@@ -37,10 +37,7 @@ export function shouldApply(faker: Faker, probability: number): boolean {
  * // Returns 'story', 'task', or 'bug' based on weights
  * ```
  */
-export function weightedPick<T extends string>(
-  faker: Faker,
-  weights: Record<T, number>
-): T {
+export function weightedPick<T extends string>(faker: Faker, weights: Record<T, number>): T {
   const items = Object.keys(weights) as T[];
   const totalWeight = (Object.values(weights) as number[]).reduce(
     (sum: number, weight: number) => sum + weight,
@@ -116,11 +113,7 @@ export function normalizeDistribution<T extends string>(
  * // Returns a number between 1 and 4
  * ```
  */
-export function randomInRange(
-  faker: Faker,
-  min: number,
-  max: number
-): number {
+export function randomInRange(faker: Faker, min: number, max: number): number {
   if (min > max) {
     [min, max] = [max, min]; // Swap if min > max
   }
@@ -170,11 +163,7 @@ export function randomPick<T>(faker: Faker, array: T[], count: number): T[] {
  * // Each label has a 30% chance of being included
  * ```
  */
-export function randomSubset<T>(
-  faker: Faker,
-  array: T[],
-  probability: number
-): T[] {
+export function randomSubset<T>(faker: Faker, array: T[], probability: number): T[] {
   if (probability <= 0) return [];
   if (probability >= 1) return [...array];
 

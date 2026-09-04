@@ -49,9 +49,7 @@ export function StatusSection({ config, onChange, projectIndex }: StatusSectionP
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="status-todo">
-            To Do
-          </Label>
+          <Label htmlFor="status-todo">To Do</Label>
           <Slider
             id="status-todo"
             min={0}
@@ -67,18 +65,14 @@ export function StatusSection({ config, onChange, projectIndex }: StatusSectionP
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="status-in-progress">
-            In Progress
-          </Label>
+          <Label htmlFor="status-in-progress">In Progress</Label>
           <Slider
             id="status-in-progress"
             min={0}
             max={1}
             step={0.01}
             value={inProgress}
-            onChange={(e) =>
-              updateStatus({ inProgress: parseFloat(e.target.value) })
-            }
+            onChange={(e) => updateStatus({ inProgress: parseFloat(e.target.value) })}
             formatValue={(v) => `${Math.round(v * 100)}%`}
           />
           <p className="text-xs text-muted-foreground">
@@ -87,9 +81,7 @@ export function StatusSection({ config, onChange, projectIndex }: StatusSectionP
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="status-done">
-            Done
-          </Label>
+          <Label htmlFor="status-done">Done</Label>
           <Slider
             id="status-done"
             min={0}

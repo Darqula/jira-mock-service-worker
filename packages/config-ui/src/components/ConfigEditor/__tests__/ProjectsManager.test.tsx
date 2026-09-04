@@ -57,10 +57,7 @@ describe('ProjectsManager', () => {
   it('removes a project when multiple projects exist', () => {
     const configWithTwoProjects: JiraMockConfig = {
       version: '1.0',
-      projects: [
-        { projectKey: 'PROJ1' },
-        { projectKey: 'PROJ2' },
-      ],
+      projects: [{ projectKey: 'PROJ1' }, { projectKey: 'PROJ2' }],
     };
 
     render(<ProjectsManager config={configWithTwoProjects} onChange={mockOnChange} />);

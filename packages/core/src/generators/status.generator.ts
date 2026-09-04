@@ -8,7 +8,7 @@ const STATUS_CATEGORIES: Omit<StatusCategory, 'self'>[] = [
   { id: 3, key: 'done', name: 'Done', colorName: 'green' },
 ];
 
-const STATUSES: Array<Omit<Status, 'self' | 'id' | 'statusCategory'> & {categoryKey: string}> = [
+const STATUSES: Array<Omit<Status, 'self' | 'id' | 'statusCategory'> & { categoryKey: string }> = [
   {
     name: 'To Do',
     description: 'The issue is open and ready for the assignee to start work on it.',
@@ -56,10 +56,7 @@ export class StatusGenerator {
     }));
   }
 
-  generateStatuses(
-    context: GenerationContext,
-    categories: StatusCategory[]
-  ): Status[] {
+  generateStatuses(context: GenerationContext, categories: StatusCategory[]): Status[] {
     const urls = generateSelfUrls();
     const categoriesMap = new Map(categories.map((c) => [c.key, c]));
 

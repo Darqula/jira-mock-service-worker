@@ -9,10 +9,7 @@ export async function POST(request: Request) {
     // Validate the config
     const errors = getConfigErrors(config);
     if (errors.length > 0) {
-      return NextResponse.json(
-        { success: false, errors },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, errors }, { status: 400 });
     }
 
     // If validation passes

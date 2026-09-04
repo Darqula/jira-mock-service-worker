@@ -65,8 +65,8 @@ describe('Data Generation', () => {
     };
 
     const { dataStore } = generateMockData(config);
-    const proj1Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'TEST1');
-    const proj2Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'TEST2');
+    const proj1Issues = dataStore.getAllIssues().filter((i) => i.fields.project.key === 'TEST1');
+    const proj2Issues = dataStore.getAllIssues().filter((i) => i.fields.project.key === 'TEST2');
 
     // Each project should have issues generated from issue types configuration
     expect(proj1Issues.length).toBeGreaterThan(0);
@@ -201,8 +201,7 @@ describe('Data Generation', () => {
 });
 
 describe('issueCount option', () => {
-  const clampRule = (issueCount: number, epicCount: number) =>
-    Math.max(issueCount, epicCount);
+  const clampRule = (issueCount: number, epicCount: number) => Math.max(issueCount, epicCount);
 
   const buildConfig = (
     seed: number,

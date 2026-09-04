@@ -11,15 +11,18 @@ import { saveConfig, loadConfig, downloadConfig, uploadConfig } from '@/lib/conf
 import { Download, Upload, Save, FileJson } from 'lucide-react';
 
 export function ConfigEditor() {
-  const [config, setConfig] = useState<JiraMockConfig>(() => loadConfig() ?? {
-    version: '1.0',
-    projects: [
-      {
-        projectKey: 'PROJ',
-        // issueCount is calculated from issue types configuration
-      },
-    ],
-  });
+  const [config, setConfig] = useState<JiraMockConfig>(
+    () =>
+      loadConfig() ?? {
+        version: '1.0',
+        projects: [
+          {
+            projectKey: 'PROJ',
+            // issueCount is calculated from issue types configuration
+          },
+        ],
+      }
+  );
 
   const [saved, setSaved] = useState(false);
 
@@ -80,12 +83,7 @@ export function ConfigEditor() {
               <label className="cursor-pointer">
                 <Upload className="mr-2 h-4 w-4" />
                 Upload JSON
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={handleUpload}
-                  className="hidden"
-                />
+                <input type="file" accept=".json" onChange={handleUpload} className="hidden" />
               </label>
             </Button>
 
@@ -98,9 +96,7 @@ export function ConfigEditor() {
           {/* Validation Errors */}
           {errors.length > 0 && (
             <div className="rounded-md bg-destructive/10 p-4 border border-destructive/20 mt-4">
-              <h4 className="text-sm font-semibold text-destructive mb-2">
-                Validation Errors
-              </h4>
+              <h4 className="text-sm font-semibold text-destructive mb-2">Validation Errors</h4>
               <ul className="text-sm text-destructive/90 space-y-1">
                 {errors.map((error, i) => (
                   <li key={i}>• {error}</li>
@@ -125,8 +121,8 @@ export function ConfigEditor() {
         <CardHeader>
           <CardTitle>Projects</CardTitle>
           <CardDescription>
-            Configure individual projects with unique keys, issue counts, and project-specific settings.
-            All configuration is done at the project level.
+            Configure individual projects with unique keys, issue counts, and project-specific
+            settings. All configuration is done at the project level.
           </CardDescription>
         </CardHeader>
         <CardContent>

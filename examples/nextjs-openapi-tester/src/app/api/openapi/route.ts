@@ -26,7 +26,7 @@ function filterOpenApiSpec(spec: any, mockedEndpoints: MockedEndpoint[]): any {
   for (const endpoint of mockedEndpoints) {
     // Normalize the path (OpenAPI uses {param} syntax)
     const normalizedPath = endpoint.path;
-    endpointMap.set(normalizedPath, new Set(endpoint.methods.map(m => m.toLowerCase())));
+    endpointMap.set(normalizedPath, new Set(endpoint.methods.map((m) => m.toLowerCase())));
   }
 
   // Filter the paths object
@@ -39,7 +39,11 @@ function filterOpenApiSpec(spec: any, mockedEndpoints: MockedEndpoint[]): any {
 
       for (const [method, operation] of Object.entries(pathItem as any)) {
         // Copy non-HTTP method properties (like parameters, servers, etc.)
-        if (!['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace'].includes(method.toLowerCase())) {
+        if (
+          !['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace'].includes(
+            method.toLowerCase()
+          )
+        ) {
           filteredPathItem[method] = operation;
         } else if (allowedMethods.has(method.toLowerCase())) {
           // Include this method as it's mocked
@@ -48,8 +52,10 @@ function filterOpenApiSpec(spec: any, mockedEndpoints: MockedEndpoint[]): any {
       }
 
       // Only add the path if it has at least one HTTP method
-      const hasMethods = Object.keys(filteredPathItem).some(key =>
-        ['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace'].includes(key.toLowerCase())
+      const hasMethods = Object.keys(filteredPathItem).some((key) =>
+        ['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace'].includes(
+          key.toLowerCase()
+        )
       );
 
       if (hasMethods || Object.keys(filteredPathItem).length > 0) {
@@ -62,8 +68,7 @@ function filterOpenApiSpec(spec: any, mockedEndpoints: MockedEndpoint[]): any {
 
   // Update the spec description to indicate it's filtered
   if (filteredSpec.info) {
-    filteredSpec.info.description =
-      `${filteredSpec.info.description || 'Jira Cloud REST API'}\n\n**Note:** This specification is filtered to only show endpoints that are mocked with MSW in this project. To add more endpoints, update the \`mocked-endpoints.json\` configuration file.`;
+    filteredSpec.info.description = `${filteredSpec.info.description || 'Jira Cloud REST API'}\n\n**Note:** This specification is filtered to only show endpoints that are mocked with MSW in this project. To add more endpoints, update the \`mocked-endpoints.json\` configuration file.`;
   }
 
   return filteredSpec;

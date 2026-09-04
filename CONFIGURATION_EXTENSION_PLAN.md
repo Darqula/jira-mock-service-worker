@@ -36,13 +36,14 @@ interface JiraMockConfig {
   version: '1.0';
   seed?: number;
   projects: {
-    count: number;              // 1-100 projects
-    issuesPerProject: number;   // 1-10000 issues per project
+    count: number; // 1-100 projects
+    issuesPerProject: number; // 1-10000 issues per project
   };
 }
 ```
 
 **Capabilities:**
+
 - Basic project and issue count control
 - Optional seed for reproducibility
 - Hardcoded issue type distribution
@@ -57,6 +58,7 @@ interface JiraMockConfig {
 The reference implementation provides comprehensive configuration across **9 major categories**:
 
 #### 1. General Settings
+
 - Project type (Company-managed vs Team-managed)
 - Project key (e.g., "PROJ", "DEMO")
 - Start issue number (e.g., start from PROJ-100)
@@ -64,11 +66,13 @@ The reference implementation provides comprehensive configuration across **9 maj
 - Export chunk size (for splitting large datasets into multiple JSON files)
 
 #### 2. Status Distribution
+
 - Weighted probabilities for "To Do" (default: 40%)
 - Weighted probabilities for "In Progress" (default: 30%)
 - Weighted probabilities for "Done" (default: 30%)
 
 #### 3. Issue Types Configuration
+
 - **Epic:**
   - Count (number of epics)
   - Children per epic
@@ -81,26 +85,31 @@ The reference implementation provides comprehensive configuration across **9 maj
   - Label probability
 
 #### 4. Data Options
+
 - Custom assignee list (email addresses)
 - Priority selection (Low, Medium, High, Highest)
 - Custom labels (with add/remove functionality)
 
 #### 5. Sprint Settings
+
 - Start sprint number
 - Sprint duration (in days)
 - Sprint assignment probability
 
 #### 6. Version Settings
+
 - Start version number
 - Version count
 - Version assignment probability
 
 #### 7. Worklog Settings
+
 - Worklog probability (chance a task has worklogs)
 - Min/max hours per worklog entry
 - Min/max worklog count per task
 
 #### 8. UI Features
+
 - LocalStorage persistence with auto-save
 - Master-detail layout for issue types
 - Preview table showing first 50 items
@@ -109,6 +118,7 @@ The reference implementation provides comprehensive configuration across **9 maj
 - Export with chunking support (ZIP archives)
 
 #### 9. Advanced Features
+
 - Team-managed project support with ParentKey custom field
 - Epic-child relationship preservation in chunked exports
 - Task templates with modifiers for realistic summaries
@@ -117,25 +127,25 @@ The reference implementation provides comprehensive configuration across **9 maj
 
 ### Gap Analysis
 
-| Feature | Current | Reference | Gap |
-|---------|---------|-----------|-----|
-| Project count control | ✅ | ✅ | None |
-| Issues per project | ✅ | ✅ | None |
-| Project key customization | ❌ | ✅ | **Missing** |
-| Project type (company/team) | ❌ | ✅ | **Missing** |
-| Status distribution | ❌ | ✅ | **Missing** |
-| Epic configuration | ❌ | ✅ | **Missing** |
-| Epic-child relationships | ❌ | ✅ | **Missing** |
-| Assignee customization | ❌ | ✅ | **Missing** |
-| Priority filtering | ❌ | ✅ | **Missing** |
-| Label customization | ❌ | ✅ | **Missing** |
-| Sprint configuration | ❌ | ✅ | **Missing** |
-| Version configuration | ❌ | ✅ | **Missing** |
-| Worklog configuration | ❌ | ✅ | **Missing** |
-| Probability controls | ❌ | ✅ | **Missing** |
-| Date range control | ❌ | ✅ | **Missing** |
-| Export chunking | ❌ | ✅ | **Missing** |
-| UI preview table | ❌ | ✅ | **Missing** |
+| Feature                     | Current | Reference | Gap         |
+| --------------------------- | ------- | --------- | ----------- |
+| Project count control       | ✅      | ✅        | None        |
+| Issues per project          | ✅      | ✅        | None        |
+| Project key customization   | ❌      | ✅        | **Missing** |
+| Project type (company/team) | ❌      | ✅        | **Missing** |
+| Status distribution         | ❌      | ✅        | **Missing** |
+| Epic configuration          | ❌      | ✅        | **Missing** |
+| Epic-child relationships    | ❌      | ✅        | **Missing** |
+| Assignee customization      | ❌      | ✅        | **Missing** |
+| Priority filtering          | ❌      | ✅        | **Missing** |
+| Label customization         | ❌      | ✅        | **Missing** |
+| Sprint configuration        | ❌      | ✅        | **Missing** |
+| Version configuration       | ❌      | ✅        | **Missing** |
+| Worklog configuration       | ❌      | ✅        | **Missing** |
+| Probability controls        | ❌      | ✅        | **Missing** |
+| Date range control          | ❌      | ✅        | **Missing** |
+| Export chunking             | ❌      | ✅        | **Missing** |
+| UI preview table            | ❌      | ✅        | **Missing** |
 
 **Summary:** 14 of 16 features are missing from the current implementation.
 
@@ -154,19 +164,19 @@ export interface JiraMockConfig {
 
   // ========== GENERAL SETTINGS ==========
   general?: {
-    projectKey?: string;              // Default: 'PROJ'
-    projectType?: ProjectType;        // Default: 'company-managed'
-    startIssueNumber?: number;        // Default: 1
-    startDate?: string;                // ISO date, default: 6 months ago
-    endDate?: string;                  // ISO date, default: today
-    chunkSize?: number;                // 0 = no chunking, default: 0
+    projectKey?: string; // Default: 'PROJ'
+    projectType?: ProjectType; // Default: 'company-managed'
+    startIssueNumber?: number; // Default: 1
+    startDate?: string; // ISO date, default: 6 months ago
+    endDate?: string; // ISO date, default: today
+    chunkSize?: number; // 0 = no chunking, default: 0
   };
 
   // ========== STATUS DISTRIBUTION ==========
   statusDistribution?: {
-    toDo?: number;                     // 0-1, default: 0.4
-    inProgress?: number;               // 0-1, default: 0.3
-    done?: number;                     // 0-1, default: 0.3
+    toDo?: number; // 0-1, default: 0.4
+    inProgress?: number; // 0-1, default: 0.3
+    done?: number; // 0-1, default: 0.3
   };
 
   // ========== ISSUE TYPES ==========
@@ -179,59 +189,59 @@ export interface JiraMockConfig {
 
   // ========== SPRINT CONFIGURATION ==========
   sprints?: {
-    startNumber?: number;              // Default: 1
-    duration?: number;                 // Days, default: 14
-    assignProbability?: number;        // 0-1, default: 0.7
+    startNumber?: number; // Default: 1
+    duration?: number; // Days, default: 14
+    assignProbability?: number; // 0-1, default: 0.7
   };
 
   // ========== VERSION CONFIGURATION ==========
   versions?: {
-    startNumber?: number;              // Default: 1
-    count?: number;                    // Default: 3
-    assignProbability?: number;        // 0-1, default: 0.6
+    startNumber?: number; // Default: 1
+    count?: number; // Default: 3
+    assignProbability?: number; // 0-1, default: 0.6
   };
 
   // ========== WORKLOG CONFIGURATION ==========
   worklogs?: {
-    probability?: number;              // 0-1, default: 0.6
-    hoursMin?: number;                 // Default: 1
-    hoursMax?: number;                 // Default: 4
-    countMin?: number;                 // Default: 1
-    countMax?: number;                 // Default: 3
+    probability?: number; // 0-1, default: 0.6
+    hoursMin?: number; // Default: 1
+    hoursMax?: number; // Default: 4
+    countMin?: number; // Default: 1
+    countMax?: number; // Default: 3
   };
 
   // ========== DATA OPTIONS ==========
   data?: {
-    assignees?: string[];              // Email addresses
-    priorities?: string[];             // Priority names to include
-    labels?: string[];                 // Available labels
+    assignees?: string[]; // Email addresses
+    priorities?: string[]; // Priority names to include
+    labels?: string[]; // Available labels
   };
 
   // ========== LEGACY (REQUIRED) ==========
   projects: {
-    count: number;                     // 1-100
-    issuesPerProject: number;          // 1-10000
+    count: number; // 1-100
+    issuesPerProject: number; // 1-10000
   };
 }
 
 export type ProjectType = 'company-managed' | 'team-managed';
 
 export interface EpicConfig {
-  count?: number;                      // Default: 10
-  childrenPerEpic?: number;            // Default: 100
-  assignProbability?: number;          // 0-1, default: 0.9
-  labelProbability?: number;           // 0-1, default: 0.8
+  count?: number; // Default: 10
+  childrenPerEpic?: number; // Default: 100
+  assignProbability?: number; // 0-1, default: 0.9
+  labelProbability?: number; // 0-1, default: 0.8
   childDistribution?: {
-    story?: number;                    // 0-1, default: 0.5
-    task?: number;                     // 0-1, default: 0.3
-    bug?: number;                      // 0-1, default: 0.2
+    story?: number; // 0-1, default: 0.5
+    task?: number; // 0-1, default: 0.3
+    bug?: number; // 0-1, default: 0.2
   };
 }
 
 export interface IssueTypeConfig {
-  standaloneCount?: number;            // Default: 0
-  assignProbability?: number;          // Default: 0.8 (0.6 for bugs)
-  labelProbability?: number;           // Default: 0.5 (0.3 for bugs)
+  standaloneCount?: number; // Default: 0
+  assignProbability?: number; // Default: 0.8 (0.6 for bugs)
+  labelProbability?: number; // Default: 0.5 (0.3 for bugs)
 }
 ```
 
@@ -264,11 +274,13 @@ const EpicConfigSchema = z.object({
   childrenPerEpic: z.number().int().min(0).max(10000).optional(),
   assignProbability: z.number().min(0).max(1).optional(),
   labelProbability: z.number().min(0).max(1).optional(),
-  childDistribution: z.object({
-    story: z.number().min(0).max(1).optional(),
-    task: z.number().min(0).max(1).optional(),
-    bug: z.number().min(0).max(1).optional(),
-  }).optional(),
+  childDistribution: z
+    .object({
+      story: z.number().min(0).max(1).optional(),
+      task: z.number().min(0).max(1).optional(),
+      bug: z.number().min(0).max(1).optional(),
+    })
+    .optional(),
 });
 
 const IssueTypeConfigSchema = z.object({
@@ -419,7 +431,9 @@ export const DEFAULT_CONFIG: Required<Omit<JiraMockConfig, 'seed'>> = {
 /**
  * Merges user config with defaults
  */
-export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMockConfig, 'seed'>> & { seed?: number } {
+export function mergeWithDefaults(
+  config: JiraMockConfig
+): Required<Omit<JiraMockConfig, 'seed'>> & { seed?: number } {
   return {
     ...DEFAULT_CONFIG,
     ...config,
@@ -477,6 +491,7 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
    - [ ] Add custom validators for complex rules
 
 #### Deliverables:
+
 - Extended type definitions
 - Complete Zod validation schema
 - Default configuration values
@@ -539,6 +554,7 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
    - [ ] `randomInRange(min: number, max: number): number` - Random number in range
 
 #### Deliverables:
+
 - Updated generators with probability logic
 - Epic-child relationship support
 - Team-managed project support
@@ -653,6 +669,7 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
 - [ ] Update validation to use new schema
 
 #### Deliverables:
+
 - 5 new base UI components
 - 7 new configuration sections
 - Updated main config editor
@@ -702,6 +719,7 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
    - [ ] Add API documentation for new interfaces
 
 #### Deliverables:
+
 - Export chunking with ZIP support
 - Enhanced preview table
 - Auto-save functionality
@@ -761,6 +779,7 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
    - [ ] Troubleshooting section
 
 #### Deliverables:
+
 - Comprehensive test suite (>80% coverage)
 - Updated documentation
 - Example configurations
@@ -773,11 +792,13 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
 ### Core Package (`packages/core/`)
 
 #### New Files:
+
 - `src/config/defaults.ts` - Default configuration values
 - `src/generators/utils/probability.ts` - Probability utility functions
 - `src/generators/utils/templates.ts` - Task summary templates
 
 #### Modified Files:
+
 - `src/config/types.ts` - Extended configuration interface
 - `src/config/schema.ts` - Extended Zod validation schema
 - `src/config/validator.ts` - Updated validation logic
@@ -795,6 +816,7 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
 #### New Files:
 
 **Base UI Components:**
+
 - `src/components/ui/slider.tsx`
 - `src/components/ui/probability-slider.tsx`
 - `src/components/ui/multi-select.tsx`
@@ -802,6 +824,7 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
 - `src/components/ui/tabs.tsx`
 
 **Configuration Sections:**
+
 - `src/components/ConfigEditor/GeneralSection.tsx`
 - `src/components/ConfigEditor/StatusSection.tsx`
 - `src/components/ConfigEditor/IssueTypesSection.tsx`
@@ -811,9 +834,11 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
 - `src/components/ConfigEditor/DataSection.tsx`
 
 **Utilities:**
+
 - `src/lib/export-manager.ts`
 
 #### Modified Files:
+
 - `src/components/ConfigEditor/index.tsx` - Add new sections
 - `src/components/ConfigEditor/PreviewSection.tsx` - Enhanced preview table
 - `src/lib/config-manager.ts` - Auto-save, version migration
@@ -822,11 +847,13 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
 ### Documentation Files
 
 #### New Files:
+
 - `docs/configuration.md` - Detailed configuration guide
 - `docs/migration.md` - Migration guide
 - `docs/examples/` - Example configurations
 
 #### Modified Files:
+
 - `README.md` - Updated features and configuration section
 - `packages/core/README.md` - Updated API documentation
 - `packages/config-ui/README.md` - Updated UI documentation
@@ -855,6 +882,7 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
 ### Migration Path
 
 #### Old Config (Still Valid)
+
 ```json
 {
   "version": "1.0",
@@ -868,6 +896,7 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
 **Behavior:** Generates 3 projects with 50 random issues each (current behavior).
 
 #### New Config (Basic Enhancement)
+
 ```json
 {
   "version": "1.0",
@@ -890,6 +919,7 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
 **Behavior:** Generates 1 project named "DEMO" with 10 epics, each containing 100 children (1000 issues) + 10 standalone issues.
 
 #### New Config (Full Featured)
+
 ```json
 {
   "version": "1.0",
@@ -943,10 +973,7 @@ export function mergeWithDefaults(config: JiraMockConfig): Required<Omit<JiraMoc
     "countMax": 5
   },
   "data": {
-    "assignees": [
-      "john.doe@example.com",
-      "jane.smith@example.com"
-    ],
+    "assignees": ["john.doe@example.com", "jane.smith@example.com"],
     "priorities": ["High", "Highest"],
     "labels": ["frontend", "backend", "critical"]
   },
@@ -992,6 +1019,7 @@ function migrateConfig(config: any): JiraMockConfig {
 **Decision:** Use Zod for runtime validation with TypeScript inference
 
 **Rationale:**
+
 - Type-safe validation
 - Automatic TypeScript type inference
 - Excellent error messages
@@ -999,6 +1027,7 @@ function migrateConfig(config: any): JiraMockConfig {
 - Already used in the project
 
 **Alternatives Considered:**
+
 - JSON Schema - Less TypeScript integration
 - Yup - Similar but Zod has better TS support
 - Manual validation - Error-prone and verbose
@@ -1008,6 +1037,7 @@ function migrateConfig(config: any): JiraMockConfig {
 **Decision:** Store dates as ISO 8601 strings, convert to Date objects in generators
 
 **Rationale:**
+
 - JSON-serializable
 - Timezone-aware
 - Standardized format
@@ -1020,11 +1050,13 @@ function migrateConfig(config: any): JiraMockConfig {
 **Decision:** Store as decimals (0-1), display as percentages (0-100%)
 
 **Rationale:**
+
 - Mathematical operations easier with decimals
 - Standard probability representation
 - UI can convert for display without changing data
 
 **Implementation:**
+
 ```typescript
 // Storage: 0.75
 // Display: 75%
@@ -1037,15 +1069,18 @@ const storageValue = displayValue / 100;
 **Decision:** Use different strategies for company-managed vs team-managed projects
 
 **Company-Managed:**
+
 - Use `parent` field with numeric ID reference
 - Native Jira support for epic-child relationships
 
 **Team-Managed:**
+
 - Use `customFieldValues` array with `ParentKey` field
 - Store parent issue key as string (e.g., "PROJ-1")
 - Jira automation can use this field to link issues
 
 **Rationale:**
+
 - Matches actual Jira behavior
 - Provides flexibility for both project types
 - Allows users to test both scenarios
@@ -1055,12 +1090,14 @@ const storageValue = displayValue / 100;
 **Decision:** Group epics with their children in the same chunk
 
 **Rationale:**
+
 - Maintains referential integrity
 - Prevents broken parent-child links
 - Makes import easier
 - Allows parallel processing of chunks
 
 **Algorithm:**
+
 ```
 1. Separate epics from children
 2. For each epic:
@@ -1076,6 +1113,7 @@ const storageValue = displayValue / 100;
 **Decision:** `issuesPerProject` is calculated from epic configuration when epics are used
 
 **Formula:**
+
 ```
 issuesPerProject = (epicCount * (childrenPerEpic + 1)) + standaloneStories + standaloneTasks + standaloneBugs
 ```
@@ -1083,6 +1121,7 @@ issuesPerProject = (epicCount * (childrenPerEpic + 1)) + standaloneStories + sta
 **Note:** The `+1` accounts for the epic issue itself.
 
 **Rationale:**
+
 - Prevents configuration mismatch
 - Makes total issue count predictable
 - Backwards compatible (when no epic config, uses direct count)
@@ -1092,6 +1131,7 @@ issuesPerProject = (epicCount * (childrenPerEpic + 1)) + standaloneStories + sta
 **Decision:** Provide comprehensive defaults for all optional fields
 
 **Rationale:**
+
 - Simplifies configuration for common use cases
 - Reduces boilerplate in config files
 - Makes examples cleaner
@@ -1104,6 +1144,7 @@ issuesPerProject = (epicCount * (childrenPerEpic + 1)) + standaloneStories + sta
 **Decision:** Continue using shadcn/ui components with Tailwind CSS
 
 **Rationale:**
+
 - Already in use in the project
 - Highly customizable
 - Accessible by default
@@ -1115,6 +1156,7 @@ issuesPerProject = (epicCount * (childrenPerEpic + 1)) + standaloneStories + sta
 **Decision:** Use React useState for local component state, lift state to parent for shared config
 
 **Rationale:**
+
 - Simple and sufficient for this use case
 - No need for Redux/Zustand/Jotai
 - Easy to understand and maintain
@@ -1127,15 +1169,17 @@ issuesPerProject = (epicCount * (childrenPerEpic + 1)) + standaloneStories + sta
 **Key:** `jira-mock-config`
 
 **Format:**
+
 ```json
 {
   "version": "1.0",
   "lastModified": "2024-01-15T10:30:00Z",
-  "config": { /* JiraMockConfig */ }
+  "config": {/* JiraMockConfig */}
 }
 ```
 
 **Rationale:**
+
 - Simple to implement
 - Easy to export/import
 - Version tracking for future migrations
@@ -1216,6 +1260,7 @@ issuesPerProject = (epicCount * (childrenPerEpic + 1)) + standaloneStories + sta
 ### Test Data
 
 **Fixtures:**
+
 - Small config (10 issues)
 - Medium config (100 issues)
 - Large config (10,000 issues)
@@ -1251,6 +1296,7 @@ This will still generate 3 projects with 50 issues each.
 You can progressively adopt new features:
 
 **Step 1: Customize Project Key**
+
 ```json
 {
   "version": "1.0",
@@ -1265,6 +1311,7 @@ You can progressively adopt new features:
 ```
 
 **Step 2: Add Epics**
+
 ```json
 {
   "version": "1.0",
@@ -1285,6 +1332,7 @@ You can progressively adopt new features:
 ```
 
 **Step 3: Configure Probabilities**
+
 ```json
 {
   "version": "1.0",
@@ -1331,12 +1379,12 @@ Generators now have access to full configuration:
 
 ```typescript
 // Before
-context.config.projects.count
+context.config.projects.count;
 
 // After (additional fields available)
-context.config.general?.projectKey
-context.config.issueTypes?.epic?.count
-context.config.statusDistribution?.toDo
+context.config.general?.projectKey;
+context.config.issueTypes?.epic?.count;
+context.config.statusDistribution?.toDo;
 ```
 
 #### Custom Field Access
@@ -1345,7 +1393,7 @@ For team-managed projects:
 
 ```typescript
 const parentKeyField = issue.fields.customFieldValues?.find(
-  field => field.fieldName === 'ParentKey'
+  (field) => field.fieldName === 'ParentKey'
 );
 const parentKey = parentKeyField?.value;
 ```
@@ -1355,22 +1403,26 @@ const parentKey = parentKeyField?.value;
 ## Timeline
 
 ### Week 1: Core Foundation
+
 - **Days 1-2:** Type definitions and schema
 - **Days 3-4:** Default values and validation
 - **Day 5:** Unit tests and documentation
 
 ### Week 2: Generators
+
 - **Days 1-2:** Issue generator (epics, children, probabilities)
 - **Day 3:** Worklog, version, sprint generators
 - **Day 4:** Project, user, priority generators
 - **Day 5:** Integration tests
 
 ### Week 3: UI Components
+
 - **Days 1-2:** Base UI components (slider, multi-select, etc.)
 - **Days 3-4:** Configuration sections
 - **Day 5:** Main editor updates and testing
 
 ### Week 4: Polish
+
 - **Days 1-2:** Export chunking and preview enhancements
 - **Day 3:** LocalStorage improvements
 - **Day 4:** Documentation and examples
@@ -1381,6 +1433,7 @@ const parentKey = parentKeyField?.value;
 ## Success Criteria
 
 ### Functional Requirements
+
 - ✅ All 40+ configuration options implemented
 - ✅ Epic-child relationships work correctly
 - ✅ Team-managed and company-managed projects supported
@@ -1390,6 +1443,7 @@ const parentKey = parentKeyField?.value;
 - ✅ Backward compatibility maintained (old configs work)
 
 ### Quality Requirements
+
 - ✅ >90% test coverage in core package
 - ✅ >80% test coverage in config UI package
 - ✅ All integration tests passing
@@ -1398,6 +1452,7 @@ const parentKey = parentKeyField?.value;
 - ✅ Documentation complete
 
 ### Performance Requirements
+
 - ✅ UI remains responsive with large configurations
 - ✅ Export completes within reasonable time (<10s for 10,000 issues)
 - ✅ Preview renders quickly (<2s for 50 items)
@@ -1409,6 +1464,7 @@ const parentKey = parentKeyField?.value;
 ### Risk 1: Complexity Overwhelms Users
 
 **Mitigation:**
+
 - Provide comprehensive defaults
 - Show advanced options in collapsible sections
 - Include presets for common scenarios
@@ -1417,6 +1473,7 @@ const parentKey = parentKeyField?.value;
 ### Risk 2: Breaking Changes Introduced Accidentally
 
 **Mitigation:**
+
 - Maintain comprehensive test suite
 - Test old configs in CI/CD
 - Manual testing of examples
@@ -1425,6 +1482,7 @@ const parentKey = parentKeyField?.value;
 ### Risk 3: Performance Issues with Large Datasets
 
 **Mitigation:**
+
 - Implement chunking for exports
 - Limit preview to 50 items
 - Add progress indicators
@@ -1433,6 +1491,7 @@ const parentKey = parentKeyField?.value;
 ### Risk 4: LocalStorage Quota Exceeded
 
 **Mitigation:**
+
 - Catch quota exceeded errors
 - Show user-friendly error message
 - Suggest downloading config as JSON
@@ -1553,10 +1612,7 @@ By following this phased approach over 4 weeks, we can deliver a powerful, flexi
     }
   },
   "data": {
-    "assignees": [
-      "alice@example.com",
-      "bob@example.com"
-    ]
+    "assignees": ["alice@example.com", "bob@example.com"]
   },
   "projects": {
     "count": 1,

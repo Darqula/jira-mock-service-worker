@@ -533,6 +533,7 @@
 ## Quality Gates
 
 ### Before Phase 2
+
 - [ ] All Phase 1 tasks completed
 - [ ] All new types have JSDoc comments
 - [ ] Schema validation covers all fields
@@ -540,6 +541,7 @@
 - [ ] Unit tests passing for Phase 1
 
 ### Before Phase 3
+
 - [ ] All Phase 2 tasks completed
 - [ ] All generators use new config options
 - [ ] Epic-child relationships working correctly
@@ -547,6 +549,7 @@
 - [ ] Unit tests passing for Phase 2
 
 ### Before Phase 4
+
 - [ ] All Phase 3 tasks completed
 - [ ] All UI components implemented
 - [ ] All configuration sections working
@@ -554,6 +557,7 @@
 - [ ] Component tests passing
 
 ### Before Release
+
 - [ ] All Phase 4 tasks completed
 - [ ] Export chunking working
 - [ ] Preview showing all fields
@@ -585,12 +589,15 @@
 ## Notes & Issues
 
 ### Blockers
+
 <!-- Add blockers here -->
 
 ### Questions
+
 <!-- Add questions here -->
 
 ### Decisions Made
+
 <!-- Document key decisions made during implementation -->
 
 ---

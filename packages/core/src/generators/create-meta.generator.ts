@@ -25,12 +25,12 @@ export class CreateMetaGenerator {
   ): CreateMeta {
     const urls = generateSelfUrls();
 
-    const metaProjects: CreateMetaProject[] = projects.map(project => {
+    const metaProjects: CreateMetaProject[] = projects.map((project) => {
       // Filter components and versions for this project
-      const projectComponents = allComponents.filter(c =>
-        c.project === project.key || c.projectId?.toString() === project.id
+      const projectComponents = allComponents.filter(
+        (c) => c.project === project.key || c.projectId?.toString() === project.id
       );
-      const projectVersions = allVersions.filter(v => v.projectId.toString() === project.id);
+      const projectVersions = allVersions.filter((v) => v.projectId.toString() === project.id);
 
       return {
         self: urls.project(project.key),
@@ -38,7 +38,7 @@ export class CreateMetaGenerator {
         key: project.key,
         name: project.name,
         avatarUrls: project.avatarUrls,
-        issuetypes: issueTypes.map(issueType =>
+        issuetypes: issueTypes.map((issueType) =>
           this.generateIssueTypeFields(
             issueType,
             project,

@@ -1,7 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { QueryEngine } from '../../src/store/query-engine.js';
 import { DataStore } from '../../src/store/data-store.js';
-import type { IssueBean, User, Project, Status, Priority, IssueType } from '../../src/types/jira-schemas.js';
+import type {
+  IssueBean,
+  User,
+  Project,
+  Status,
+  Priority,
+  IssueType,
+} from '../../src/types/jira-schemas.js';
 
 describe('QueryEngine', () => {
   let dataStore: DataStore;
@@ -72,7 +79,11 @@ describe('QueryEngine', () => {
   describe('Basic JQL queries', () => {
     it('should filter by project key', () => {
       const issue1: IssueBean = createTestIssue('TEST-1', testProject);
-      const issue2: IssueBean = createTestIssue('OTHER-2', { ...testProject, id: '2', key: 'OTHER' }); // Use OTHER-2 to avoid ID collision
+      const issue2: IssueBean = createTestIssue('OTHER-2', {
+        ...testProject,
+        id: '2',
+        key: 'OTHER',
+      }); // Use OTHER-2 to avoid ID collision
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -119,7 +130,7 @@ describe('QueryEngine', () => {
       const results = queryEngine.executeJQL({ jql: 'project in (1001, 1003)' });
 
       expect(results.total).toBe(2);
-      expect(results.issues.map(i => i.key)).toEqual(['PROJ1-10', 'PROJ3-30']);
+      expect(results.issues.map((i) => i.key)).toEqual(['PROJ1-10', 'PROJ3-30']);
     });
 
     it('should filter by project KEY using IN clause', () => {
@@ -140,7 +151,7 @@ describe('QueryEngine', () => {
       const results = queryEngine.executeJQL({ jql: 'project in (PROJ1, PROJ3)' });
 
       expect(results.total).toBe(2);
-      expect(results.issues.map(i => i.key)).toEqual(['PROJ1-10', 'PROJ3-30']);
+      expect(results.issues.map((i) => i.key)).toEqual(['PROJ1-10', 'PROJ3-30']);
     });
 
     it('should filter by mixed project IDs and KEYs using IN clause', () => {
@@ -161,7 +172,7 @@ describe('QueryEngine', () => {
       const results = queryEngine.executeJQL({ jql: 'project in (1001, PROJ3)' });
 
       expect(results.total).toBe(2);
-      expect(results.issues.map(i => i.key)).toEqual(['PROJ1-10', 'PROJ3-30']);
+      expect(results.issues.map((i) => i.key)).toEqual(['PROJ1-10', 'PROJ3-30']);
     });
 
     it('should filter by status', () => {
@@ -251,7 +262,7 @@ describe('QueryEngine', () => {
       const results = queryEngine.executeJQL({ jql: 'key IN (TEST-1, TEST-3)' });
 
       expect(results.total).toBe(2);
-      expect(results.issues.map(i => i.key)).toEqual(['TEST-1', 'TEST-3']);
+      expect(results.issues.map((i) => i.key)).toEqual(['TEST-1', 'TEST-3']);
     });
   });
 

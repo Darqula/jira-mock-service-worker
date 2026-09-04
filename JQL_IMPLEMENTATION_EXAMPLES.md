@@ -22,15 +22,18 @@ The JQL implementation has three main components:
 export interface JQLParseResult {
   project?: string;
   status?: string;
-  statusExclude?: string;  // NEW: Excluded values
+  statusExclude?: string; // NEW: Excluded values
   assignee?: string;
-  assigneeExclude?: string;  // NEW
+  assigneeExclude?: string; // NEW
   priority?: string;
-  priorityExclude?: string;  // NEW
+  priorityExclude?: string; // NEW
   // ... other fields
 }
 
-function extractFieldValue(jql: string, field: string): {
+function extractFieldValue(
+  jql: string,
+  field: string
+): {
   value: string | null;
   operator: '=' | '!=' | 'IN' | 'NOT IN' | 'IS' | 'IS NOT' | '~' | '!~';
 } {
@@ -148,10 +151,10 @@ describe('Query execution with !=', () => {
 
 export interface JQLParseResult {
   status?: string;
-  statusValues?: string[];  // NEW: Multiple values
+  statusValues?: string[]; // NEW: Multiple values
   priority?: string;
-  priorityValues?: string[];  // NEW
-  labels?: string[];  // Already supports multiple
+  priorityValues?: string[]; // NEW
+  labels?: string[]; // Already supports multiple
   // ... other fields
 }
 
@@ -161,9 +164,7 @@ function parseFieldWithOperators(jql: string, field: string): FieldParseResult {
   const inMatch = jql.match(inRegex);
 
   if (inMatch) {
-    const values = inMatch[1]
-      .split(',')
-      .map(v => v.trim().replace(/["']/g, ''));
+    const values = inMatch[1].split(',').map((v) => v.trim().replace(/["']/g, ''));
     return { operator: 'IN', values };
   }
 
@@ -261,10 +262,10 @@ describe('IN operator for all fields', () => {
 // packages/core/src/utils/jql-parser.ts
 
 export interface JQLParseResult {
-  assigneeIsEmpty?: boolean;  // NEW
-  assigneeIsNotEmpty?: boolean;  // NEW
-  resolutionIsEmpty?: boolean;  // NEW
-  labelsIsEmpty?: boolean;  // NEW
+  assigneeIsEmpty?: boolean; // NEW
+  assigneeIsNotEmpty?: boolean; // NEW
+  resolutionIsEmpty?: boolean; // NEW
+  labelsIsEmpty?: boolean; // NEW
   // ... other fields
 }
 
@@ -375,9 +376,9 @@ describe('IS EMPTY / IS NOT EMPTY', () => {
 // packages/core/src/utils/jql-parser.ts
 
 export interface JQLParseResult {
-  summaryContains?: string;  // NEW
-  descriptionContains?: string;  // NEW
-  textContains?: string;  // NEW: Full-text search
+  summaryContains?: string; // NEW
+  descriptionContains?: string; // NEW
+  textContains?: string; // NEW: Full-text search
 }
 
 function parseTextSearch(jql: string): Partial<JQLParseResult> {
@@ -453,10 +454,10 @@ searchIssues(filters: IssueFilters, options: QueryOptions): SearchResults {
 export interface IssueFields {
   summary: string;
   description?: string;
-  created: string;  // ISO 8601 date string
-  updated: string;  // ISO 8601 date string
-  resolved?: string;  // Optional resolution date
-  duedate?: string;  // Optional due date
+  created: string; // ISO 8601 date string
+  updated: string; // ISO 8601 date string
+  resolved?: string; // Optional resolution date
+  duedate?: string; // Optional due date
   // ... other fields
 }
 ```
@@ -481,14 +482,15 @@ export type DateFunction =
 
 export interface JQLParseResult {
   // ... existing fields
-  dateFilters?: DateFilter[];  // NEW
+  dateFilters?: DateFilter[]; // NEW
 }
 
 function parseDateFilters(jql: string): DateFilter[] {
   const filters: DateFilter[] = [];
 
   // Match date comparisons
-  const dateRegex = /(created|updated|resolved|duedate)\s*(=|!=|>|>=|<|<=)\s*("[\d-]+"|now\(\)|startOfDay\(\)|endOfDay\(\))/gi;
+  const dateRegex =
+    /(created|updated|resolved|duedate)\s*(=|!=|>|>=|<|<=)\s*("[\d-]+"|now\(\)|startOfDay\(\)|endOfDay\(\))/gi;
 
   let match;
   while ((match = dateRegex.exec(jql)) !== null) {
@@ -635,11 +637,7 @@ This requires a significant parser redesign to build an expression tree.
 ```typescript
 // packages/core/src/utils/jql-ast.ts
 
-export type JQLExpression =
-  | AndExpression
-  | OrExpression
-  | NotExpression
-  | ComparisonExpression;
+export type JQLExpression = AndExpression | OrExpression | NotExpression | ComparisonExpression;
 
 export interface AndExpression {
   type: 'AND';
@@ -739,16 +737,10 @@ export class ExpressionEvaluator {
   evaluate(expression: JQLExpression, issue: IssueBean): boolean {
     switch (expression.type) {
       case 'AND':
-        return (
-          this.evaluate(expression.left, issue) &&
-          this.evaluate(expression.right, issue)
-        );
+        return this.evaluate(expression.left, issue) && this.evaluate(expression.right, issue);
 
       case 'OR':
-        return (
-          this.evaluate(expression.left, issue) ||
-          this.evaluate(expression.right, issue)
-        );
+        return this.evaluate(expression.left, issue) || this.evaluate(expression.right, issue);
 
       case 'NOT':
         return !this.evaluate(expression.expression, issue);
@@ -758,10 +750,7 @@ export class ExpressionEvaluator {
     }
   }
 
-  private evaluateComparison(
-    expr: ComparisonExpression,
-    issue: IssueBean
-  ): boolean {
+  private evaluateComparison(expr: ComparisonExpression, issue: IssueBean): boolean {
     // Evaluate field comparison against issue
     // ... implementation
   }
@@ -799,14 +788,14 @@ describe('Query Engine Unit Tests', () => {
 describe('JQL Integration Tests', () => {
   it('should execute complex query with multiple operators', () => {
     const results = queryEngine.executeJQL({
-      jql: 'project = TEST AND status != Done AND assignee IS NOT EMPTY'
+      jql: 'project = TEST AND status != Done AND assignee IS NOT EMPTY',
     });
     // Verify results
   });
 
   it('should handle OR logic', () => {
     const results = queryEngine.executeJQL({
-      jql: 'status = Open OR priority = Highest'
+      jql: 'status = Open OR priority = Highest',
     });
     // Verify results
   });
@@ -818,6 +807,7 @@ describe('JQL Integration Tests', () => {
 ### Optimization Strategies
 
 1. **Index commonly filtered fields**
+
    ```typescript
    // Build indexes for fast lookups
    private statusIndex: Map<string, Set<string>>; // status -> issue IDs
@@ -825,12 +815,14 @@ describe('JQL Integration Tests', () => {
    ```
 
 2. **Short-circuit evaluation**
+
    ```typescript
    // For AND: stop if any condition fails
    // For OR: stop if any condition succeeds
    ```
 
 3. **Filter order optimization**
+
    ```typescript
    // Apply most selective filters first
    // E.g., specific key lookup before broad text search

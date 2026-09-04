@@ -7,18 +7,22 @@ export class AttachmentGenerator {
     { ext: 'png', mime: 'image/png', size: [50000, 500000] },
     { ext: 'jpg', mime: 'image/jpeg', size: [40000, 400000] },
     { ext: 'pdf', mime: 'application/pdf', size: [100000, 2000000] },
-    { ext: 'docx', mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', size: [20000, 500000] },
-    { ext: 'xlsx', mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', size: [15000, 300000] },
+    {
+      ext: 'docx',
+      mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      size: [20000, 500000],
+    },
+    {
+      ext: 'xlsx',
+      mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      size: [15000, 300000],
+    },
     { ext: 'txt', mime: 'text/plain', size: [1000, 50000] },
     { ext: 'log', mime: 'text/plain', size: [5000, 200000] },
     { ext: 'zip', mime: 'application/zip', size: [100000, 5000000] },
   ];
 
-  generateAttachments(
-    issue: IssueBean,
-    users: User[],
-    context: GenerationContext
-  ): Attachment[] {
+  generateAttachments(issue: IssueBean, users: User[], context: GenerationContext): Attachment[] {
     // Generate 0-5 attachments per issue
     const count = context.faker.number.int({ min: 0, max: 5 });
     const attachments: Attachment[] = [];
@@ -30,11 +34,7 @@ export class AttachmentGenerator {
     return attachments;
   }
 
-  generateAttachment(
-    issue: IssueBean,
-    users: User[],
-    context: GenerationContext
-  ): Attachment {
+  generateAttachment(issue: IssueBean, users: User[], context: GenerationContext): Attachment {
     const id = context.idGenerator.next('attachment');
     const author = users[context.faker.number.int({ min: 0, max: users.length - 1 })];
 
@@ -46,13 +46,14 @@ export class AttachmentGenerator {
     const createdOffset = context.faker.number.int({ min: 0, max: timeDiff });
     const created = new Date(issueCreated.getTime() + createdOffset);
 
-    const fileType = AttachmentGenerator.COMMON_FILE_TYPES[
-      context.faker.number.int({ min: 0, max: AttachmentGenerator.COMMON_FILE_TYPES.length - 1 })
-    ];
+    const fileType =
+      AttachmentGenerator.COMMON_FILE_TYPES[
+        context.faker.number.int({ min: 0, max: AttachmentGenerator.COMMON_FILE_TYPES.length - 1 })
+      ];
 
     const size = context.faker.number.int({
       min: fileType.size[0],
-      max: fileType.size[1]
+      max: fileType.size[1],
     });
 
     const filename = this.generateFilename(context, fileType.ext);

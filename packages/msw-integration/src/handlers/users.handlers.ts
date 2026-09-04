@@ -15,10 +15,7 @@ export function createUsersHandlers(
     http.get(`${baseUrl}/rest/api/2/myself`, () => {
       const currentUser = dataStore.getCurrentUser();
       if (!currentUser) {
-        return HttpResponse.json(
-          { errorMessages: ['User not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['User not found'] }, { status: 404 });
       }
       return HttpResponse.json(currentUser);
     }),
@@ -37,10 +34,7 @@ export function createUsersHandlers(
 
       const user = dataStore.getUser(accountId);
       if (!user) {
-        return HttpResponse.json(
-          { errorMessages: ['User not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['User not found'] }, { status: 404 });
       }
 
       return HttpResponse.json(user);
@@ -92,10 +86,7 @@ export function createUsersHandlers(
     http.get(`${baseUrl}/rest/api/2/mypermissions`, () => {
       const currentUser = dataStore.getCurrentUser();
       if (!currentUser) {
-        return HttpResponse.json(
-          { errorMessages: ['User not found'] },
-          { status: 401 }
-        );
+        return HttpResponse.json({ errorMessages: ['User not found'] }, { status: 401 });
       }
 
       // Check if permissions are already stored
@@ -110,7 +101,7 @@ export function createUsersHandlers(
 
       // Convert to the expected format
       const permissionsMap: Record<string, any> = {};
-      permissions.forEach(perm => {
+      permissions.forEach((perm) => {
         permissionsMap[perm.key] = {
           id: perm.id,
           key: perm.key,

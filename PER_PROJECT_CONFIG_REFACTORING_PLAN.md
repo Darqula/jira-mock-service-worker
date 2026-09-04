@@ -22,7 +22,7 @@ The current architecture has these issues:
 ```typescript
 interface JiraMockConfig {
   version: '1.0';
-  globalDefaults?: ProjectConfig;  // ← WILL BE REMOVED
+  globalDefaults?: ProjectConfig; // ← WILL BE REMOVED
   projects: ProjectConfigWithKey[];
 }
 ```
@@ -43,6 +43,7 @@ Built-in Defaults (CODE) → Global Defaults (USER) → Project Config (USER) �
 ```
 
 **Example:**
+
 ```json
 {
   "version": "1.0",
@@ -72,14 +73,14 @@ Built-in Defaults (CODE) → Global Defaults (USER) → Project Config (USER) �
 ```typescript
 interface JiraMockConfig {
   version: '1.0';
-  projects: ProjectConfigWithKey[];  // No globalDefaults
+  projects: ProjectConfigWithKey[]; // No globalDefaults
 }
 
 interface ProjectConfigWithKey {
-  projectKey: string;           // Required
+  projectKey: string; // Required
   projectName?: string;
   projectType?: ProjectType;
-  issueCount: number;           // Required
+  issueCount: number; // Required
   seed?: number;
   // All configuration blocks are per-project
   statusDistribution?: StatusDistribution;
@@ -101,6 +102,7 @@ Built-in Defaults (CODE) → Project Config (USER) → Final Config
 ```
 
 **Example:**
+
 ```json
 {
   "version": "1.0",
@@ -135,6 +137,7 @@ Built-in Defaults (CODE) → Project Config (USER) → Final Config
 #### 1.1 Type Definitions (`src/config/types.ts`)
 
 **Changes:**
+
 - Remove `globalDefaults?: ProjectConfig` from `JiraMockConfig` interface
 - Keep `ProjectConfig` and `ProjectConfigWithKey` as-is
 - Update JSDoc comments to reflect per-project only scope
@@ -144,6 +147,7 @@ Built-in Defaults (CODE) → Project Config (USER) → Final Config
 #### 1.2 Schema Validation (`src/config/schema.ts`)
 
 **Changes:**
+
 - Remove `globalDefaults: ProjectConfigSchema` from `JiraMockConfigSchema`
 - All validation rules remain the same for per-project config
 
@@ -157,12 +161,12 @@ Built-in Defaults (CODE) → Project Config (USER) → Final Config
 // BEFORE (3-level merge)
 export function mergeProjectWithDefaults(
   projectConfig: ProjectConfigWithKey,
-  globalDefaults?: ProjectConfig  // ← Remove this parameter
+  globalDefaults?: ProjectConfig // ← Remove this parameter
 ): ProjectConfigWithKey {
   const builtInDefaults = getBuiltInDefaults();
 
   const baseConfig = globalDefaults
-    ? deepMerge(builtInDefaults, globalDefaults)  // ← Remove this logic
+    ? deepMerge(builtInDefaults, globalDefaults) // ← Remove this logic
     : builtInDefaults;
 
   const merged = deepMerge(baseConfig, projectConfig);
@@ -190,7 +194,7 @@ export function mergeProjectWithDefaults(
 const globalSeed = validConfig.globalDefaults?.seed || Date.now();
 const mergedProjectConfig = mergeProjectWithDefaults(
   projectConfig,
-  validConfig.globalDefaults  // ← Remove this argument
+  validConfig.globalDefaults // ← Remove this argument
 );
 
 // AFTER
@@ -206,6 +210,7 @@ for (const projectConfig of validConfig.projects) {
 #### 1.5 Validators (`src/config/validator.ts`)
 
 **Changes:**
+
 - Remove any validation specific to `globalDefaults`
 - Update error messages to reflect per-project validation only
 
@@ -218,22 +223,25 @@ for (const projectConfig of validConfig.projects) {
 **Major Changes:**
 
 **REMOVE these sections entirely:**
+
 - Lines 155-167: Global Defaults header card
 - Lines 169-200: Global seed input
 - Lines 203-218: All global configuration sections (Status, IssueTypes, Sprints, Versions, Worklogs, Data)
 
 **KEEP:**
+
 - Action buttons
 - Projects Manager
 - Preview section
 
 **New structure:**
+
 ```tsx
 export function ConfigEditor() {
   return (
     <div>
       <ActionButtons />
-      <ProjectsManager />  {/* Now contains ALL config */}
+      <ProjectsManager /> {/* Now contains ALL config */}
       <PreviewSection />
     </div>
   );
@@ -255,6 +263,7 @@ export function ConfigEditor() {
 4. Sections update `config.projects[projectIndex]` instead of `config.globalDefaults`
 
 **New structure:**
+
 ```tsx
 <ProjectCard>
   <ProjectHeader />
@@ -285,6 +294,7 @@ export function ConfigEditor() {
 ```
 
 **Add UI Components:**
+
 - Import Tabs component from shadcn/ui
 - Or use Accordion for collapsible sections
 - Add visual indicators for fields using built-in defaults
@@ -315,8 +325,8 @@ const updateValue = (newValue) => {
     ...config,
     globalDefaults: {
       ...config.globalDefaults,
-      statusDistribution: newValue
-    }
+      statusDistribution: newValue,
+    },
   });
 };
 
@@ -324,7 +334,7 @@ const updateValue = (newValue) => {
 interface SectionProps {
   config: JiraMockConfig;
   onChange: (config: JiraMockConfig) => void;
-  projectIndex: number;  // ← NEW: Which project to update
+  projectIndex: number; // ← NEW: Which project to update
 }
 
 // Section updates config.projects[projectIndex]
@@ -332,11 +342,11 @@ const updateValue = (newValue) => {
   const newProjects = [...config.projects];
   newProjects[projectIndex] = {
     ...newProjects[projectIndex],
-    statusDistribution: newValue
+    statusDistribution: newValue,
   };
   onChange({
     ...config,
-    projects: newProjects
+    projects: newProjects,
   });
 };
 ```
@@ -348,6 +358,7 @@ All example config files must be updated to remove `globalDefaults` and move set
 #### 3.1 Example Config Files
 
 **Files to update:**
+
 1. `examples/configs/multi-project.json`
 2. `examples/configs/large-project.json`
 3. `examples/configs/full-featured.json`
@@ -407,9 +418,11 @@ Note: Settings must be duplicated across projects if they should be the same.
 #### 3.2 Documentation
 
 **File to update:**
+
 - `examples/configs/README.md`
 
 **Changes:**
+
 - Remove references to `globalDefaults`
 - Explain per-project configuration
 - Add examples showing how to configure each project
@@ -440,7 +453,7 @@ Note: Settings must be duplicated across projects if they should be the same.
 it('should use built-in defaults when project config is minimal', () => {
   const config = {
     version: '1.0',
-    projects: [{ projectKey: 'TEST', issueCount: 10 }]
+    projects: [{ projectKey: 'TEST', issueCount: 10 }],
   };
   const { dataStore } = generateMockData(config);
   const issues = dataStore.getAllIssues();
@@ -450,11 +463,13 @@ it('should use built-in defaults when project config is minimal', () => {
 it('should use per-project config when specified', () => {
   const config = {
     version: '1.0',
-    projects: [{
-      projectKey: 'TEST',
-      issueCount: 10,
-      statusDistribution: { toDo: 1.0, inProgress: 0, done: 0 }
-    }]
+    projects: [
+      {
+        projectKey: 'TEST',
+        issueCount: 10,
+        statusDistribution: { toDo: 1.0, inProgress: 0, done: 0 },
+      },
+    ],
   };
   const { dataStore } = generateMockData(config);
   const issues = dataStore.getAllIssues();
@@ -468,18 +483,18 @@ it('should allow different config per project', () => {
       {
         projectKey: 'PROJ1',
         issueCount: 10,
-        statusDistribution: { toDo: 1.0, inProgress: 0, done: 0 }
+        statusDistribution: { toDo: 1.0, inProgress: 0, done: 0 },
       },
       {
         projectKey: 'PROJ2',
         issueCount: 10,
-        statusDistribution: { toDo: 0, inProgress: 0, done: 1.0 }
-      }
-    ]
+        statusDistribution: { toDo: 0, inProgress: 0, done: 1.0 },
+      },
+    ],
   };
   const { dataStore } = generateMockData(config);
-  const proj1Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'PROJ1');
-  const proj2Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'PROJ2');
+  const proj1Issues = dataStore.getAllIssues().filter((i) => i.fields.project.key === 'PROJ1');
+  const proj2Issues = dataStore.getAllIssues().filter((i) => i.fields.project.key === 'PROJ2');
   // Verify PROJ1 issues are all "To Do"
   // Verify PROJ2 issues are all "Done"
 });
@@ -596,6 +611,7 @@ Final Config:          { toDo: 0.5, inProgress: 0.3, done: 0.2 }
 ## File Modification Summary
 
 ### Core Package (6 files)
+
 - `packages/core/src/config/types.ts` - Remove `globalDefaults` from interface
 - `packages/core/src/config/schema.ts` - Remove from schema
 - `packages/core/src/config/defaults.ts` - Remove parameter from merge function
@@ -604,6 +620,7 @@ Final Config:          { toDo: 0.5, inProgress: 0.3, done: 0.2 }
 - `packages/core/src/types/generator.types.ts` - Update context types
 
 ### Config UI (9 files)
+
 - `packages/config-ui/src/components/ConfigEditor/index.tsx` - Remove global sections
 - `packages/config-ui/src/components/ConfigEditor/ProjectsManager.tsx` - Add config sections
 - `packages/config-ui/src/components/ConfigEditor/StatusSection.tsx` - Add projectIndex
@@ -615,6 +632,7 @@ Final Config:          { toDo: 0.5, inProgress: 0.3, done: 0.2 }
 - (Potentially) Add `packages/config-ui/src/components/ui/tabs.tsx` if not exists
 
 ### Tests (10+ files)
+
 - `packages/core/tests/data-generation.test.ts`
 - `packages/core/tests/config.test.ts`
 - `packages/core/tests/generators/*.test.ts` (multiple files)
@@ -627,6 +645,7 @@ Final Config:          { toDo: 0.5, inProgress: 0.3, done: 0.2 }
 - `examples/vitest-example/jira-api.test.ts`
 
 ### Examples (7 files)
+
 - `examples/configs/multi-project.json`
 - `examples/configs/large-project.json`
 - `examples/configs/full-featured.json`
@@ -636,6 +655,7 @@ Final Config:          { toDo: 0.5, inProgress: 0.3, done: 0.2 }
 - `examples/nextjs-openapi-tester/jira-mock-config.json`
 
 ### Documentation (1 file)
+
 - `examples/configs/README.md`
 
 **Total: ~33 files**
@@ -643,28 +663,33 @@ Final Config:          { toDo: 0.5, inProgress: 0.3, done: 0.2 }
 ## Success Criteria
 
 ✅ **Configuration:**
+
 - Config with `globalDefaults` is rejected by schema validation
 - Config with only per-project settings is accepted
 - Built-in defaults apply when project config is empty
 - Per-project config overrides built-in defaults correctly
 
 ✅ **Code Quality:**
+
 - No references to `globalDefaults` anywhere in codebase
 - All merge logic uses 2-level merge
 - All tests pass
 
 ✅ **UI:**
+
 - No global defaults section in config editor
 - All configuration sections appear within project cards
 - Can add/edit/remove projects with full configuration
 - UI clearly shows which settings use built-in defaults
 
 ✅ **Examples:**
+
 - All example configs work without `globalDefaults`
 - Generated data respects per-project settings
 - Multi-project examples show different configs per project
 
 ✅ **Documentation:**
+
 - README and examples explain per-project approach
 - No references to `globalDefaults` in docs
 

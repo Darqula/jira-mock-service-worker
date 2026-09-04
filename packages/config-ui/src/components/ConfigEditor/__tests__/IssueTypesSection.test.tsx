@@ -8,38 +8,40 @@ describe('IssueTypesSection', () => {
 
   const defaultConfig: JiraMockConfig = {
     version: '1.0',
-    projects: [{
-      projectKey: 'TEST',
-      issueCount: 50,
-      issueTypes: {
-        epic: {
-          count: 10,
-          childrenPerEpic: 100,
-          assignProbability: 0.9,
-          labelProbability: 0.8,
-          childDistribution: {
-            story: 0.5,
-            task: 0.3,
-            bug: 0.2,
+    projects: [
+      {
+        projectKey: 'TEST',
+        issueCount: 50,
+        issueTypes: {
+          epic: {
+            count: 10,
+            childrenPerEpic: 100,
+            assignProbability: 0.9,
+            labelProbability: 0.8,
+            childDistribution: {
+              story: 0.5,
+              task: 0.3,
+              bug: 0.2,
+            },
+          },
+          story: {
+            standaloneCount: 0,
+            assignProbability: 0.8,
+            labelProbability: 0.5,
+          },
+          task: {
+            standaloneCount: 0,
+            assignProbability: 0.8,
+            labelProbability: 0.5,
+          },
+          bug: {
+            standaloneCount: 0,
+            assignProbability: 0.6,
+            labelProbability: 0.3,
           },
         },
-        story: {
-          standaloneCount: 0,
-          assignProbability: 0.8,
-          labelProbability: 0.5,
-        },
-        task: {
-          standaloneCount: 0,
-          assignProbability: 0.8,
-          labelProbability: 0.5,
-        },
-        bug: {
-          standaloneCount: 0,
-          assignProbability: 0.6,
-          labelProbability: 0.3,
-        },
       },
-    }],
+    ],
   };
 
   beforeEach(() => {
@@ -78,16 +80,18 @@ describe('IssueTypesSection', () => {
 
     expect(mockOnChange).toHaveBeenCalledWith({
       ...defaultConfig,
-      projects: [{
-        ...defaultConfig.projects[0],
-        issueTypes: {
-          ...defaultConfig.projects[0].issueTypes,
-          epic: {
-            ...defaultConfig.projects[0].issueTypes?.epic,
-            count: 15,
+      projects: [
+        {
+          ...defaultConfig.projects[0],
+          issueTypes: {
+            ...defaultConfig.projects[0].issueTypes,
+            epic: {
+              ...defaultConfig.projects[0].issueTypes?.epic,
+              count: 15,
+            },
           },
         },
-      }],
+      ],
     });
   });
 
@@ -99,16 +103,18 @@ describe('IssueTypesSection', () => {
 
     expect(mockOnChange).toHaveBeenCalledWith({
       ...defaultConfig,
-      projects: [{
-        ...defaultConfig.projects[0],
-        issueTypes: {
-          ...defaultConfig.projects[0].issueTypes,
-          epic: {
-            ...defaultConfig.projects[0].issueTypes?.epic,
-            childrenPerEpic: 150,
+      projects: [
+        {
+          ...defaultConfig.projects[0],
+          issueTypes: {
+            ...defaultConfig.projects[0].issueTypes,
+            epic: {
+              ...defaultConfig.projects[0].issueTypes?.epic,
+              childrenPerEpic: 150,
+            },
           },
         },
-      }],
+      ],
     });
   });
 
@@ -124,16 +130,18 @@ describe('IssueTypesSection', () => {
 
     expect(mockOnChange).toHaveBeenCalledWith({
       ...defaultConfig,
-      projects: [{
-        ...defaultConfig.projects[0],
-        issueTypes: {
-          ...defaultConfig.projects[0].issueTypes,
-          story: {
-            ...defaultConfig.projects[0].issueTypes?.story,
-            standaloneCount: 20,
+      projects: [
+        {
+          ...defaultConfig.projects[0],
+          issueTypes: {
+            ...defaultConfig.projects[0].issueTypes,
+            story: {
+              ...defaultConfig.projects[0].issueTypes?.story,
+              standaloneCount: 20,
+            },
           },
         },
-      }],
+      ],
     });
   });
 

@@ -3,11 +3,7 @@ import type { GenerationContext } from '../types/generator.types.js';
 import { generateSelfUrls } from '../utils/response-builder.js';
 
 export class ComponentGenerator {
-  generateComponents(
-    project: Project,
-    users: User[],
-    context: GenerationContext
-  ): Component[] {
+  generateComponents(project: Project, users: User[], context: GenerationContext): Component[] {
     const count = context.faker.number.int({ min: 2, max: 5 });
     const components: Component[] = [];
 
@@ -18,11 +14,7 @@ export class ComponentGenerator {
     return components;
   }
 
-  generateComponent(
-    project: Project,
-    users: User[],
-    context: GenerationContext
-  ): Component {
+  generateComponent(project: Project, users: User[], context: GenerationContext): Component {
     const id = context.idGenerator.next('component');
     const name = this.generateComponentName(context);
     const lead = users[context.faker.number.int({ min: 0, max: users.length - 1 })];

@@ -200,10 +200,7 @@ export function generateStorySummary(faker: Faker): string {
   const action = faker.helpers.arrayElement(ACTIONS);
   const area = faker.helpers.arrayElement(AREAS);
 
-  return template
-    .replace('{feature}', feature)
-    .replace('{action}', action)
-    .replace('{area}', area);
+  return template.replace('{feature}', feature).replace('{action}', action).replace('{area}', area);
 }
 
 /**
@@ -217,9 +214,7 @@ export function generateTaskSummary(faker: Faker): string {
   const feature = faker.helpers.arrayElement(FEATURES);
   const environment = faker.helpers.arrayElement(ENVIRONMENTS);
 
-  return template
-    .replace('{feature}', feature)
-    .replace('{environment}', environment);
+  return template.replace('{feature}', feature).replace('{environment}', environment);
 }
 
 /**
@@ -243,10 +238,7 @@ export function generateBugSummary(faker: Faker): string {
  * @param issueType - Type of issue (Epic, Story, Task, Bug)
  * @returns Issue summary string
  */
-export function generateIssueSummary(
-  faker: Faker,
-  issueType: string
-): string {
+export function generateIssueSummary(faker: Faker, issueType: string): string {
   const normalizedType = issueType.toLowerCase();
 
   switch (normalizedType) {
@@ -270,10 +262,7 @@ export function generateIssueSummary(
  * @param issueType - Type of issue (Epic, Story, Task, Bug)
  * @returns Issue description string
  */
-export function generateIssueDescription(
-  faker: Faker,
-  issueType: string
-): string {
+export function generateIssueDescription(faker: Faker, issueType: string): string {
   const normalizedType = issueType.toLowerCase();
 
   const paragraphs = faker.number.int({ min: 2, max: 4 });

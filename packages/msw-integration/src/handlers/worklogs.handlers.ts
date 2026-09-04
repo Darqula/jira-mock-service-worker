@@ -13,10 +13,7 @@ export function createWorklogsHandlers(dataStore: DataStore, baseUrl: string) {
       const issue = dataStore.getIssue(issueIdOrKey as string);
 
       if (!issue) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue does not exist'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Issue does not exist'] }, { status: 404 });
       }
 
       const worklogs = dataStore.getWorklogsByIssue(issueIdOrKey as string);
@@ -39,26 +36,17 @@ export function createWorklogsHandlers(dataStore: DataStore, baseUrl: string) {
       const issue = dataStore.getIssue(issueIdOrKey as string);
 
       if (!issue) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue does not exist'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Issue does not exist'] }, { status: 404 });
       }
 
       // Validate required fields
       if (!body.timeSpentSeconds) {
-        return HttpResponse.json(
-          { errorMessages: ['Time spent is required'] },
-          { status: 400 }
-        );
+        return HttpResponse.json({ errorMessages: ['Time spent is required'] }, { status: 400 });
       }
 
       const currentUser = dataStore.getCurrentUser();
       if (!currentUser) {
-        return HttpResponse.json(
-          { errorMessages: ['User not authenticated'] },
-          { status: 401 }
-        );
+        return HttpResponse.json({ errorMessages: ['User not authenticated'] }, { status: 401 });
       }
 
       // Create worklog
@@ -86,46 +74,40 @@ export function createWorklogsHandlers(dataStore: DataStore, baseUrl: string) {
     }),
 
     // PUT /rest/api/2/issue/:issueIdOrKey/worklog/:worklogId - Update worklog
-    http.put(`${baseUrl}/rest/api/2/issue/:issueIdOrKey/worklog/:worklogId`, async ({ params, request }) => {
-      const { issueIdOrKey, worklogId } = params;
-      const body = (await request.json()) as Partial<CreateWorklogInput>;
+    http.put(
+      `${baseUrl}/rest/api/2/issue/:issueIdOrKey/worklog/:worklogId`,
+      async ({ params, request }) => {
+        const { issueIdOrKey, worklogId } = params;
+        const body = (await request.json()) as Partial<CreateWorklogInput>;
 
-      const issue = dataStore.getIssue(issueIdOrKey as string);
-      if (!issue) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue does not exist'] },
-          { status: 404 }
-        );
+        const issue = dataStore.getIssue(issueIdOrKey as string);
+        if (!issue) {
+          return HttpResponse.json({ errorMessages: ['Issue does not exist'] }, { status: 404 });
+        }
+
+        const currentUser = dataStore.getCurrentUser();
+        if (!currentUser) {
+          return HttpResponse.json({ errorMessages: ['User not authenticated'] }, { status: 401 });
+        }
+
+        const updates: any = {
+          updated: new Date().toISOString(),
+          updateAuthor: currentUser,
+        };
+
+        if (body.timeSpentSeconds) updates.timeSpentSeconds = body.timeSpentSeconds;
+        if (body.timeSpent) updates.timeSpent = body.timeSpent;
+        if (body.comment !== undefined) updates.comment = body.comment;
+        if (body.started) updates.started = body.started;
+
+        const updatedWorklog = dataStore.updateWorklog(worklogId as string, updates);
+        if (!updatedWorklog) {
+          return HttpResponse.json({ errorMessages: ['Worklog not found'] }, { status: 404 });
+        }
+
+        return HttpResponse.json(updatedWorklog);
       }
-
-      const currentUser = dataStore.getCurrentUser();
-      if (!currentUser) {
-        return HttpResponse.json(
-          { errorMessages: ['User not authenticated'] },
-          { status: 401 }
-        );
-      }
-
-      const updates: any = {
-        updated: new Date().toISOString(),
-        updateAuthor: currentUser,
-      };
-
-      if (body.timeSpentSeconds) updates.timeSpentSeconds = body.timeSpentSeconds;
-      if (body.timeSpent) updates.timeSpent = body.timeSpent;
-      if (body.comment !== undefined) updates.comment = body.comment;
-      if (body.started) updates.started = body.started;
-
-      const updatedWorklog = dataStore.updateWorklog(worklogId as string, updates);
-      if (!updatedWorklog) {
-        return HttpResponse.json(
-          { errorMessages: ['Worklog not found'] },
-          { status: 404 }
-        );
-      }
-
-      return HttpResponse.json(updatedWorklog);
-    }),
+    ),
 
     // DELETE /rest/api/2/issue/:issueIdOrKey/worklog/:worklogId - Delete worklog
     http.delete(`${baseUrl}/rest/api/2/issue/:issueIdOrKey/worklog/:worklogId`, ({ params }) => {
@@ -133,18 +115,12 @@ export function createWorklogsHandlers(dataStore: DataStore, baseUrl: string) {
 
       const issue = dataStore.getIssue(issueIdOrKey as string);
       if (!issue) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue does not exist'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Issue does not exist'] }, { status: 404 });
       }
 
       const deleted = dataStore.deleteWorklogById(worklogId as string);
       if (!deleted) {
-        return HttpResponse.json(
-          { errorMessages: ['Worklog not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Worklog not found'] }, { status: 404 });
       }
 
       return HttpResponse.json(null, { status: 204 });
@@ -171,10 +147,7 @@ export function createWorklogsHandlers(dataStore: DataStore, baseUrl: string) {
       const body = (await request.json()) as { ids: string[] };
 
       if (!body.ids || !Array.isArray(body.ids)) {
-        return HttpResponse.json(
-          { errorMessages: ['ids array is required'] },
-          { status: 400 }
-        );
+        return HttpResponse.json({ errorMessages: ['ids array is required'] }, { status: 400 });
       }
 
       const worklogs = dataStore.getWorklogsByIds(body.ids);

@@ -26,10 +26,7 @@ export function createVersionsHandlers(dataStore: DataStore, baseUrl: string) {
 
       const project = dataStore.getProject(projectIdOrKey as string);
       if (!project) {
-        return HttpResponse.json(
-          { errorMessages: ['Project not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Project not found'] }, { status: 404 });
       }
 
       const versions = dataStore.getVersionsByProject(project.id);
@@ -42,10 +39,7 @@ export function createVersionsHandlers(dataStore: DataStore, baseUrl: string) {
 
       const version = dataStore.getVersion(id as string);
       if (!version) {
-        return HttpResponse.json(
-          { errorMessages: ['Version not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Version not found'] }, { status: 404 });
       }
 
       return HttpResponse.json(version);
@@ -56,25 +50,16 @@ export function createVersionsHandlers(dataStore: DataStore, baseUrl: string) {
       const body = (await request.json()) as CreateVersionInput;
 
       if (!body.name || body.name.trim() === '') {
-        return HttpResponse.json(
-          { errorMessages: ['Version name is required'] },
-          { status: 400 }
-        );
+        return HttpResponse.json({ errorMessages: ['Version name is required'] }, { status: 400 });
       }
 
       if (!body.projectId) {
-        return HttpResponse.json(
-          { errorMessages: ['Project ID is required'] },
-          { status: 400 }
-        );
+        return HttpResponse.json({ errorMessages: ['Project ID is required'] }, { status: 400 });
       }
 
       const project = dataStore.getProject(body.projectId.toString());
       if (!project) {
-        return HttpResponse.json(
-          { errorMessages: ['Project not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Project not found'] }, { status: 404 });
       }
 
       const versionId = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
@@ -101,10 +86,7 @@ export function createVersionsHandlers(dataStore: DataStore, baseUrl: string) {
 
       const version = dataStore.getVersion(id as string);
       if (!version) {
-        return HttpResponse.json(
-          { errorMessages: ['Version not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Version not found'] }, { status: 404 });
       }
 
       const updatedVersion: Version = {
@@ -127,10 +109,7 @@ export function createVersionsHandlers(dataStore: DataStore, baseUrl: string) {
 
       const version = dataStore.getVersion(id as string);
       if (!version) {
-        return HttpResponse.json(
-          { errorMessages: ['Version not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Version not found'] }, { status: 404 });
       }
 
       // Note: In the real API, you might want to check if the version is in use
@@ -150,10 +129,7 @@ export function createVersionsHandlers(dataStore: DataStore, baseUrl: string) {
 
       const version = dataStore.getVersion(id as string);
       if (!version) {
-        return HttpResponse.json(
-          { errorMessages: ['Version not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Version not found'] }, { status: 404 });
       }
 
       // Validate target versions if provided

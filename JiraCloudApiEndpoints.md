@@ -41,7 +41,6 @@ Project milestone operations reuse the project properties endpoint with a specif
 keys:
 JIRA_PROJECT_MILESTONE_PROPERTY = 'pwMilestone';
 
-
 ## Issue Types, Fields, Metadata
 
 - `GET /rest/api/2/issuetype`

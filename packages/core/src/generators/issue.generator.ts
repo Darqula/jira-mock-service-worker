@@ -13,15 +13,8 @@ import type { IssueContext } from '../types/generator.types.js';
 import type { IssueTypesConfig } from '../config/types.js';
 import { generateSelfUrls } from '../utils/response-builder.js';
 import { getBuiltInDefaults } from '../config/defaults.js';
-import {
-  shouldApply,
-  weightedPick,
-  normalizeDistribution,
-} from './utils/probability.js';
-import {
-  generateIssueSummary,
-  generateIssueDescription,
-} from './utils/templates.js';
+import { shouldApply, weightedPick, normalizeDistribution } from './utils/probability.js';
+import { generateIssueSummary, generateIssueDescription } from './utils/templates.js';
 import { SprintGenerator } from './sprint.generator.js';
 
 export class IssueGenerator {
@@ -44,8 +37,7 @@ export class IssueGenerator {
 
     // Check if we should use epic-based generation
     const useEpics =
-      projectConfig.issueTypes?.epic &&
-      (projectConfig.issueTypes.epic.count || 0) > 0;
+      projectConfig.issueTypes?.epic && (projectConfig.issueTypes.epic.count || 0) > 0;
 
     // Honor an explicit issueCount by distributing the budget across
     // standalone issues and epic children; without it this reduces to the
@@ -137,8 +129,7 @@ export class IssueGenerator {
       bug: issueTypesConfig?.bug?.standaloneCount || 0,
     };
     const epicCount = issueTypesConfig?.epic?.count || 0;
-    const standaloneTotal =
-      standaloneCounts.story + standaloneCounts.task + standaloneCounts.bug;
+    const standaloneTotal = standaloneCounts.story + standaloneCounts.task + standaloneCounts.bug;
 
     if (projectConfig.issueCount === undefined) {
       // Legacy path: without epics, calculateIssueCount's total already
@@ -166,8 +157,7 @@ export class IssueGenerator {
     cappedCounts.task = Math.min(standaloneCounts.task, left);
     left -= cappedCounts.task;
     cappedCounts.bug = Math.min(standaloneCounts.bug, left);
-    const usedStandalone =
-      cappedCounts.story + cappedCounts.task + cappedCounts.bug;
+    const usedStandalone = cappedCounts.story + cappedCounts.task + cappedCounts.bug;
 
     budget -= usedStandalone;
 
@@ -234,8 +224,7 @@ export class IssueGenerator {
       issues.push(epic);
 
       // Generate children for this epic
-      const childrenPerEpic =
-        childrenPerEpicBase + (epicIndex < childrenPerEpicExtra ? 1 : 0);
+      const childrenPerEpic = childrenPerEpicBase + (epicIndex < childrenPerEpicExtra ? 1 : 0);
       const children = this.generateEpicChildren(
         project,
         epic,
@@ -363,10 +352,7 @@ export class IssueGenerator {
 
       // Determine child type based on distribution
       const childTypeName = weightedPick(context.faker, childDistribution);
-      const childType = this.getIssueTypeByName(
-        issueTypes,
-        this.capitalizeFirst(childTypeName)
-      );
+      const childType = this.getIssueTypeByName(issueTypes, this.capitalizeFirst(childTypeName));
 
       if (!childType) {
         console.warn(`Child type ${childTypeName} not found`);
@@ -568,15 +554,9 @@ export class IssueGenerator {
     const distribution = projectConfig.statusDistribution!;
 
     // Categorize statuses by category key
-    const todoStatuses = statuses.filter(
-      (s) => s.statusCategory.key === 'new'
-    );
-    const inProgressStatuses = statuses.filter(
-      (s) => s.statusCategory.key === 'indeterminate'
-    );
-    const doneStatuses = statuses.filter(
-      (s) => s.statusCategory.key === 'done'
-    );
+    const todoStatuses = statuses.filter((s) => s.statusCategory.key === 'new');
+    const inProgressStatuses = statuses.filter((s) => s.statusCategory.key === 'indeterminate');
+    const doneStatuses = statuses.filter((s) => s.statusCategory.key === 'done');
 
     // Use weighted distribution to pick a category
     const categoryWeights = normalizeDistribution({
@@ -846,9 +826,7 @@ export class IssueGenerator {
       ? new Date(projectConfig.startDate)
       : new Date(Date.now() - 180 * 24 * 60 * 60 * 1000);
 
-    const endDate = projectConfig.endDate
-      ? new Date(projectConfig.endDate)
-      : new Date();
+    const endDate = projectConfig.endDate ? new Date(projectConfig.endDate) : new Date();
 
     const created = context.dateGenerator.issueCreated(startDate, endDate);
     const updated = context.dateGenerator.issueUpdated(created);
@@ -875,13 +853,8 @@ export class IssueGenerator {
   /**
    * Finds an issue type by name
    */
-  private getIssueTypeByName(
-    issueTypes: IssueType[],
-    name: string
-  ): IssueType | undefined {
-    return issueTypes.find(
-      (t) => t.name.toLowerCase() === name.toLowerCase()
-    );
+  private getIssueTypeByName(issueTypes: IssueType[], name: string): IssueType | undefined {
+    return issueTypes.find((t) => t.name.toLowerCase() === name.toLowerCase());
   }
 
   /**

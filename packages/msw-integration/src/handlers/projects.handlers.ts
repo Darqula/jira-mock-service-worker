@@ -61,10 +61,7 @@ export function createProjectsHandlers(dataStore: DataStore, baseUrl: string) {
       const project = dataStore.getProject(projectIdOrKey as string);
 
       if (!project) {
-        return HttpResponse.json(
-          { errorMessages: ['Project not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Project not found'] }, { status: 404 });
       }
 
       return HttpResponse.json(project);
@@ -76,10 +73,7 @@ export function createProjectsHandlers(dataStore: DataStore, baseUrl: string) {
       const project = dataStore.getProject(projectIdOrKey as string);
 
       if (!project) {
-        return HttpResponse.json(
-          { errorMessages: ['Project not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Project not found'] }, { status: 404 });
       }
 
       const issueTypes = dataStore.getAllIssueTypes();

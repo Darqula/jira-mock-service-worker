@@ -77,10 +77,7 @@ export function createComponentsHandlers(dataStore: DataStore, baseUrl: string) 
 
       const project = dataStore.getProject(projectIdOrKey as string);
       if (!project) {
-        return HttpResponse.json(
-          { errorMessages: ['Project not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Project not found'] }, { status: 404 });
       }
 
       const components = dataStore.getComponentsByProject(projectIdOrKey as string);
@@ -93,10 +90,7 @@ export function createComponentsHandlers(dataStore: DataStore, baseUrl: string) 
 
       const component = dataStore.getComponent(id as string);
       if (!component) {
-        return HttpResponse.json(
-          { errorMessages: ['Component not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Component not found'] }, { status: 404 });
       }
 
       return HttpResponse.json(component);
@@ -114,28 +108,19 @@ export function createComponentsHandlers(dataStore: DataStore, baseUrl: string) 
       }
 
       if (!body.project) {
-        return HttpResponse.json(
-          { errorMessages: ['Project is required'] },
-          { status: 400 }
-        );
+        return HttpResponse.json({ errorMessages: ['Project is required'] }, { status: 400 });
       }
 
       const project = dataStore.getProject(body.project);
       if (!project) {
-        return HttpResponse.json(
-          { errorMessages: ['Project not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Project not found'] }, { status: 404 });
       }
 
       let lead;
       if (body.leadAccountId) {
         lead = dataStore.getUser(body.leadAccountId);
         if (!lead) {
-          return HttpResponse.json(
-            { errorMessages: ['Lead user not found'] },
-            { status: 404 }
-          );
+          return HttpResponse.json({ errorMessages: ['Lead user not found'] }, { status: 404 });
         }
       }
 
@@ -164,20 +149,14 @@ export function createComponentsHandlers(dataStore: DataStore, baseUrl: string) 
 
       const component = dataStore.getComponent(id as string);
       if (!component) {
-        return HttpResponse.json(
-          { errorMessages: ['Component not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Component not found'] }, { status: 404 });
       }
 
       let lead = component.lead;
       if (body.leadAccountId) {
         lead = dataStore.getUser(body.leadAccountId);
         if (!lead) {
-          return HttpResponse.json(
-            { errorMessages: ['Lead user not found'] },
-            { status: 404 }
-          );
+          return HttpResponse.json({ errorMessages: ['Lead user not found'] }, { status: 404 });
         }
       }
 
@@ -201,10 +180,7 @@ export function createComponentsHandlers(dataStore: DataStore, baseUrl: string) 
 
       const component = dataStore.getComponent(id as string);
       if (!component) {
-        return HttpResponse.json(
-          { errorMessages: ['Component not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Component not found'] }, { status: 404 });
       }
 
       // Note: In the real API, you might want to check if the component is in use

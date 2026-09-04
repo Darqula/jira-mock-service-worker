@@ -18,18 +18,12 @@ export function createUserPropertiesHandlers(dataStore: DataStore, baseUrl: stri
 
       const user = dataStore.getUser(accountId);
       if (!user) {
-        return HttpResponse.json(
-          { errorMessages: ['User not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['User not found'] }, { status: 404 });
       }
 
       const property = dataStore.getUserProperty(accountId, propertyKey as string);
       if (!property) {
-        return HttpResponse.json(
-          { errorMessages: ['Property not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Property not found'] }, { status: 404 });
       }
 
       return HttpResponse.json(property);
@@ -50,10 +44,7 @@ export function createUserPropertiesHandlers(dataStore: DataStore, baseUrl: stri
 
       const user = dataStore.getUser(accountId);
       if (!user) {
-        return HttpResponse.json(
-          { errorMessages: ['User not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['User not found'] }, { status: 404 });
       }
 
       const value = await request.json();
@@ -77,18 +68,12 @@ export function createUserPropertiesHandlers(dataStore: DataStore, baseUrl: stri
 
       const user = dataStore.getUser(accountId);
       if (!user) {
-        return HttpResponse.json(
-          { errorMessages: ['User not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['User not found'] }, { status: 404 });
       }
 
       const deleted = dataStore.deleteUserProperty(accountId, propertyKey as string);
       if (!deleted) {
-        return HttpResponse.json(
-          { errorMessages: ['Property not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Property not found'] }, { status: 404 });
       }
 
       return HttpResponse.json(null, { status: 204 });

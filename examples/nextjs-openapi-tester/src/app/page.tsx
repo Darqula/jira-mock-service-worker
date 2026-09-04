@@ -54,12 +54,13 @@ export default function Home() {
           <div className="config-info">
             <h3>📋 Current Configuration</h3>
             <div>
-              Projects: <code>{config.projects.length}</code> |
-              Total Issues: <code>{config.projects.reduce((sum, p) => sum + calculateIssueCount(p), 0)}</code>
+              Projects: <code>{config.projects.length}</code> | Total Issues:{' '}
+              <code>{config.projects.reduce((sum, p) => sum + calculateIssueCount(p), 0)}</code>
             </div>
             {stats && (
               <div style={{ marginTop: '0.5rem' }}>
-                Generated: <code>{stats.projects} projects</code> | <code>{stats.issues} issues</code>
+                Generated: <code>{stats.projects} projects</code> |{' '}
+                <code>{stats.issues} issues</code>
               </div>
             )}
             <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', opacity: 0.8 }}>

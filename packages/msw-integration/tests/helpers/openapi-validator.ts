@@ -109,11 +109,7 @@ export class OpenAPIValidator {
   /**
    * Extracts the response schema from the OpenAPI spec
    */
-  private getResponseSchema(
-    path: string,
-    method: string,
-    statusCode: number
-  ): object | null {
+  private getResponseSchema(path: string, method: string, statusCode: number): object | null {
     // Normalize path (remove query params, handle path params)
     const normalizedPath = this.normalizePath(path);
 
@@ -125,8 +121,7 @@ export class OpenAPIValidator {
 
     // Get operation (GET, POST, etc.)
     const operation = pathItem[method.toLowerCase() as keyof OpenAPIV3.PathItemObject] as
-      | OpenAPIV3.OperationObject
-      | undefined;
+      OpenAPIV3.OperationObject | undefined;
 
     if (!operation || !operation.responses) {
       return null;
@@ -187,12 +182,7 @@ export class OpenAPIValidator {
   private pathMatches(actualPath: string, specPath: string): boolean {
     // Convert spec path template to regex
     // e.g., /rest/api/2/issue/{issueIdOrKey} -> /rest/api/2/issue/[^/]+
-    const regexPattern =
-      '^' +
-      specPath
-        .replace(/\{[^}]+\}/g, '[^/]+')
-        .replace(/\//g, '\\/') +
-      '$';
+    const regexPattern = '^' + specPath.replace(/\{[^}]+\}/g, '[^/]+').replace(/\//g, '\\/') + '$';
 
     return new RegExp(regexPattern).test(actualPath);
   }

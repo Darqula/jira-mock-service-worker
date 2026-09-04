@@ -49,9 +49,7 @@ export function validateConfigWithWarnings(config: unknown): ValidationResult {
   if (!result.success) {
     return {
       valid: false,
-      errors: result.error.errors.map(
-        (err) => `${err.path.join('.')}: ${err.message}`
-      ),
+      errors: result.error.errors.map((err) => `${err.path.join('.')}: ${err.message}`),
       warnings: [],
     };
   }
@@ -130,9 +128,7 @@ export function getConfigErrors(config: unknown): string[] {
   if (result.success) {
     return [];
   }
-  return result.error.errors.map(
-    (err) => `${err.path.join('.')}: ${err.message}`
-  );
+  return result.error.errors.map((err) => `${err.path.join('.')}: ${err.message}`);
 }
 
 /**

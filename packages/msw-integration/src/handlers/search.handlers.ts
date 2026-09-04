@@ -1,10 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import type { QueryEngine } from '@jira-mock/core';
 
-export function createSearchHandlers(
-  queryEngine: QueryEngine,
-  baseUrl: string
-) {
+export function createSearchHandlers(queryEngine: QueryEngine, baseUrl: string) {
   const runSearch = (params: {
     jql: string;
     startAt: number;
@@ -32,10 +29,7 @@ export function createSearchHandlers(
       };
 
       if (!body.jql) {
-        return HttpResponse.json(
-          { errorMessages: ['JQL query is required'] },
-          { status: 400 }
-        );
+        return HttpResponse.json({ errorMessages: ['JQL query is required'] }, { status: 400 });
       }
 
       const results = runSearch({
@@ -94,10 +88,7 @@ export function createSearchHandlers(
       };
 
       if (!body.jql) {
-        return HttpResponse.json(
-          { errorMessages: ['JQL query is required'] },
-          { status: 400 }
-        );
+        return HttpResponse.json({ errorMessages: ['JQL query is required'] }, { status: 400 });
       }
 
       // Execute JQL to get actual count (in a real API this would be approximate)
@@ -128,10 +119,7 @@ export function createSearchHandlers(
       }
 
       if (!body.jql) {
-        return HttpResponse.json(
-          { errorMessages: ['JQL query is required'] },
-          { status: 400 }
-        );
+        return HttpResponse.json({ errorMessages: ['JQL query is required'] }, { status: 400 });
       }
 
       // Execute JQL to get matching issues
@@ -201,9 +189,10 @@ export function createSearchHandlers(
       let filteredSuggestions = suggestions;
       if (fieldValue) {
         const lowerValue = fieldValue.toLowerCase();
-        filteredSuggestions = suggestions.filter((s) =>
-          s.value.toLowerCase().includes(lowerValue) ||
-          s.displayName.toLowerCase().includes(lowerValue)
+        filteredSuggestions = suggestions.filter(
+          (s) =>
+            s.value.toLowerCase().includes(lowerValue) ||
+            s.displayName.toLowerCase().includes(lowerValue)
         );
       }
 

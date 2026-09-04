@@ -246,8 +246,10 @@ export class DataStore {
     }
 
     // Handle array filters with OR logic (for IN clauses)
-    if ((filters.projectKeys && filters.projectKeys.length > 0) ||
-        (filters.projectIds && filters.projectIds.length > 0)) {
+    if (
+      (filters.projectKeys && filters.projectKeys.length > 0) ||
+      (filters.projectIds && filters.projectIds.length > 0)
+    ) {
       results = results.filter((issue) => {
         const matchesKey = filters.projectKeys?.includes(issue.fields.project.key) ?? false;
         const matchesId = filters.projectIds?.includes(issue.fields.project.id) ?? false;
@@ -261,7 +263,9 @@ export class DataStore {
     }
 
     if (filters.issueTypes && filters.issueTypes.length > 0) {
-      results = results.filter((issue) => filters.issueTypes!.includes(issue.fields.issuetype.name));
+      results = results.filter((issue) =>
+        filters.issueTypes!.includes(issue.fields.issuetype.name)
+      );
     }
 
     if (filters.issueTypeExclude) {
@@ -269,7 +273,9 @@ export class DataStore {
     }
 
     if (filters.issueTypesExclude && filters.issueTypesExclude.length > 0) {
-      results = results.filter((issue) => !filters.issueTypesExclude!.includes(issue.fields.issuetype.name));
+      results = results.filter(
+        (issue) => !filters.issueTypesExclude!.includes(issue.fields.issuetype.name)
+      );
     }
 
     // Status filters
@@ -286,19 +292,20 @@ export class DataStore {
     }
 
     if (filters.statusesExclude && filters.statusesExclude.length > 0) {
-      results = results.filter((issue) => !filters.statusesExclude!.includes(issue.fields.status.name));
+      results = results.filter(
+        (issue) => !filters.statusesExclude!.includes(issue.fields.status.name)
+      );
     }
 
     // Assignee filters
     if (filters.assignee) {
-      results = results.filter(
-        (issue) => issue.fields.assignee?.accountId === filters.assignee
-      );
+      results = results.filter((issue) => issue.fields.assignee?.accountId === filters.assignee);
     }
 
     if (filters.assignees && filters.assignees.length > 0) {
       results = results.filter(
-        (issue) => issue.fields.assignee && filters.assignees!.includes(issue.fields.assignee.accountId)
+        (issue) =>
+          issue.fields.assignee && filters.assignees!.includes(issue.fields.assignee.accountId)
       );
     }
 
@@ -310,7 +317,9 @@ export class DataStore {
 
     if (filters.assigneesExclude && filters.assigneesExclude.length > 0) {
       results = results.filter(
-        (issue) => !issue.fields.assignee || !filters.assigneesExclude!.includes(issue.fields.assignee.accountId)
+        (issue) =>
+          !issue.fields.assignee ||
+          !filters.assigneesExclude!.includes(issue.fields.assignee.accountId)
       );
     }
 
@@ -324,14 +333,13 @@ export class DataStore {
 
     // Reporter filters
     if (filters.reporter) {
-      results = results.filter(
-        (issue) => issue.fields.reporter?.accountId === filters.reporter
-      );
+      results = results.filter((issue) => issue.fields.reporter?.accountId === filters.reporter);
     }
 
     if (filters.reporters && filters.reporters.length > 0) {
       results = results.filter(
-        (issue) => issue.fields.reporter && filters.reporters!.includes(issue.fields.reporter.accountId)
+        (issue) =>
+          issue.fields.reporter && filters.reporters!.includes(issue.fields.reporter.accountId)
       );
     }
 
@@ -343,7 +351,9 @@ export class DataStore {
 
     if (filters.reportersExclude && filters.reportersExclude.length > 0) {
       results = results.filter(
-        (issue) => !issue.fields.reporter || !filters.reportersExclude!.includes(issue.fields.reporter.accountId)
+        (issue) =>
+          !issue.fields.reporter ||
+          !filters.reportersExclude!.includes(issue.fields.reporter.accountId)
       );
     }
 
@@ -369,7 +379,9 @@ export class DataStore {
     }
 
     if (filters.prioritiesExclude && filters.prioritiesExclude.length > 0) {
-      results = results.filter((issue) => !filters.prioritiesExclude!.includes(issue.fields.priority.name));
+      results = results.filter(
+        (issue) => !filters.prioritiesExclude!.includes(issue.fields.priority.name)
+      );
     }
 
     // Labels filters
@@ -380,8 +392,8 @@ export class DataStore {
     }
 
     if (filters.labelsExclude && filters.labelsExclude.length > 0) {
-      results = results.filter((issue) =>
-        !filters.labelsExclude!.some((label) => issue.fields.labels?.includes(label))
+      results = results.filter(
+        (issue) => !filters.labelsExclude!.some((label) => issue.fields.labels?.includes(label))
       );
     }
 
@@ -404,7 +416,9 @@ export class DataStore {
 
     // Resolution filters
     if (filters.resolution) {
-      results = results.filter((issue) => (issue.fields as any).resolution?.name === filters.resolution);
+      results = results.filter(
+        (issue) => (issue.fields as any).resolution?.name === filters.resolution
+      );
     }
 
     if (filters.resolutions && filters.resolutions.length > 0) {
@@ -425,15 +439,13 @@ export class DataStore {
     // Text search filters
     if (filters.summaryContains) {
       const searchTerm = filters.summaryContains.toLowerCase();
-      results = results.filter((issue) =>
-        issue.fields.summary?.toLowerCase().includes(searchTerm)
-      );
+      results = results.filter((issue) => issue.fields.summary?.toLowerCase().includes(searchTerm));
     }
 
     if (filters.summaryNotContains) {
       const searchTerm = filters.summaryNotContains.toLowerCase();
-      results = results.filter((issue) =>
-        !issue.fields.summary?.toLowerCase().includes(searchTerm)
+      results = results.filter(
+        (issue) => !issue.fields.summary?.toLowerCase().includes(searchTerm)
       );
     }
 
@@ -446,8 +458,8 @@ export class DataStore {
 
     if (filters.descriptionNotContains) {
       const searchTerm = filters.descriptionNotContains.toLowerCase();
-      results = results.filter((issue) =>
-        !issue.fields.description?.toLowerCase().includes(searchTerm)
+      results = results.filter(
+        (issue) => !issue.fields.description?.toLowerCase().includes(searchTerm)
       );
     }
 
@@ -744,9 +756,7 @@ export class DataStore {
   }
 
   getVersionsByProject(projectId: string): Version[] {
-    return Array.from(this.versions.values()).filter(
-      (v) => v.projectId.toString() === projectId
-    );
+    return Array.from(this.versions.values()).filter((v) => v.projectId.toString() === projectId);
   }
 
   getAllVersions(): Version[] {

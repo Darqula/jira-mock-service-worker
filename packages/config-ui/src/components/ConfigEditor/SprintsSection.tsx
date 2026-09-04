@@ -34,60 +34,42 @@ export function SprintsSection({ config, onChange, projectIndex }: SprintsSectio
     <Card>
       <CardHeader>
         <CardTitle>Sprints Configuration</CardTitle>
-        <CardDescription>
-          Configure sprint generation and assignment settings
-        </CardDescription>
+        <CardDescription>Configure sprint generation and assignment settings</CardDescription>
       </CardHeader>
       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="sprint-start-number">
-            Start Sprint Number
-          </Label>
+          <Label htmlFor="sprint-start-number">Start Sprint Number</Label>
           <Input
             id="sprint-start-number"
             type="number"
             min="1"
             value={sprints.startNumber ?? 1}
-            onChange={(e) =>
-              updateSprints({ startNumber: parseInt(e.target.value) || 1 })
-            }
+            onChange={(e) => updateSprints({ startNumber: parseInt(e.target.value) || 1 })}
           />
-          <p className="text-xs text-muted-foreground">
-            First sprint number to generate
-          </p>
+          <p className="text-xs text-muted-foreground">First sprint number to generate</p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="sprint-duration">
-            Sprint Duration (days)
-          </Label>
+          <Label htmlFor="sprint-duration">Sprint Duration (days)</Label>
           <Input
             id="sprint-duration"
             type="number"
             min="1"
             value={sprints.duration ?? 14}
-            onChange={(e) =>
-              updateSprints({ duration: parseInt(e.target.value) || 14 })
-            }
+            onChange={(e) => updateSprints({ duration: parseInt(e.target.value) || 14 })}
           />
-          <p className="text-xs text-muted-foreground">
-            Length of each sprint in days
-          </p>
+          <p className="text-xs text-muted-foreground">Length of each sprint in days</p>
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="sprint-assign-prob">
-            Sprint Assignment Probability
-          </Label>
+          <Label htmlFor="sprint-assign-prob">Sprint Assignment Probability</Label>
           <Slider
             id="sprint-assign-prob"
             min={0}
             max={1}
             step={0.01}
             value={sprints.assignProbability ?? 0.7}
-            onChange={(e) =>
-              updateSprints({ assignProbability: parseFloat(e.target.value) })
-            }
+            onChange={(e) => updateSprints({ assignProbability: parseFloat(e.target.value) })}
             formatValue={(v) => `${Math.round(v * 100)}%`}
           />
           <p className="text-xs text-muted-foreground">

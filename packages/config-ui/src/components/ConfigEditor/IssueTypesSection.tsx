@@ -111,13 +111,9 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   type="number"
                   min="0"
                   value={epic.count ?? 10}
-                  onChange={(e) =>
-                    updateEpic({ count: parseInt(e.target.value) || 0 })
-                  }
+                  onChange={(e) => updateEpic({ count: parseInt(e.target.value) || 0 })}
                 />
-                <p className="text-xs text-muted-foreground">
-                  How many epics to generate
-                </p>
+                <p className="text-xs text-muted-foreground">How many epics to generate</p>
               </div>
 
               <div className="space-y-2">
@@ -127,13 +123,9 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   type="number"
                   min="0"
                   value={epic.childrenPerEpic ?? 100}
-                  onChange={(e) =>
-                    updateEpic({ childrenPerEpic: parseInt(e.target.value) || 0 })
-                  }
+                  onChange={(e) => updateEpic({ childrenPerEpic: parseInt(e.target.value) || 0 })}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Tasks created under each epic
-                </p>
+                <p className="text-xs text-muted-foreground">Tasks created under each epic</p>
               </div>
             </div>
 
@@ -146,14 +138,10 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   max={1}
                   step={0.01}
                   value={epic.assignProbability ?? 0.9}
-                  onChange={(e) =>
-                    updateEpic({ assignProbability: parseFloat(e.target.value) })
-                  }
+                  onChange={(e) => updateEpic({ assignProbability: parseFloat(e.target.value) })}
                   formatValue={(v) => `${Math.round(v * 100)}%`}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Chance to assign epic to a user
-                </p>
+                <p className="text-xs text-muted-foreground">Chance to assign epic to a user</p>
               </div>
 
               <div className="space-y-2">
@@ -164,14 +152,10 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   max={1}
                   step={0.01}
                   value={epic.labelProbability ?? 0.8}
-                  onChange={(e) =>
-                    updateEpic({ labelProbability: parseFloat(e.target.value) })
-                  }
+                  onChange={(e) => updateEpic({ labelProbability: parseFloat(e.target.value) })}
                   formatValue={(v) => `${Math.round(v * 100)}%`}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Chance to add labels to epic
-                </p>
+                <p className="text-xs text-muted-foreground">Chance to add labels to epic</p>
               </div>
             </div>
 
@@ -186,14 +170,10 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                     max={1}
                     step={0.01}
                     value={childDist.story ?? 0.5}
-                    onChange={(e) =>
-                      updateChildDist({ story: parseFloat(e.target.value) })
-                    }
+                    onChange={(e) => updateChildDist({ story: parseFloat(e.target.value) })}
                     formatValue={(v) => `${Math.round(v * 100)}%`}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    How often Story tasks are created
-                  </p>
+                  <p className="text-xs text-muted-foreground">How often Story tasks are created</p>
                 </div>
 
                 <div className="space-y-2">
@@ -204,14 +184,10 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                     max={1}
                     step={0.01}
                     value={childDist.task ?? 0.3}
-                    onChange={(e) =>
-                      updateChildDist({ task: parseFloat(e.target.value) })
-                    }
+                    onChange={(e) => updateChildDist({ task: parseFloat(e.target.value) })}
                     formatValue={(v) => `${Math.round(v * 100)}%`}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    How often Task tasks are created
-                  </p>
+                  <p className="text-xs text-muted-foreground">How often Task tasks are created</p>
                 </div>
 
                 <div className="space-y-2">
@@ -222,14 +198,10 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                     max={1}
                     step={0.01}
                     value={childDist.bug ?? 0.2}
-                    onChange={(e) =>
-                      updateChildDist({ bug: parseFloat(e.target.value) })
-                    }
+                    onChange={(e) => updateChildDist({ bug: parseFloat(e.target.value) })}
                     formatValue={(v) => `${Math.round(v * 100)}%`}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    How often Bug tasks are created
-                  </p>
+                  <p className="text-xs text-muted-foreground">How often Bug tasks are created</p>
                 </div>
               </div>
             </div>
@@ -247,9 +219,7 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   type="number"
                   min="0"
                   value={story.standaloneCount ?? 0}
-                  onChange={(e) =>
-                    updateStory({ standaloneCount: parseInt(e.target.value) || 0 })
-                  }
+                  onChange={(e) => updateStory({ standaloneCount: parseInt(e.target.value) || 0 })}
                 />
                 <p className="text-xs text-muted-foreground">
                   Number of stories created outside epics
@@ -266,14 +236,10 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   max={1}
                   step={0.01}
                   value={story.assignProbability ?? 0.8}
-                  onChange={(e) =>
-                    updateStory({ assignProbability: parseFloat(e.target.value) })
-                  }
+                  onChange={(e) => updateStory({ assignProbability: parseFloat(e.target.value) })}
                   formatValue={(v) => `${Math.round(v * 100)}%`}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Chance to assign story to a user
-                </p>
+                <p className="text-xs text-muted-foreground">Chance to assign story to a user</p>
               </div>
 
               <div className="space-y-2">
@@ -284,14 +250,10 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   max={1}
                   step={0.01}
                   value={story.labelProbability ?? 0.5}
-                  onChange={(e) =>
-                    updateStory({ labelProbability: parseFloat(e.target.value) })
-                  }
+                  onChange={(e) => updateStory({ labelProbability: parseFloat(e.target.value) })}
                   formatValue={(v) => `${Math.round(v * 100)}%`}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Chance to add labels to story
-                </p>
+                <p className="text-xs text-muted-foreground">Chance to add labels to story</p>
               </div>
             </div>
           </div>
@@ -308,9 +270,7 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   type="number"
                   min="0"
                   value={task.standaloneCount ?? 0}
-                  onChange={(e) =>
-                    updateTask({ standaloneCount: parseInt(e.target.value) || 0 })
-                  }
+                  onChange={(e) => updateTask({ standaloneCount: parseInt(e.target.value) || 0 })}
                 />
                 <p className="text-xs text-muted-foreground">
                   Number of tasks created outside epics
@@ -327,14 +287,10 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   max={1}
                   step={0.01}
                   value={task.assignProbability ?? 0.8}
-                  onChange={(e) =>
-                    updateTask({ assignProbability: parseFloat(e.target.value) })
-                  }
+                  onChange={(e) => updateTask({ assignProbability: parseFloat(e.target.value) })}
                   formatValue={(v) => `${Math.round(v * 100)}%`}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Chance to assign task to a user
-                </p>
+                <p className="text-xs text-muted-foreground">Chance to assign task to a user</p>
               </div>
 
               <div className="space-y-2">
@@ -345,14 +301,10 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   max={1}
                   step={0.01}
                   value={task.labelProbability ?? 0.5}
-                  onChange={(e) =>
-                    updateTask({ labelProbability: parseFloat(e.target.value) })
-                  }
+                  onChange={(e) => updateTask({ labelProbability: parseFloat(e.target.value) })}
                   formatValue={(v) => `${Math.round(v * 100)}%`}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Chance to add labels to task
-                </p>
+                <p className="text-xs text-muted-foreground">Chance to add labels to task</p>
               </div>
             </div>
           </div>
@@ -369,9 +321,7 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   type="number"
                   min="0"
                   value={bug.standaloneCount ?? 0}
-                  onChange={(e) =>
-                    updateBug({ standaloneCount: parseInt(e.target.value) || 0 })
-                  }
+                  onChange={(e) => updateBug({ standaloneCount: parseInt(e.target.value) || 0 })}
                 />
                 <p className="text-xs text-muted-foreground">
                   Number of bugs created outside epics
@@ -388,14 +338,10 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   max={1}
                   step={0.01}
                   value={bug.assignProbability ?? 0.6}
-                  onChange={(e) =>
-                    updateBug({ assignProbability: parseFloat(e.target.value) })
-                  }
+                  onChange={(e) => updateBug({ assignProbability: parseFloat(e.target.value) })}
                   formatValue={(v) => `${Math.round(v * 100)}%`}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Chance to assign bug to a user
-                </p>
+                <p className="text-xs text-muted-foreground">Chance to assign bug to a user</p>
               </div>
 
               <div className="space-y-2">
@@ -406,14 +352,10 @@ export function IssueTypesSection({ config, onChange, projectIndex }: IssueTypes
                   max={1}
                   step={0.01}
                   value={bug.labelProbability ?? 0.3}
-                  onChange={(e) =>
-                    updateBug({ labelProbability: parseFloat(e.target.value) })
-                  }
+                  onChange={(e) => updateBug({ labelProbability: parseFloat(e.target.value) })}
                   formatValue={(v) => `${Math.round(v * 100)}%`}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Chance to add labels to bug
-                </p>
+                <p className="text-xs text-muted-foreground">Chance to add labels to bug</p>
               </div>
             </div>
           </div>

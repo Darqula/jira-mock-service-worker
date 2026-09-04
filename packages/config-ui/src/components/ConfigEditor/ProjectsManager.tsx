@@ -81,7 +81,7 @@ export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
     let counter = 1;
 
     // Ensure the project key is unique
-    while (config.projects.some(p => p.projectKey === newProjectKey)) {
+    while (config.projects.some((p) => p.projectKey === newProjectKey)) {
       counter++;
       newProjectKey = `${sourceProject.projectKey}_COPY${counter}`;
     }
@@ -107,7 +107,7 @@ export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
 
     // Expand the newly cloned project and adjust indices
     const newExpanded = new Set<number>();
-    expandedProjects.forEach(expandedIndex => {
+    expandedProjects.forEach((expandedIndex) => {
       if (expandedIndex <= index) {
         newExpanded.add(expandedIndex);
       } else {
@@ -237,7 +237,9 @@ export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
                   <div className="space-y-2">
                     <Label>
                       Issue Count (Calculated)
-                      <span className="ml-2 text-xs text-muted-foreground">(Based on issue types)</span>
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        (Based on issue types)
+                      </span>
                     </Label>
                     <div className="h-10 px-3 py-2 rounded-md border border-input bg-muted flex items-center text-sm">
                       {calculateIssueCount(project).toLocaleString()}
@@ -306,45 +308,22 @@ export function ProjectsManager({ config, onChange }: ProjectsManagerProps) {
                   <div className="flex flex-col gap-2 mb-4">
                     <h4 className="font-semibold text-sm">Project Configuration</h4>
                     <p className="text-xs text-muted-foreground">
-                      Configure project-specific settings below. If not specified, built-in defaults will be used.
+                      Configure project-specific settings below. If not specified, built-in defaults
+                      will be used.
                     </p>
                   </div>
 
-                  <StatusSection
-                    config={config}
-                    onChange={onChange}
-                    projectIndex={index}
-                  />
+                  <StatusSection config={config} onChange={onChange} projectIndex={index} />
 
-                  <IssueTypesSection
-                    config={config}
-                    onChange={onChange}
-                    projectIndex={index}
-                  />
+                  <IssueTypesSection config={config} onChange={onChange} projectIndex={index} />
 
-                  <SprintsSection
-                    config={config}
-                    onChange={onChange}
-                    projectIndex={index}
-                  />
+                  <SprintsSection config={config} onChange={onChange} projectIndex={index} />
 
-                  <VersionsSection
-                    config={config}
-                    onChange={onChange}
-                    projectIndex={index}
-                  />
+                  <VersionsSection config={config} onChange={onChange} projectIndex={index} />
 
-                  <WorklogsSection
-                    config={config}
-                    onChange={onChange}
-                    projectIndex={index}
-                  />
+                  <WorklogsSection config={config} onChange={onChange} projectIndex={index} />
 
-                  <DataSection
-                    config={config}
-                    onChange={onChange}
-                    projectIndex={index}
-                  />
+                  <DataSection config={config} onChange={onChange} projectIndex={index} />
                 </div>
               </CardContent>
             )}

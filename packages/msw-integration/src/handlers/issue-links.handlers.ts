@@ -18,10 +18,7 @@ export function createIssueLinksHandlers(dataStore: DataStore, baseUrl: string) 
 
       const link = dataStore.getIssueLink(linkId as string);
       if (!link) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue link not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Issue link not found'] }, { status: 404 });
       }
 
       return HttpResponse.json(link);
@@ -33,24 +30,15 @@ export function createIssueLinksHandlers(dataStore: DataStore, baseUrl: string) 
 
       // Validate required fields
       if (!body.type) {
-        return HttpResponse.json(
-          { errorMessages: ['Link type is required'] },
-          { status: 400 }
-        );
+        return HttpResponse.json({ errorMessages: ['Link type is required'] }, { status: 400 });
       }
 
       if (!body.inwardIssue || (!body.inwardIssue.id && !body.inwardIssue.key)) {
-        return HttpResponse.json(
-          { errorMessages: ['Inward issue is required'] },
-          { status: 400 }
-        );
+        return HttpResponse.json({ errorMessages: ['Inward issue is required'] }, { status: 400 });
       }
 
       if (!body.outwardIssue || (!body.outwardIssue.id && !body.outwardIssue.key)) {
-        return HttpResponse.json(
-          { errorMessages: ['Outward issue is required'] },
-          { status: 400 }
-        );
+        return HttpResponse.json({ errorMessages: ['Outward issue is required'] }, { status: 400 });
       }
 
       // Find link type
@@ -62,10 +50,7 @@ export function createIssueLinksHandlers(dataStore: DataStore, baseUrl: string) 
       }
 
       if (!linkType) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue link type not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Issue link type not found'] }, { status: 404 });
       }
 
       // Find inward issue
@@ -73,10 +58,7 @@ export function createIssueLinksHandlers(dataStore: DataStore, baseUrl: string) 
       const inwardIssue = inwardIssueId ? dataStore.getIssue(inwardIssueId) : undefined;
 
       if (!inwardIssue) {
-        return HttpResponse.json(
-          { errorMessages: ['Inward issue not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Inward issue not found'] }, { status: 404 });
       }
 
       // Find outward issue
@@ -84,10 +66,7 @@ export function createIssueLinksHandlers(dataStore: DataStore, baseUrl: string) 
       const outwardIssue = outwardIssueId ? dataStore.getIssue(outwardIssueId) : undefined;
 
       if (!outwardIssue) {
-        return HttpResponse.json(
-          { errorMessages: ['Outward issue not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Outward issue not found'] }, { status: 404 });
       }
 
       // Create the link
@@ -151,10 +130,7 @@ export function createIssueLinksHandlers(dataStore: DataStore, baseUrl: string) 
 
       const deleted = dataStore.deleteIssueLink(linkId as string);
       if (!deleted) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue link not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Issue link not found'] }, { status: 404 });
       }
 
       return HttpResponse.json(null, { status: 204 });

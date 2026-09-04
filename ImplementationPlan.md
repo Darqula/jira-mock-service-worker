@@ -3,11 +3,13 @@
 ## 1. Project Overview
 
 ### 1.1 Project Goals
+
 - Generate realistic mock Jira Cloud API data for automated testing and performance benchmarks
 - Support MSW (Mock Service Worker) integration for seamless API mocking
 - Provide a user-friendly Next.js interface for configuration management
 
 ### 1.2 Technology Stack
+
 - **Language**: TypeScript (strict mode)
 - **Package Manager**: npm (with workspaces)
 - **Testing**: Vitest + @testing-library
@@ -151,11 +153,11 @@ jira-mock-service-worker/
 ```typescript
 // config/schema.ts
 interface JiraMockConfig {
-  version: "1.0";
-  seed?: number;                    // For reproducible random data
+  version: '1.0';
+  seed?: number; // For reproducible random data
   projects: {
-    count: number;                  // Number of projects to generate
-    issuesPerProject: number;       // Issues per project
+    count: number; // Number of projects to generate
+    issuesPerProject: number; // Issues per project
   };
 }
 ```
@@ -163,12 +165,14 @@ interface JiraMockConfig {
 ### 3.2 Data Generation Strategy
 
 **Key Principles:**
+
 1. **Deterministic generation**: Use seed for reproducibility
 2. **Relational integrity**: Maintain relationships between entities
 3. **Realistic data**: Use faker.js with sensible defaults
 4. **Performance**: Generate data lazily where possible
 
 **Generation Flow:**
+
 ```
 1. Load & validate config
 2. Initialize ID generators (deterministic sequences)
@@ -187,6 +191,7 @@ interface JiraMockConfig {
 ### 3.3 Core Components
 
 #### 3.3.1 Data Store
+
 - In-memory storage with indexed access
 - Support for:
   - Get by ID
@@ -198,6 +203,7 @@ interface JiraMockConfig {
 #### 3.3.2 Generators
 
 Each generator follows this interface:
+
 ```typescript
 interface Generator<T> {
   generate(context: GenerationContext): T;
@@ -206,6 +212,7 @@ interface Generator<T> {
 ```
 
 **Priority Order:**
+
 1. **User Generator**: System users, project leads, assignees
 2. **Metadata Generators**: Statuses, priorities, issue types, fields
 3. **Project Generator**: Projects with metadata
@@ -216,6 +223,7 @@ interface Generator<T> {
 #### 3.3.3 Query Engine
 
 Support for:
+
 - Field filtering (equality, IN, range)
 - Basic JQL parsing (project, status, assignee, etc.)
 - Sorting
@@ -229,6 +237,7 @@ Support for:
 ### 4.1 Handler Organization
 
 Group handlers by API domain:
+
 - **Users & Permissions**: `/rest/api/2/myself`, `/rest/api/2/user/*`
 - **Projects**: `/rest/api/2/project/*`
 - **Issues**: `/rest/api/2/issue/*`
@@ -268,8 +277,8 @@ export function setupJiraMock(config: JiraMockConfig) {
 
 // Usage in tests
 const { handlers } = setupJiraMock({
-  version: "1.0",
-  projects: { count: 3, issuesPerProject: 50 }
+  version: '1.0',
+  projects: { count: 3, issuesPerProject: 50 },
 });
 
 const server = setupServer(...handlers);
@@ -330,6 +339,7 @@ const server = setupServer(...handlers);
 ## 6. Implementation Phases
 
 ### Phase 1: Core Foundation (Week 1)
+
 1. Set up monorepo structure with npm workspaces
 2. Configure TypeScript, ESLint, Prettier
 3. Set up Vitest testing infrastructure
@@ -338,6 +348,7 @@ const server = setupServer(...handlers);
 6. Implement data store with basic CRUD
 
 ### Phase 2: Core Generators (Week 1-2)
+
 1. User generator
 2. Project generator (basic)
 3. Issue type, status, priority generators
@@ -347,12 +358,14 @@ const server = setupServer(...handlers);
 7. Worklog generator
 
 ### Phase 3: Core Testing (Week 2)
+
 1. Unit tests for all generators
 2. Unit tests for data store
 3. Unit tests for config validation
 4. Data consistency tests
 
 ### Phase 4: MSW Integration (Week 2-3)
+
 1. Set up MSW handlers structure
 2. Implement user endpoints
 3. Implement project endpoints
@@ -363,6 +376,7 @@ const server = setupServer(...handlers);
 8. Tests for MSW handlers
 
 ### Phase 5: Next.js UI (Week 3)
+
 1. Set up Next.js 14 with App Router
 2. Create layout and navigation
 3. Build config editor form
@@ -372,6 +386,7 @@ const server = setupServer(...handlers);
 7. Style with Tailwind + Shadcn
 
 ### Phase 6: Documentation & Examples (Week 4)
+
 1. Write comprehensive README
 2. Create API reference docs
 3. Add usage examples (Vitest, Playwright)
@@ -379,6 +394,7 @@ const server = setupServer(...handlers);
 5. Create architecture documentation
 
 ### Phase 7: Polish & Release (Week 4)
+
 1. End-to-end testing
 2. Error handling improvements
 3. CI/CD setup
@@ -391,6 +407,7 @@ const server = setupServer(...handlers);
 ### 7.1 Core Library Tests
 
 **Unit Tests:**
+
 - Each generator produces valid Jira entities
 - ID generation is deterministic with seed
 - Relationships are maintained correctly
@@ -419,6 +436,7 @@ const server = setupServer(...handlers);
 ## 8. Key Technical Decisions
 
 ### 8.1 Why Monorepo with npm workspaces?
+
 - Shared types between packages
 - Easier development and testing
 - Single version management
@@ -426,18 +444,21 @@ const server = setupServer(...handlers);
 - Native to npm (no additional tools needed)
 
 ### 8.2 Why Zod?
+
 - Runtime validation
 - Type inference
 - Great error messages
 - JSON schema generation
 
 ### 8.3 Why Vitest?
+
 - Fast
 - Native ESM support
 - Compatible with Vite/Next.js
 - Great DX
 
 ### 8.4 Why In-Memory Store?
+
 - Simple implementation
 - Fast for testing scenarios
 - No external dependencies
@@ -448,6 +469,7 @@ const server = setupServer(...handlers);
 ## 9. API Coverage (Iteration 1)
 
 ### 9.1 Must Implement (44 endpoints)
+
 - GET /rest/api/2/myself
 - GET /rest/api/2/user
 - GET /rest/api/2/user/search
@@ -470,6 +492,7 @@ const server = setupServer(...handlers);
 - GET /rest/api/2/label
 
 ### 9.2 Future Iterations
+
 - Advanced JQL support
 - Issue transitions
 - Attachments
@@ -482,15 +505,13 @@ const server = setupServer(...handlers);
 ## 10. Dependencies
 
 ### Root (`package.json`)
+
 ```json
 {
   "name": "jira-mock-service-worker",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "packages/*",
-    "examples/*"
-  ],
+  "workspaces": ["packages/*", "examples/*"],
   "devDependencies": {
     "@types/node": "^20.0.0",
     "typescript": "^5.3.0",
@@ -501,6 +522,7 @@ const server = setupServer(...handlers);
 ```
 
 ### Core (`packages/core`)
+
 ```json
 {
   "name": "@jira-mock/core",
@@ -518,6 +540,7 @@ const server = setupServer(...handlers);
 ```
 
 ### MSW Integration (`packages/msw-integration`)
+
 ```json
 {
   "name": "@jira-mock/msw-integration",
@@ -534,6 +557,7 @@ const server = setupServer(...handlers);
 ```
 
 ### Config UI (`packages/config-ui`)
+
 ```json
 {
   "name": "@jira-mock/config-ui",
@@ -584,23 +608,27 @@ const server = setupServer(...handlers);
 ## 12. Success Criteria
 
 **Core Library**:
+
 - Generates valid Jira entities matching OpenAPI spec
 - Passes all unit tests
 - Has >80% code coverage
 
 **MSW Integration**:
+
 - Covers all iteration 1 endpoints
 - Works in both Node and browser
 - Easy setup (< 5 lines of code)
 - Clear documentation
 
 **Next.js UI**:
+
 - Intuitive config editing
 - Real-time validation
 - Works on mobile/desktop
 - Fast and responsive
 
 **Documentation**:
+
 - Complete API reference
 - Multiple usage examples
 - Architecture explanation
@@ -615,6 +643,7 @@ Based on the actual API usage in the codebase (documented in JiraCloudApiEndpoin
 ### 13.1 Iteration 3 Scope (32 additional endpoints)
 
 #### Phase 3.1: User Properties & Advanced Search (8 endpoints)
+
 **Priority: High** - Used for user preferences and advanced search
 
 1. **User Search Extensions**:
@@ -630,12 +659,14 @@ Based on the actual API usage in the codebase (documented in JiraCloudApiEndpoin
    - `GET /rest/api/2/mypermissions` - Get current user's permissions
 
 **Implementation Notes**:
+
 - Add `UserProperty` type to jira-schemas.ts
 - Extend DataStore with user properties storage
 - Create UserPropertyGenerator for default properties
 - Add permissions calculation based on user roles
 
 #### Phase 3.2: Project Properties & Search (6 endpoints)
+
 **Priority: High** - Used for project configuration and milestones
 
 1. **Project Search**:
@@ -651,12 +682,14 @@ Based on the actual API usage in the codebase (documented in JiraCloudApiEndpoin
    - Project milestones using property key: `pwMilestone`
 
 **Implementation Notes**:
+
 - Add `ProjectProperty` type to jira-schemas.ts
 - Extend DataStore with project properties Map
 - Create handlers in projects.handlers.ts
 - Support milestone-specific property handling
 
 #### Phase 3.3: Component & Version Extensions (3 endpoints)
+
 **Priority: Medium** - Used for component/version listing
 
 1. **Component Listing**:
@@ -667,11 +700,13 @@ Based on the actual API usage in the codebase (documented in JiraCloudApiEndpoin
    - `POST /rest/api/2/version/{versionId}/removeAndSwap` - Remove version and swap issues
 
 **Implementation Notes**:
+
 - Add global component retrieval to DataStore
 - Implement pagination for components
 - Add version swap logic (move issues from one version to another)
 
 #### Phase 3.4: Issue Metadata & Create/Edit Meta (6 endpoints)
+
 **Priority: High** - Critical for issue creation/editing UIs
 
 1. **Issue Type Extensions**:
@@ -687,12 +722,14 @@ Based on the actual API usage in the codebase (documented in JiraCloudApiEndpoin
    - `GET /rest/api/2/issue/{issueId}/editmeta` - Get metadata for editing issue
 
 **Implementation Notes**:
+
 - Create metadata.handlers.ts extensions
 - Generate field schemas with validation rules
 - Include required/optional field information
 - Support field dependencies and conditions
 
 #### Phase 3.5: Worklog Extensions (5 endpoints)
+
 **Priority: Medium** - Used for time tracking management
 
 1. **Worklog CRUD Completion**:
@@ -705,12 +742,14 @@ Based on the actual API usage in the codebase (documented in JiraCloudApiEndpoin
    - `GET /rest/api/2/worklog/deleted` - Get deleted worklog IDs
 
 **Implementation Notes**:
+
 - Add update/delete methods to DataStore for worklogs
 - Track worklog modification history
 - Track deleted worklog IDs with timestamps
 - Support bulk worklog retrieval
 
 #### Phase 3.6: Issue Properties (2 endpoints)
+
 **Priority: Medium** - Used for custom issue data storage
 
 1. **Issue Properties**:
@@ -718,12 +757,14 @@ Based on the actual API usage in the codebase (documented in JiraCloudApiEndpoin
    - `POST /rest/api/2/issue/properties/multi` - Bulk set properties on multiple issues
 
 **Implementation Notes**:
+
 - Add `IssueProperty` type to jira-schemas.ts
 - Extend DataStore with issue properties Map
 - Support bulk property operations
 - Add property change tracking
 
 #### Phase 3.7: Search & JQL Extensions (3 endpoints)
+
 **Priority: High** - Used for search optimization and validation
 
 1. **Search Enhancements**:
@@ -734,34 +775,40 @@ Based on the actual API usage in the codebase (documented in JiraCloudApiEndpoin
    - `GET /rest/api/2/jql/autocompletedata/suggestions` - Get JQL autocomplete suggestions
 
 **Implementation Notes**:
+
 - Implement fast count estimation (use sampling for large datasets)
 - Add JQL matching without full search
 - Generate autocomplete data from schema
 - Support field, function, and value suggestions
 
 #### Phase 3.8: Filter Details (1 endpoint)
+
 **Priority: Low** - Currently only search is implemented
 
 1. **Filter Retrieval**:
    - `GET /rest/api/2/filter/{filterId}` - Get filter by ID
 
 **Implementation Notes**:
+
 - Add to existing filters.handlers.ts
 - Return complete filter object with permissions
 
 ### 13.2 Implementation Order
 
 **Week 1**: High Priority User & Project Endpoints
+
 - Phase 3.1: User properties & search (days 1-2)
 - Phase 3.2: Project properties (days 3-4)
 - Phase 3.4: Issue metadata (days 5-7)
 
 **Week 2**: Search & Worklog Enhancements
+
 - Phase 3.7: Search & JQL extensions (days 1-3)
 - Phase 3.5: Worklog extensions (days 4-5)
 - Phase 3.6: Issue properties (days 6-7)
 
 **Week 3**: Remaining & Testing
+
 - Phase 3.3: Component/version extensions (days 1-2)
 - Phase 3.8: Filter details (day 3)
 - Comprehensive testing (days 4-7)
@@ -769,6 +816,7 @@ Based on the actual API usage in the codebase (documented in JiraCloudApiEndpoin
 ### 13.3 Required Types & Generators
 
 **New Types** (add to jira-schemas.ts):
+
 ```typescript
 interface UserProperty {
   key: string;
@@ -810,6 +858,7 @@ interface Permission {
 ```
 
 **New Generators**:
+
 - `UserPropertyGenerator` - Generate default user properties
 - `ProjectPropertyGenerator` - Generate project properties & milestones
 - `PermissionGenerator` - Generate user permissions based on role
@@ -819,6 +868,7 @@ interface Permission {
 ### 13.4 DataStore Extensions
 
 **New Methods**:
+
 ```typescript
 // User properties
 getUserProperty(accountId: string, key: string): UserProperty | undefined
@@ -855,25 +905,30 @@ getUserPermissions(accountId: string): Permission[]
 ### 13.5 Success Criteria for Iteration 3
 
 **Endpoint Coverage**:
+
 - All 32 endpoints from JiraCloudApiEndpoints.md implemented
 - Total endpoint count: 100+ endpoints
 
 **Properties Support**:
+
 - User, project, and issue properties fully functional
 - Bulk operations supported
 - Property change tracking
 
 **Metadata Support**:
+
 - Create/edit metadata accurate for all issue types
 - Field validation rules included
 - Autocomplete data generated
 
 **Testing**:
+
 - Unit tests for all new endpoints
 - Integration tests for property operations
 - Performance tests for bulk operations
 
 **Documentation**:
+
 - Update README with new endpoint count
 - Add examples for property usage
 - Document metadata structure
@@ -888,8 +943,8 @@ getUserPermissions(accountId: string): Permission[]
 ### 13.7 Dependencies
 
 No new external dependencies required. All implementation uses existing:
+
 - @faker-js/faker
 - msw
 - zod
 - TypeScript
-

@@ -3,11 +3,7 @@ import type { GenerationContext } from '../types/generator.types.js';
 import { generateSelfUrls } from '../utils/response-builder.js';
 
 export class CommentGenerator {
-  generateComments(
-    issue: IssueBean,
-    users: User[],
-    context: GenerationContext
-  ): Comment[] {
+  generateComments(issue: IssueBean, users: User[], context: GenerationContext): Comment[] {
     // Generate 0-8 comments per issue
     const count = context.faker.number.int({ min: 0, max: 8 });
     const comments: Comment[] = [];
@@ -43,7 +39,7 @@ export class CommentGenerator {
     // Updated time is between created and issue updated
     const updateOffset = context.faker.number.int({
       min: 0,
-      max: issueUpdated.getTime() - created.getTime()
+      max: issueUpdated.getTime() - created.getTime(),
     });
     const updated = new Date(created.getTime() + updateOffset);
 
@@ -75,7 +71,8 @@ export class CommentGenerator {
       () => `Resolved: ${context.faker.lorem.sentence()}`,
       () => `This is related to ${context.faker.lorem.words(3)}. ${context.faker.lorem.sentence()}`,
       () => `As discussed, ${context.faker.lorem.paragraph()}`,
-      () => `${context.faker.lorem.sentence()}\n\nSteps taken:\n1. ${context.faker.lorem.sentence()}\n2. ${context.faker.lorem.sentence()}`,
+      () =>
+        `${context.faker.lorem.sentence()}\n\nSteps taken:\n1. ${context.faker.lorem.sentence()}\n2. ${context.faker.lorem.sentence()}`,
     ];
 
     const template = templates[context.faker.number.int({ min: 0, max: templates.length - 1 })];

@@ -26,7 +26,11 @@ export class QueryEngine {
     return this.dataStore.searchIssues(filters, options);
   }
 
-  private parseJQL(jql: string): { filters: IssueFilters; orderBy?: string; orderDirection?: 'asc' | 'desc' } {
+  private parseJQL(jql: string): {
+    filters: IssueFilters;
+    orderBy?: string;
+    orderDirection?: 'asc' | 'desc';
+  } {
     const filters: IssueFilters = {};
 
     // Parse ORDER BY clause (extract and remove from jql for cleaner parsing)
@@ -42,9 +46,33 @@ export class QueryEngine {
     this.parseProjectFilters(jql, filters);
 
     // Parse all field filters with their operators
-    this.parseFieldFilter(jql, 'status', filters, 'status', 'statuses', 'statusExclude', 'statusesExclude');
-    this.parseFieldFilter(jql, 'issuetype', filters, 'issueType', 'issueTypes', 'issueTypeExclude', 'issueTypesExclude');
-    this.parseFieldFilter(jql, 'priority', filters, 'priority', 'priorities', 'priorityExclude', 'prioritiesExclude');
+    this.parseFieldFilter(
+      jql,
+      'status',
+      filters,
+      'status',
+      'statuses',
+      'statusExclude',
+      'statusesExclude'
+    );
+    this.parseFieldFilter(
+      jql,
+      'issuetype',
+      filters,
+      'issueType',
+      'issueTypes',
+      'issueTypeExclude',
+      'issueTypesExclude'
+    );
+    this.parseFieldFilter(
+      jql,
+      'priority',
+      filters,
+      'priority',
+      'priorities',
+      'priorityExclude',
+      'prioritiesExclude'
+    );
     this.parseFieldFilter(jql, 'resolution', filters, 'resolution', 'resolutions');
 
     // Parse assignee and reporter with special handling for currentUser()
@@ -82,9 +110,7 @@ export class QueryEngine {
     // Parse project with IN clause
     const projectInMatch = jql.match(/project\s+in\s*\(([^)]+)\)/i);
     if (projectInMatch) {
-      const values = projectInMatch[1]
-        .split(',')
-        .map((v) => v.trim().replace(/["']/g, ''));
+      const values = projectInMatch[1].split(',').map((v) => v.trim().replace(/["']/g, ''));
 
       const ids: string[] = [];
       const keys: string[] = [];
@@ -126,9 +152,7 @@ export class QueryEngine {
     if (excludeMultiKey) {
       const notInMatch = jql.match(new RegExp(`${fieldName}\\s+not\\s+in\\s*\\(([^)]+)\\)`, 'i'));
       if (notInMatch) {
-        const values = notInMatch[1]
-          .split(',')
-          .map((v) => this.cleanValue(v));
+        const values = notInMatch[1].split(',').map((v) => this.cleanValue(v));
         (filters as any)[excludeMultiKey] = values;
         return;
       }
@@ -138,9 +162,7 @@ export class QueryEngine {
     if (multiKey) {
       const inMatch = jql.match(new RegExp(`${fieldName}\\s+in\\s*\\(([^)]+)\\)`, 'i'));
       if (inMatch) {
-        const values = inMatch[1]
-          .split(',')
-          .map((v) => this.cleanValue(v));
+        const values = inMatch[1].split(',').map((v) => this.cleanValue(v));
         (filters as any)[multiKey] = values;
         return;
       }
@@ -149,7 +171,9 @@ export class QueryEngine {
     // Check for != operator (with quoted or unquoted value)
     if (excludeKey) {
       // Try quoted first
-      const notEqualsQuotedMatch = jql.match(new RegExp(`${fieldName}\\s*!=\\s*["']([^"']+)["']`, 'i'));
+      const notEqualsQuotedMatch = jql.match(
+        new RegExp(`${fieldName}\\s*!=\\s*["']([^"']+)["']`, 'i')
+      );
       if (notEqualsQuotedMatch) {
         (filters as any)[excludeKey] = notEqualsQuotedMatch[1];
         return;
@@ -177,7 +201,11 @@ export class QueryEngine {
     }
   }
 
-  private parseUserField(jql: string, fieldName: 'assignee' | 'reporter', filters: IssueFilters): void {
+  private parseUserField(
+    jql: string,
+    fieldName: 'assignee' | 'reporter',
+    filters: IssueFilters
+  ): void {
     // Check for NOT IN
     const notInMatch = jql.match(new RegExp(`${fieldName}\\s+not\\s+in\\s*\\(([^)]+)\\)`, 'i'));
     if (notInMatch) {
@@ -199,7 +227,9 @@ export class QueryEngine {
     }
 
     // Check for !=
-    const notEqualsMatch = jql.match(new RegExp(`${fieldName}\\s*!=\\s*([^\\s,]+(?:\\([^)]*\\))?)`, 'i'));
+    const notEqualsMatch = jql.match(
+      new RegExp(`${fieldName}\\s*!=\\s*([^\\s,]+(?:\\([^)]*\\))?)`, 'i')
+    );
     if (notEqualsMatch) {
       const value = this.processUserValue(notEqualsMatch[1]);
       (filters as any)[`${fieldName}Exclude`] = value;
@@ -207,7 +237,9 @@ export class QueryEngine {
     }
 
     // Check for =
-    const equalsMatch = jql.match(new RegExp(`${fieldName}\\s*=\\s*([^\\s,]+(?:\\([^)]*\\))?)`, 'i'));
+    const equalsMatch = jql.match(
+      new RegExp(`${fieldName}\\s*=\\s*([^\\s,]+(?:\\([^)]*\\))?)`, 'i')
+    );
     if (equalsMatch) {
       const value = this.processUserValue(equalsMatch[1]);
       (filters as any)[fieldName] = value;
@@ -261,9 +293,7 @@ export class QueryEngine {
     // IN
     const inMatch = jql.match(/key\s+in\s*\(([^)]+)\)/i);
     if (inMatch) {
-      filters.keys = inMatch[1]
-        .split(',')
-        .map((k) => k.trim().replace(/["']/g, '').toUpperCase());
+      filters.keys = inMatch[1].split(',').map((k) => k.trim().replace(/["']/g, '').toUpperCase());
     }
   }
 
@@ -415,9 +445,7 @@ export class QueryEngine {
     // Check for IN
     const inMatch = jql.match(/component\s+in\s*\(([^)]+)\)/i);
     if (inMatch) {
-      filters.components = inMatch[1]
-        .split(',')
-        .map((v) => this.cleanValue(v));
+      filters.components = inMatch[1].split(',').map((v) => this.cleanValue(v));
       return;
     }
 
@@ -440,9 +468,7 @@ export class QueryEngine {
 
     const fixVersionInMatch = jql.match(/fixversion\s+in\s*\(([^)]+)\)/i);
     if (fixVersionInMatch) {
-      filters.fixVersions = fixVersionInMatch[1]
-        .split(',')
-        .map((v) => this.cleanValue(v));
+      filters.fixVersions = fixVersionInMatch[1].split(',').map((v) => this.cleanValue(v));
     } else {
       const fixVersionMatch = jql.match(/fixversion\s*=\s*["']?([^"'\s,]+(?:\s+[^"'\s,]+)*)["']?/i);
       if (fixVersionMatch) {
@@ -458,7 +484,9 @@ export class QueryEngine {
         .split(',')
         .map((v) => this.cleanValue(v));
     } else {
-      const affectedVersionMatch = jql.match(/affectedversion\s*=\s*["']?([^"'\s,]+(?:\s+[^"'\s,]+)*)["']?/i);
+      const affectedVersionMatch = jql.match(
+        /affectedversion\s*=\s*["']?([^"'\s,]+(?:\s+[^"'\s,]+)*)["']?/i
+      );
       if (affectedVersionMatch) {
         const quotedMatch = jql.match(/affectedversion\s*=\s*["']([^"']+)["']/i);
         filters.affectedVersion = quotedMatch ? quotedMatch[1] : affectedVersionMatch[1];
@@ -480,9 +508,7 @@ export class QueryEngine {
     // Check for IN
     const inMatch = jql.match(/sprint\s+in\s*\(([^)]+)\)/i);
     if (inMatch) {
-      filters.sprints = inMatch[1]
-        .split(',')
-        .map((v) => this.cleanValue(v));
+      filters.sprints = inMatch[1].split(',').map((v) => this.cleanValue(v));
       return;
     }
 

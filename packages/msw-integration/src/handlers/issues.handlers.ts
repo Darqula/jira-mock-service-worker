@@ -77,10 +77,7 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
       const issue = dataStore.getIssue(issueIdOrKey as string);
 
       if (!issue) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue does not exist'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Issue does not exist'] }, { status: 404 });
       }
 
       // Handle expand parameter: not supported — the stored issue already
@@ -113,34 +110,38 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
       const project = projectKey ? dataStore.getProject(projectKey) : undefined;
 
       if (!project) {
-        return HttpResponse.json(
-          { errorMessages: ['Project not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Project not found'] }, { status: 404 });
       }
 
       // Find issue type (build Map for O(1) lookup)
       const issueTypes = dataStore.getAllIssueTypes();
-      const issueTypeMap = new Map(issueTypes.flatMap(it => [[it.id, it], [it.name, it]]));
-      const issueType = (body.fields.issuetype.id && issueTypeMap.get(body.fields.issuetype.id)) ||
-                        (body.fields.issuetype.name && issueTypeMap.get(body.fields.issuetype.name));
+      const issueTypeMap = new Map(
+        issueTypes.flatMap((it) => [
+          [it.id, it],
+          [it.name, it],
+        ])
+      );
+      const issueType =
+        (body.fields.issuetype.id && issueTypeMap.get(body.fields.issuetype.id)) ||
+        (body.fields.issuetype.name && issueTypeMap.get(body.fields.issuetype.name));
 
       if (!issueType) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue type not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Issue type not found'] }, { status: 404 });
       }
 
       // Find priority (build Map for O(1) lookup)
       const priorities = dataStore.getAllPriorities();
-      const priorityMap = new Map(priorities.flatMap(p => [[p.id, p], [p.name, p]]));
-      const priority =
-        body.fields.priority
-          ? (body.fields.priority.id && priorityMap.get(body.fields.priority.id)) ||
-            (body.fields.priority.name && priorityMap.get(body.fields.priority.name)) ||
-            priorities[2]
-          : priorities[2];
+      const priorityMap = new Map(
+        priorities.flatMap((p) => [
+          [p.id, p],
+          [p.name, p],
+        ])
+      );
+      const priority = body.fields.priority
+        ? (body.fields.priority.id && priorityMap.get(body.fields.priority.id)) ||
+          (body.fields.priority.name && priorityMap.get(body.fields.priority.name)) ||
+          priorities[2]
+        : priorities[2];
 
       // Find or default status
       const statuses = dataStore.getAllStatuses();
@@ -215,10 +216,7 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
       const issue = dataStore.getIssue(issueIdOrKey as string);
 
       if (!issue) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue does not exist'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Issue does not exist'] }, { status: 404 });
       }
 
       // Update fields
@@ -266,10 +264,7 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
       const deleted = dataStore.deleteIssue(issueIdOrKey as string);
 
       if (!deleted) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue does not exist'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Issue does not exist'] }, { status: 404 });
       }
 
       return HttpResponse.json(null, { status: 204 });

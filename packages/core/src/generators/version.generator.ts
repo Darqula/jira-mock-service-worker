@@ -50,9 +50,9 @@ export class VersionGenerator {
   private generateVersionName(versionNumber: number, context: GenerationContext): string {
     // Choose from different version formats
     const formats = [
-      `${versionNumber}.0`,           // Simple: 1.0, 2.0, 3.0
-      `${versionNumber}.0.0`,         // Semantic: 1.0.0, 2.0.0, 3.0.0
-      `v${versionNumber}`,            // Prefixed: v1, v2, v3
+      `${versionNumber}.0`, // Simple: 1.0, 2.0, 3.0
+      `${versionNumber}.0.0`, // Semantic: 1.0.0, 2.0.0, 3.0.0
+      `v${versionNumber}`, // Prefixed: v1, v2, v3
       `${versionNumber}.${context.faker.number.int({ min: 0, max: 9 })}`, // With minor: 1.5, 2.3
     ];
 

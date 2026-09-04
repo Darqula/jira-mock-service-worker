@@ -47,8 +47,10 @@ status = Open OR status = "In Progress"
 ## Top 10 Most Valuable Improvements
 
 ### 1. 🔥 NOT EQUALS (`!=`) Operator
+
 **Why**: Essential for exclusions
 **Examples**:
+
 ```jql
 assignee != currentUser()           -- Not assigned to me
 status != Done                      -- Not completed
@@ -56,8 +58,10 @@ project != ARCHIVED                 -- Active projects only
 ```
 
 ### 2. 🔥 IN Operator for All Fields
+
 **Why**: Multi-value filtering is very common
 **Examples**:
+
 ```jql
 status IN ("To Do", "In Progress", "Blocked")
 assignee IN (user1, user2, user3)
@@ -66,8 +70,10 @@ labels IN (frontend, backend, urgent)
 ```
 
 ### 3. 🔥 IS EMPTY / IS NOT EMPTY
+
 **Why**: Finding unassigned, unresolved, or incomplete issues
 **Examples**:
+
 ```jql
 assignee IS EMPTY                   -- Unassigned issues
 resolution IS NOT EMPTY             -- Resolved issues
@@ -76,8 +82,10 @@ dueDate IS NOT EMPTY               -- Issues with deadlines
 ```
 
 ### 4. 🔥 Text Search (`~` operator)
+
 **Why**: Search across summaries, descriptions, comments
 **Examples**:
+
 ```jql
 summary ~ "performance"             -- Title contains "performance"
 description ~ "database error"      -- Description search
@@ -85,8 +93,10 @@ text ~ "critical bug"              -- Full-text search (all fields)
 ```
 
 ### 5. 🔥 Date Fields + Comparisons
+
 **Why**: Time-based filtering is crucial
 **Examples**:
+
 ```jql
 created >= "2024-01-01"            -- Created this year
 updated <= "2024-11-01"            -- Not updated recently
@@ -95,8 +105,10 @@ resolved IS EMPTY                  -- Unresolved issues
 ```
 
 ### 6. 🔥 OR Logical Operator
+
 **Why**: Alternative conditions are common
 **Examples**:
+
 ```jql
 status = Open OR status = "In Progress"
 assignee = currentUser() OR reporter = currentUser()
@@ -104,8 +116,10 @@ priority = Highest OR labels = urgent
 ```
 
 ### 7. 🔥 NOT IN Operator
+
 **Why**: Exclude multiple values
 **Examples**:
+
 ```jql
 status NOT IN (Done, Closed, Cancelled)
 priority NOT IN (Low, Lowest)
@@ -113,8 +127,10 @@ project NOT IN (ARCHIVED, OLD)
 ```
 
 ### 8. 🔥 Date Functions
+
 **Why**: Relative date queries
 **Examples**:
+
 ```jql
 created >= startOfWeek()           -- Created this week
 due <= endOfMonth()                -- Due this month
@@ -123,8 +139,10 @@ created >= now()                   -- Future dated (rare)
 ```
 
 ### 9. 🔥 NOT Operator & Parentheses
+
 **Why**: Complex query logic
 **Examples**:
+
 ```jql
 NOT assignee = currentUser()
 project = TEST AND (status = Open OR priority = High)
@@ -132,8 +150,10 @@ project = TEST AND (status = Open OR priority = High)
 ```
 
 ### 10. 🔥 ORDER BY (Full Implementation)
+
 **Why**: Already parsed but not executed
 **Examples**:
+
 ```jql
 project = TEST ORDER BY created DESC
 status = Open ORDER BY priority DESC, updated DESC
@@ -143,6 +163,7 @@ assignee = currentUser() ORDER BY due ASC
 ## Recommended Implementation Order
 
 ### Phase 1: Quick Wins (1-2 weeks)
+
 These are high-impact, low-effort improvements:
 
 1. **`!=` operator** - Very common, easy to implement
@@ -153,6 +174,7 @@ These are high-impact, low-effort improvements:
 **Result**: ~60% coverage of common JQL patterns
 
 ### Phase 2: Text & Dates (2-3 weeks)
+
 Critical search capabilities:
 
 5. **`~` (contains) operator** - Text search
@@ -163,6 +185,7 @@ Critical search capabilities:
 **Result**: ~80% coverage of common JQL patterns
 
 ### Phase 3: Complex Logic (3-4 weeks)
+
 Advanced query capabilities:
 
 9. **`OR` operator** - Alternative conditions
@@ -175,6 +198,7 @@ Advanced query capabilities:
 ## Example: Real-World JQL Queries
 
 ### Before (Not Supported)
+
 ```jql
 -- Find my overdue high-priority bugs
 assignee = currentUser()
@@ -185,6 +209,7 @@ assignee = currentUser()
 ```
 
 ### After Phase 1
+
 ```jql
 -- Partially supported
 assignee = currentUser()
@@ -193,6 +218,7 @@ assignee = currentUser()
 ```
 
 ### After Phase 2
+
 ```jql
 -- Mostly supported
 assignee = currentUser()
@@ -203,6 +229,7 @@ assignee = currentUser()
 ```
 
 ### After Phase 3
+
 ```jql
 -- Fully supported with complex logic
 (assignee = currentUser() OR reporter = currentUser())
@@ -215,28 +242,31 @@ assignee = currentUser()
 
 ## Impact Metrics
 
-| Phase | New Patterns | Coverage | Effort | Value |
-|-------|--------------|----------|--------|-------|
-| Current | 5 basic patterns | ~30% | - | Baseline |
-| Phase 1 | +10 patterns | ~60% | Low | ⭐⭐⭐⭐⭐ |
-| Phase 2 | +15 patterns | ~80% | Medium | ⭐⭐⭐⭐⭐ |
-| Phase 3 | +20 patterns | ~95% | High | ⭐⭐⭐⭐ |
+| Phase   | New Patterns     | Coverage | Effort | Value      |
+| ------- | ---------------- | -------- | ------ | ---------- |
+| Current | 5 basic patterns | ~30%     | -      | Baseline   |
+| Phase 1 | +10 patterns     | ~60%     | Low    | ⭐⭐⭐⭐⭐ |
+| Phase 2 | +15 patterns     | ~80%     | Medium | ⭐⭐⭐⭐⭐ |
+| Phase 3 | +20 patterns     | ~95%     | High   | ⭐⭐⭐⭐   |
 
 ## Common Use Cases Enabled
 
 ### Phase 1 Unlocks:
+
 - ✅ "Show me everything NOT in Done status"
 - ✅ "Find issues with multiple possible statuses"
 - ✅ "Show unassigned issues"
 - ✅ "Find resolved issues"
 
 ### Phase 2 Unlocks:
+
 - ✅ "Search for issues with 'bug' in the title"
 - ✅ "Find issues created this month"
 - ✅ "Show overdue issues"
 - ✅ "Find recently updated issues"
 
 ### Phase 3 Unlocks:
+
 - ✅ "My issues OR issues I reported"
 - ✅ "High priority OR has 'urgent' label, but not done"
 - ✅ "Complex filters with multiple alternatives"

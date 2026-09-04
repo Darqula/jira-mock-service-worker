@@ -76,9 +76,7 @@ describe('Jira API Integration Example', () => {
     it('should search issues by project', async () => {
       const project = dataStore.getAllProjects()[0];
 
-      const response = await fetch(
-        `${baseUrl}/rest/api/2/search?jql=project=${project.key}`
-      );
+      const response = await fetch(`${baseUrl}/rest/api/2/search?jql=project=${project.key}`);
       const result = await response.json();
 
       // issueCount is honored exactly: 10 issues per project
@@ -132,9 +130,7 @@ describe('Jira API Integration Example', () => {
 
   describe('JQL Search', () => {
     it('should search by status', async () => {
-      const response = await fetch(
-        `${baseUrl}/rest/api/2/search?jql=status="To Do"`
-      );
+      const response = await fetch(`${baseUrl}/rest/api/2/search?jql=status="To Do"`);
       const result = await response.json();
 
       result.issues.forEach((issue: any) => {
@@ -145,9 +141,7 @@ describe('Jira API Integration Example', () => {
     it('should search by assignee', async () => {
       const currentUser = dataStore.getCurrentUser();
 
-      const response = await fetch(
-        `${baseUrl}/rest/api/2/search?jql=assignee=currentUser()`
-      );
+      const response = await fetch(`${baseUrl}/rest/api/2/search?jql=assignee=currentUser()`);
       const result = await response.json();
 
       result.issues.forEach((issue: any) => {
@@ -160,18 +154,15 @@ describe('Jira API Integration Example', () => {
     it('should add a worklog to an issue', async () => {
       const issue = dataStore.getAllIssues()[0];
 
-      const response = await fetch(
-        `${baseUrl}/rest/api/2/issue/${issue.key}/worklog`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            timeSpentSeconds: 3600, // 1 hour
-            comment: 'Working on the issue',
-            started: new Date().toISOString(),
-          }),
-        }
-      );
+      const response = await fetch(`${baseUrl}/rest/api/2/issue/${issue.key}/worklog`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timeSpentSeconds: 3600, // 1 hour
+          comment: 'Working on the issue',
+          started: new Date().toISOString(),
+        }),
+      });
 
       expect(response.status).toBe(201);
 

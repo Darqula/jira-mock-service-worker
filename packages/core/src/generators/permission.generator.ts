@@ -173,10 +173,7 @@ export class PermissionGenerator {
     },
   ];
 
-  generateUserPermissions(
-    _user: User,
-    context: GenerationContext
-  ): Permission[] {
+  generateUserPermissions(_user: User, context: GenerationContext): Permission[] {
     const permissions: Permission[] = [];
 
     // Generate permissions based on user role
@@ -184,7 +181,7 @@ export class PermissionGenerator {
     const isAdmin = context.faker.datatype.boolean({ probability: 0.1 });
     const isDeveloper = context.faker.datatype.boolean({ probability: 0.6 });
 
-    PermissionGenerator.ALL_PERMISSIONS.forEach(perm => {
+    PermissionGenerator.ALL_PERMISSIONS.forEach((perm) => {
       let havePermission = false;
 
       if (isAdmin) {
@@ -192,8 +189,7 @@ export class PermissionGenerator {
         havePermission = true;
       } else if (isDeveloper) {
         // Developers have most permissions except admin and delete all
-        havePermission = !perm.key.includes('ADMINISTER') &&
-          !perm.key.includes('DELETE_ALL');
+        havePermission = !perm.key.includes('ADMINISTER') && !perm.key.includes('DELETE_ALL');
       } else {
         // Regular users have basic permissions
         havePermission = [
@@ -227,7 +223,7 @@ export class PermissionGenerator {
   }
 
   getPermission(key: string, havePermission: boolean, context: GenerationContext): Permission {
-    const perm = PermissionGenerator.ALL_PERMISSIONS.find(p => p.key === key);
+    const perm = PermissionGenerator.ALL_PERMISSIONS.find((p) => p.key === key);
 
     if (perm) {
       return {

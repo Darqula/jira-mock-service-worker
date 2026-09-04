@@ -8,15 +8,17 @@ describe('DataSection', () => {
 
   const defaultConfig: JiraMockConfig = {
     version: '1.0',
-    projects: [{
-      projectKey: 'TEST',
-      issueCount: 50,
-      data: {
-        assignees: ['user1@example.com', 'user2@example.com'],
-        priorities: ['Low', 'Medium', 'High'],
-        labels: ['bug', 'feature'],
+    projects: [
+      {
+        projectKey: 'TEST',
+        issueCount: 50,
+        data: {
+          assignees: ['user1@example.com', 'user2@example.com'],
+          priorities: ['Low', 'Medium', 'High'],
+          labels: ['bug', 'feature'],
+        },
       },
-    }],
+    ],
   };
 
   beforeEach(() => {
@@ -43,13 +45,15 @@ describe('DataSection', () => {
 
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultConfig,
-        projects: [{
-          ...defaultConfig.projects[0],
-          data: {
-            ...defaultConfig.projects[0].data,
-            assignees: ['user1@example.com', 'user2@example.com', 'newuser@example.com'],
+        projects: [
+          {
+            ...defaultConfig.projects[0],
+            data: {
+              ...defaultConfig.projects[0].data,
+              assignees: ['user1@example.com', 'user2@example.com', 'newuser@example.com'],
+            },
           },
-        }],
+        ],
       });
     });
 
@@ -68,21 +72,23 @@ describe('DataSection', () => {
     it('removes an assignee', () => {
       render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
-      const removeButtons = screen.getAllByRole('button').filter(button =>
-        button.querySelector('.lucide-x')
-      );
+      const removeButtons = screen
+        .getAllByRole('button')
+        .filter((button) => button.querySelector('.lucide-x'));
       // First remove button is for user1@example.com
       fireEvent.click(removeButtons[0]);
 
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultConfig,
-        projects: [{
-          ...defaultConfig.projects[0],
-          data: {
-            ...defaultConfig.projects[0].data,
-            assignees: ['user2@example.com'],
+        projects: [
+          {
+            ...defaultConfig.projects[0],
+            data: {
+              ...defaultConfig.projects[0].data,
+              assignees: ['user2@example.com'],
+            },
           },
-        }],
+        ],
       });
     });
   });
@@ -108,34 +114,38 @@ describe('DataSection', () => {
 
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultConfig,
-        projects: [{
-          ...defaultConfig.projects[0],
-          data: {
-            ...defaultConfig.projects[0].data,
-            priorities: ['Low', 'Medium', 'High', 'Urgent'],
+        projects: [
+          {
+            ...defaultConfig.projects[0],
+            data: {
+              ...defaultConfig.projects[0].data,
+              priorities: ['Low', 'Medium', 'High', 'Urgent'],
+            },
           },
-        }],
+        ],
       });
     });
 
     it('removes a priority', () => {
       render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
-      const removeButtons = screen.getAllByRole('button').filter(button =>
-        button.querySelector('.lucide-x')
-      );
+      const removeButtons = screen
+        .getAllByRole('button')
+        .filter((button) => button.querySelector('.lucide-x'));
       // After 2 assignee remove buttons, find priority remove button
       fireEvent.click(removeButtons[2]); // First priority (Low)
 
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultConfig,
-        projects: [{
-          ...defaultConfig.projects[0],
-          data: {
-            ...defaultConfig.projects[0].data,
-            priorities: ['Medium', 'High'],
+        projects: [
+          {
+            ...defaultConfig.projects[0],
+            data: {
+              ...defaultConfig.projects[0].data,
+              priorities: ['Medium', 'High'],
+            },
           },
-        }],
+        ],
       });
     });
   });
@@ -155,42 +165,46 @@ describe('DataSection', () => {
       fireEvent.change(input, { target: { value: 'enhancement' } });
 
       // Find Plus icon buttons (these are the add buttons)
-      const addButtons = screen.getAllByRole('button').filter(button =>
-        button.querySelector('.lucide-plus')
-      );
+      const addButtons = screen
+        .getAllByRole('button')
+        .filter((button) => button.querySelector('.lucide-plus'));
       // Third add button is for labels (after assignees and priorities)
       fireEvent.click(addButtons[2]);
 
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultConfig,
-        projects: [{
-          ...defaultConfig.projects[0],
-          data: {
-            ...defaultConfig.projects[0].data,
-            labels: ['bug', 'feature', 'enhancement'],
+        projects: [
+          {
+            ...defaultConfig.projects[0],
+            data: {
+              ...defaultConfig.projects[0].data,
+              labels: ['bug', 'feature', 'enhancement'],
+            },
           },
-        }],
+        ],
       });
     });
 
     it('removes a label', () => {
       render(<DataSection config={defaultConfig} onChange={mockOnChange} projectIndex={0} />);
 
-      const removeButtons = screen.getAllByRole('button').filter(button =>
-        button.querySelector('.lucide-x')
-      );
+      const removeButtons = screen
+        .getAllByRole('button')
+        .filter((button) => button.querySelector('.lucide-x'));
       // Last label remove button
       fireEvent.click(removeButtons[removeButtons.length - 1]);
 
       expect(mockOnChange).toHaveBeenCalledWith({
         ...defaultConfig,
-        projects: [{
-          ...defaultConfig.projects[0],
-          data: {
-            ...defaultConfig.projects[0].data,
-            labels: ['bug'],
+        projects: [
+          {
+            ...defaultConfig.projects[0],
+            data: {
+              ...defaultConfig.projects[0].data,
+              labels: ['bug'],
+            },
           },
-        }],
+        ],
       });
     });
   });

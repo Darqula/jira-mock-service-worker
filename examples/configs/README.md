@@ -10,29 +10,34 @@ document explains the fields.
 ## Files
 
 ### `minimal.json`
+
 The simplest possible configuration: a single project and nothing else. All other
 configuration values use the built-in epic-based defaults (~1,010 issues).
 
 **Use case:** Quick testing, simple mock data generation
 
 ### `small-project.json`
+
 A small team project (~58 issues) exercising most per-project fields: epics with
 children, standalone stories/tasks/bugs, sprints, versions, worklogs, custom data.
 
 **Use case:** A realistic small-team board
 
 ### `team-managed.json`
+
 A team-managed (Next-Gen) project (~123 issues) with weekly sprints and its own seed.
 
 **Use case:** Testing team-managed project behavior
 
 ### `large-project.json`
+
 A large enterprise project (~1,200 issues) spanning two years with 12 versions and
 heavy worklogging.
 
 **Use case:** Performance benchmarks and pagination testing
 
 ### `full-featured.json`
+
 The canonical reference example: every supported field on a single company-managed
 project (~360 issues).
 
@@ -40,10 +45,12 @@ project (~360 issues).
 Fields" section for a field-by-field walkthrough
 
 ### `multi-project.json`
+
 A three-project workspace (Backend, Frontend, Infrastructure), each configured
 independently.
 
 **Features demonstrated:**
+
 - Per-project seeds, status distributions, and worklog settings
 - Different issue counts per project (BACKEND derives ~55 issues from its epic config;
   FRONTEND and INFRA configure no `issueTypes`, so they use the built-in defaults,

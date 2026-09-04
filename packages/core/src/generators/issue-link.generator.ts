@@ -14,7 +14,7 @@ export class IssueLinkGenerator {
     const links: IssueLink[] = [];
 
     // Filter out the current issue
-    const otherIssues = allIssues.filter(i => i.id !== issue.id);
+    const otherIssues = allIssues.filter((i) => i.id !== issue.id);
     if (otherIssues.length === 0) {
       return [];
     }
@@ -37,21 +37,18 @@ export class IssueLinkGenerator {
   ): IssueLink | null {
     // Find issues not already linked
     const linkedIssueIds = new Set(
-      existingLinks.flatMap(l => [l.inwardIssue?.id, l.outwardIssue?.id].filter(Boolean))
+      existingLinks.flatMap((l) => [l.inwardIssue?.id, l.outwardIssue?.id].filter(Boolean))
     );
 
-    const availableIssues = otherIssues.filter(i => !linkedIssueIds.has(i.id));
+    const availableIssues = otherIssues.filter((i) => !linkedIssueIds.has(i.id));
     if (availableIssues.length === 0) {
       return null;
     }
 
     const id = context.idGenerator.next('issuelink');
-    const linkedIssue = availableIssues[
-      context.faker.number.int({ min: 0, max: availableIssues.length - 1 })
-    ];
-    const linkType = linkTypes[
-      context.faker.number.int({ min: 0, max: linkTypes.length - 1 })
-    ];
+    const linkedIssue =
+      availableIssues[context.faker.number.int({ min: 0, max: availableIssues.length - 1 })];
+    const linkType = linkTypes[context.faker.number.int({ min: 0, max: linkTypes.length - 1 })];
 
     const urls = generateSelfUrls();
 
@@ -73,7 +70,10 @@ export class IssueLinkGenerator {
     return link;
   }
 
-  private createLinkedIssue(issue: IssueBean, urls: ReturnType<typeof generateSelfUrls>): LinkedIssue {
+  private createLinkedIssue(
+    issue: IssueBean,
+    urls: ReturnType<typeof generateSelfUrls>
+  ): LinkedIssue {
     return {
       id: issue.id,
       key: issue.key,

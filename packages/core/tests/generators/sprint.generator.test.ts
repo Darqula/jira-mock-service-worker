@@ -248,9 +248,16 @@ describe('SprintGenerator', () => {
       sprintsWithGoals.forEach((sprint) => {
         expect(sprint.goal!.length).toBeGreaterThan(10);
         // Goals should contain action words
-        const hasAction = ['Complete', 'Improve', 'Fix', 'Launch', 'Enhance', 'Refactor', 'Deliver', 'Stabilize'].some(
-          (word) => sprint.goal!.includes(word)
-        );
+        const hasAction = [
+          'Complete',
+          'Improve',
+          'Fix',
+          'Launch',
+          'Enhance',
+          'Refactor',
+          'Deliver',
+          'Stabilize',
+        ].some((word) => sprint.goal!.includes(word));
         expect(hasAction).toBe(true);
       });
     });

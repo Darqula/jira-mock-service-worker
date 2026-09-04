@@ -10,7 +10,7 @@
       "endDate": "2024-12-31T23:59:59.999Z",
       "statusDistribution": {
         "toDo": 0.25,
-        "inProgress": 0.40,
+        "inProgress": 0.4,
         "done": 0.35
       },
       "issueTypes": {
@@ -20,7 +20,7 @@
           "assignProbability": 0.95,
           "labelProbability": 0.85,
           "childDistribution": {
-            "story": 0.50,
+            "story": 0.5,
             "task": 0.35,
             "bug": 0.15
           }
@@ -32,24 +32,24 @@
         },
         "task": {
           "standaloneCount": 15,
-          "assignProbability": 0.80,
-          "labelProbability": 0.70
+          "assignProbability": 0.8,
+          "labelProbability": 0.7
         },
         "bug": {
           "standaloneCount": 10,
           "assignProbability": 0.95,
-          "labelProbability": 0.90
+          "labelProbability": 0.9
         }
       },
       "sprints": {
         "startNumber": 1,
         "duration": 14,
-        "assignProbability": 0.80
+        "assignProbability": 0.8
       },
       "versions": {
         "startNumber": 1,
         "count": 6,
-        "assignProbability": 0.50
+        "assignProbability": 0.5
       },
       "worklogs": {
         "probability": 0.75,

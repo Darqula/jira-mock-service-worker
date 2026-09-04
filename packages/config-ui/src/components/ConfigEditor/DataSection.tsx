@@ -192,9 +192,7 @@ export function DataSection({ config, onChange, projectIndex }: DataSectionProps
               ))}
             </div>
           )}
-          <p className="text-xs text-muted-foreground">
-            Custom labels to use in issue generation
-          </p>
+          <p className="text-xs text-muted-foreground">Custom labels to use in issue generation</p>
         </div>
       </CardContent>
     </Card>

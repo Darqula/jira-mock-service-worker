@@ -5,11 +5,7 @@ import { getBuiltInDefaults } from '../config/defaults.js';
 import { shouldApply, randomInRange } from './utils/probability.js';
 
 export class WorklogGenerator {
-  generateWorklogs(
-    issue: IssueBean,
-    users: User[],
-    context: GenerationContext
-  ): Worklog[] {
+  generateWorklogs(issue: IssueBean, users: User[], context: GenerationContext): Worklog[] {
     const projectConfig = context.currentProject || getBuiltInDefaults();
     const worklogConfig = projectConfig.worklogs!;
 
@@ -33,11 +29,7 @@ export class WorklogGenerator {
     return worklogs;
   }
 
-  generateWorklog(
-    issue: IssueBean,
-    users: User[],
-    context: GenerationContext
-  ): Worklog {
+  generateWorklog(issue: IssueBean, users: User[], context: GenerationContext): Worklog {
     const projectConfig = context.currentProject || getBuiltInDefaults();
     const worklogConfig = projectConfig.worklogs!;
 
@@ -50,11 +42,7 @@ export class WorklogGenerator {
     const updated = started;
 
     // Generate time spent in hours based on config
-    const hours = randomInRange(
-      context.faker,
-      worklogConfig.hoursMin!,
-      worklogConfig.hoursMax!
-    );
+    const hours = randomInRange(context.faker, worklogConfig.hoursMin!, worklogConfig.hoursMax!);
     const timeSpentSeconds = Math.floor(hours * 3600);
     const timeSpent = this.formatTimeSpent(timeSpentSeconds);
     const urls = generateSelfUrls();
@@ -65,9 +53,7 @@ export class WorklogGenerator {
       issueId: issue.id,
       author,
       updateAuthor,
-      comment: context.faker.datatype.boolean()
-        ? context.faker.lorem.sentence()
-        : undefined,
+      comment: context.faker.datatype.boolean() ? context.faker.lorem.sentence() : undefined,
       created: created.toISOString(),
       updated: updated.toISOString(),
       started: started.toISOString(),

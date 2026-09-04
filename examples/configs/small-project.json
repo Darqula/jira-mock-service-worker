@@ -59,11 +59,7 @@
         "countMax": 5
       },
       "data": {
-        "assignees": [
-          "john.doe@example.com",
-          "jane.smith@example.com",
-          "bob.wilson@example.com"
-        ],
+        "assignees": ["john.doe@example.com", "jane.smith@example.com", "bob.wilson@example.com"],
         "priorities": ["High", "Medium", "Low"],
         "labels": ["frontend", "backend", "api", "bug", "enhancement", "documentation"]
       }

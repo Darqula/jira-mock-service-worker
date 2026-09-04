@@ -36,9 +36,7 @@ export class PriorityGenerator {
     let prioritiesToGenerate = PRIORITIES;
     if (configPriorities.length > 0) {
       prioritiesToGenerate = PRIORITIES.filter((p) =>
-        configPriorities.some(
-          (configName) => configName.toLowerCase() === p.name.toLowerCase()
-        )
+        configPriorities.some((configName) => configName.toLowerCase() === p.name.toLowerCase())
       );
 
       // If no matches found, fall back to all priorities

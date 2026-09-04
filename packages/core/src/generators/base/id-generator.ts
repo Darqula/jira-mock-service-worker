@@ -25,18 +25,7 @@ export class IdGenerator {
 
   // Generate Jira-style project keys (e.g., PROJ, TEST, DEV)
   projectKey(index: number): string {
-    const keys = [
-      'PROJ',
-      'TEST',
-      'DEV',
-      'DEMO',
-      'PROD',
-      'WORK',
-      'TASK',
-      'BUG',
-      'EPIC',
-      'STORY',
-    ];
+    const keys = ['PROJ', 'TEST', 'DEV', 'DEMO', 'PROD', 'WORK', 'TASK', 'BUG', 'EPIC', 'STORY'];
     if (index < keys.length) {
       return keys[index];
     }

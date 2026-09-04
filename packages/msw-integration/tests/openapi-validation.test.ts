@@ -46,12 +46,7 @@ describe('OpenAPI Schema Validation', () => {
       expect(response.status).toBe(200);
 
       const data = await response.json();
-      const result = validator.validateResponse(
-        '/rest/api/2/myself',
-        'GET',
-        200,
-        data
-      );
+      const result = validator.validateResponse('/rest/api/2/myself', 'GET', 200, data);
 
       if (!result.valid) {
         console.error('Validation errors:', result.errors);
@@ -63,9 +58,7 @@ describe('OpenAPI Schema Validation', () => {
       const users = dataStore.getAllUsers();
       const user = users[0];
 
-      const response = await fetch(
-        `${baseUrl}/rest/api/2/user?accountId=${user.accountId}`
-      );
+      const response = await fetch(`${baseUrl}/rest/api/2/user?accountId=${user.accountId}`);
       expect(response.status).toBe(200);
 
       const data = await response.json();
@@ -82,12 +75,7 @@ describe('OpenAPI Schema Validation', () => {
       expect(response.status).toBe(200);
 
       const data = await response.json();
-      const result = validator.validateResponse(
-        '/rest/api/2/user/search',
-        'GET',
-        200,
-        data
-      );
+      const result = validator.validateResponse('/rest/api/2/user/search', 'GET', 200, data);
 
       if (!result.valid) {
         console.error('Validation errors:', result.errors);
@@ -115,12 +103,7 @@ describe('OpenAPI Schema Validation', () => {
       expect(response.status).toBe(200);
 
       const data = await response.json();
-      const result = validator.validateResponse(
-        '/rest/api/2/project/search',
-        'GET',
-        200,
-        data
-      );
+      const result = validator.validateResponse('/rest/api/2/project/search', 'GET', 200, data);
 
       if (!result.valid) {
         console.error('Validation errors:', result.errors);
@@ -153,9 +136,7 @@ describe('OpenAPI Schema Validation', () => {
       const projects = dataStore.getAllProjects();
       const project = projects[0];
 
-      const response = await fetch(
-        `${baseUrl}/rest/api/2/project/${project.key}/statuses`
-      );
+      const response = await fetch(`${baseUrl}/rest/api/2/project/${project.key}/statuses`);
       expect(response.status).toBe(200);
 
       const data = await response.json();
@@ -182,12 +163,7 @@ describe('OpenAPI Schema Validation', () => {
       expect(response.status).toBe(200);
 
       const data = await response.json();
-      const result = validator.validateResponse(
-        `/rest/api/2/issue/${issue.key}`,
-        'GET',
-        200,
-        data
-      );
+      const result = validator.validateResponse(`/rest/api/2/issue/${issue.key}`, 'GET', 200, data);
 
       if (!result.valid) {
         console.error('Validation errors:', result.errors);
@@ -245,12 +221,7 @@ describe('OpenAPI Schema Validation', () => {
       expect(response.status).toBe(200);
 
       const data = await response.json();
-      const result = validator.validateResponse(
-        '/rest/api/2/issue/picker',
-        'GET',
-        200,
-        data
-      );
+      const result = validator.validateResponse('/rest/api/2/issue/picker', 'GET', 200, data);
 
       if (!result.valid) {
         console.error('Validation errors:', result.errors);
@@ -264,9 +235,7 @@ describe('OpenAPI Schema Validation', () => {
       const projects = dataStore.getAllProjects();
       const project = projects[0];
 
-      const response = await fetch(
-        `${baseUrl}/rest/api/2/search?jql=project=${project.key}`
-      );
+      const response = await fetch(`${baseUrl}/rest/api/2/search?jql=project=${project.key}`);
       expect(response.status).toBe(200);
 
       const data = await response.json();
@@ -285,12 +254,7 @@ describe('OpenAPI Schema Validation', () => {
       expect(response.status).toBe(200);
 
       const data = await response.json();
-      const result = validator.validateResponse(
-        '/rest/api/2/issuetype',
-        'GET',
-        200,
-        data
-      );
+      const result = validator.validateResponse('/rest/api/2/issuetype', 'GET', 200, data);
 
       if (!result.valid) {
         console.error('Validation errors:', result.errors);
@@ -329,12 +293,7 @@ describe('OpenAPI Schema Validation', () => {
       expect(response.status).toBe(200);
 
       const data = await response.json();
-      const result = validator.validateResponse(
-        '/rest/api/2/statuscategory',
-        'GET',
-        200,
-        data
-      );
+      const result = validator.validateResponse('/rest/api/2/statuscategory', 'GET', 200, data);
 
       if (!result.valid) {
         console.error('Validation errors:', result.errors);
@@ -348,9 +307,7 @@ describe('OpenAPI Schema Validation', () => {
       const issues = dataStore.getAllIssues();
       const issue = issues[0];
 
-      const response = await fetch(
-        `${baseUrl}/rest/api/2/issue/${issue.key}/worklog`
-      );
+      const response = await fetch(`${baseUrl}/rest/api/2/issue/${issue.key}/worklog`);
       expect(response.status).toBe(200);
 
       const data = await response.json();
@@ -371,18 +328,15 @@ describe('OpenAPI Schema Validation', () => {
       const issues = dataStore.getAllIssues();
       const issue = issues[0];
 
-      const response = await fetch(
-        `${baseUrl}/rest/api/2/issue/${issue.key}/worklog`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            timeSpentSeconds: 3600,
-            comment: 'Test worklog',
-            started: new Date().toISOString(),
-          }),
-        }
-      );
+      const response = await fetch(`${baseUrl}/rest/api/2/issue/${issue.key}/worklog`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timeSpentSeconds: 3600,
+          comment: 'Test worklog',
+          started: new Date().toISOString(),
+        }),
+      });
 
       expect(response.status).toBe(201);
 
@@ -406,9 +360,7 @@ describe('OpenAPI Schema Validation', () => {
       const projects = dataStore.getAllProjects();
       const project = projects[0];
 
-      const response = await fetch(
-        `${baseUrl}/rest/api/2/project/${project.key}/versions`
-      );
+      const response = await fetch(`${baseUrl}/rest/api/2/project/${project.key}/versions`);
       expect(response.status).toBe(200);
 
       const data = await response.json();
@@ -431,9 +383,7 @@ describe('OpenAPI Schema Validation', () => {
       const projects = dataStore.getAllProjects();
       const project = projects[0];
 
-      const response = await fetch(
-        `${baseUrl}/rest/api/2/project/${project.key}/components`
-      );
+      const response = await fetch(`${baseUrl}/rest/api/2/project/${project.key}/components`);
       expect(response.status).toBe(200);
 
       const data = await response.json();
@@ -457,12 +407,7 @@ describe('OpenAPI Schema Validation', () => {
       expect(response.status).toBe(200);
 
       const data = await response.json();
-      const result = validator.validateResponse(
-        '/rest/api/2/mypermissions',
-        'GET',
-        200,
-        data
-      );
+      const result = validator.validateResponse('/rest/api/2/mypermissions', 'GET', 200, data);
 
       if (!result.valid) {
         console.error('Validation errors:', result.errors);
@@ -476,9 +421,7 @@ describe('OpenAPI Schema Validation', () => {
       const issues = dataStore.getAllIssues();
       const issue = issues[0];
 
-      const response = await fetch(
-        `${baseUrl}/rest/api/2/issue/${issue.key}/transitions`
-      );
+      const response = await fetch(`${baseUrl}/rest/api/2/issue/${issue.key}/transitions`);
       expect(response.status).toBe(200);
 
       const data = await response.json();

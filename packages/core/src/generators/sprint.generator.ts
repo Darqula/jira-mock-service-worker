@@ -18,11 +18,7 @@ export class SprintGenerator {
   /**
    * Generates sprints based on project timeline and config
    */
-  generateSprints(
-    startDate: Date,
-    endDate: Date,
-    context: GenerationContext
-  ): Sprint[] {
+  generateSprints(startDate: Date, endDate: Date, context: GenerationContext): Sprint[] {
     const projectConfig = context.currentProject || getBuiltInDefaults();
     const sprintConfig = projectConfig.sprints!;
     const startNumber = sprintConfig.startNumber!;
@@ -185,9 +181,7 @@ export class SprintGenerator {
     }
 
     // Only assign to active or closed sprints (not future)
-    const validSprints = sprints.filter(
-      (s) => s.state === 'active' || s.state === 'closed'
-    );
+    const validSprints = sprints.filter((s) => s.state === 'active' || s.state === 'closed');
 
     if (validSprints.length === 0) {
       return undefined;

@@ -42,18 +42,18 @@ export async function POST(request: Request) {
         summary: i.fields.summary,
         projectKey: i.fields.project.key,
       })),
-      users: dataStore.getAllUsers().slice(0, 3).map((u) => ({
-        displayName: u.displayName,
-        emailAddress: u.emailAddress,
-      })),
+      users: dataStore
+        .getAllUsers()
+        .slice(0, 3)
+        .map((u) => ({
+          displayName: u.displayName,
+          emailAddress: u.emailAddress,
+        })),
       stats: dataStore.getStats(),
     };
 
     return NextResponse.json(preview);
   } catch (error) {
-    return NextResponse.json(
-      { error: (error as Error).message },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: (error as Error).message }, { status: 400 });
   }
 }

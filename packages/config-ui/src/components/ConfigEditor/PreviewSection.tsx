@@ -11,15 +11,14 @@ interface PreviewSectionProps {
 
 export function PreviewSection({ config }: PreviewSectionProps) {
   const projectCount = config.projects.length;
-  const totalIssues = config.projects.reduce((sum, project) => sum + calculateIssueCount(project), 0);
+  const totalIssues = config.projects.reduce(
+    (sum, project) => sum + calculateIssueCount(project),
+    0
+  );
   const estimatedUsers = Math.min(20, Math.max(10, projectCount * 3));
 
   // Rough estimation: ~2KB per issue, ~0.5KB per project, ~0.3KB per user
-  const estimatedSize = (
-    (totalIssues * 2) +
-    (projectCount * 0.5) +
-    (estimatedUsers * 0.3)
-  ).toFixed(1);
+  const estimatedSize = (totalIssues * 2 + projectCount * 0.5 + estimatedUsers * 0.3).toFixed(1);
 
   // Rough estimation: ~1ms per issue for generation
   const estimatedTime = (totalIssues / 1000).toFixed(2);
@@ -28,9 +27,7 @@ export function PreviewSection({ config }: PreviewSectionProps) {
     <Card>
       <CardHeader>
         <CardTitle>Preview</CardTitle>
-        <CardDescription>
-          What will be generated with this configuration
-        </CardDescription>
+        <CardDescription>What will be generated with this configuration</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -40,9 +37,7 @@ export function PreviewSection({ config }: PreviewSectionProps) {
               <FolderKanban className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                {projectCount}
-              </p>
+              <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{projectCount}</p>
               <p className="text-sm text-blue-700 dark:text-blue-300">Projects</p>
             </div>
           </div>

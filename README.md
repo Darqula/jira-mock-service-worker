@@ -122,32 +122,42 @@ The minimal configuration requires only `version` and at least one project:
 
 ```typescript
 interface JiraMockConfig {
-  version: '1.0';                    // Required: literal
-  projects: Array<{                  // Required: at least one, project keys unique
-    projectKey: string;              // Required: 1-10 chars, e.g. "PROJ", "APP2"
-    projectName?: string;            // Optional display name
+  version: '1.0'; // Required: literal
+  projects: Array<{
+    // Required: at least one, project keys unique
+    projectKey: string; // Required: 1-10 chars, e.g. "PROJ", "APP2"
+    projectName?: string; // Optional display name
     projectType?: 'company-managed' | 'team-managed';
-    seed?: number;                   // Reproducible generation for this project
-    issueCount?: number;             // Exact number of issues for this project (1-10000).
-                                     // When omitted, the count is derived from the issue
-                                     // types configuration (see Epic Hierarchy below).
-    statusDistribution?: {           // Probabilities (0-1), see below
-      toDo?: number; inProgress?: number; done?: number;
+    seed?: number; // Reproducible generation for this project
+    issueCount?: number; // Exact number of issues for this project (1-10000).
+    // When omitted, the count is derived from the issue
+    // types configuration (see Epic Hierarchy below).
+    statusDistribution?: {
+      // Probabilities (0-1), see below
+      toDo?: number;
+      inProgress?: number;
+      done?: number;
     };
-    issueTypes?: {                   // Epic/standalone generation, see below
-      epic?: { count?: number; childrenPerEpic?: number; /* ... */ };
-      story?: { standaloneCount?: number; /* ... */ };
-      task?: { standaloneCount?: number; /* ... */ };
-      bug?: { standaloneCount?: number; /* ... */ };
+    issueTypes?: {
+      // Epic/standalone generation, see below
+      epic?: { count?: number; childrenPerEpic?: number /* ... */ };
+      story?: { standaloneCount?: number /* ... */ };
+      task?: { standaloneCount?: number /* ... */ };
+      bug?: { standaloneCount?: number /* ... */ };
     };
     sprints?: { startNumber?: number; duration?: number; assignProbability?: number };
     versions?: { startNumber?: number; count?: number; assignProbability?: number };
-    worklogs?: { probability?: number; hoursMin?: number; hoursMax?: number;
-                 countMin?: number; countMax?: number };
+    worklogs?: {
+      probability?: number;
+      hoursMin?: number;
+      hoursMax?: number;
+      countMin?: number;
+      countMax?: number;
+    };
     data?: { assignees?: string[]; priorities?: string[]; labels?: string[] };
-    startIssueNumber?: number;       // First issue number (default 1)
-    startDate?: string;              // Full ISO 8601, e.g. '2024-01-01T00:00:00.000Z'
-    endDate?: string;                // Must be after startDate when both are set
+    startIssueNumber?: number; // First issue number (default 1)
+    startDate?: string; // Full ISO 8601, e.g. '2024-01-01T00:00:00.000Z'
+    endDate?: string; // Must be after startDate when both are set
   }>;
 }
 ```
@@ -157,9 +167,7 @@ interface JiraMockConfig {
 ```typescript
 const config = {
   version: '1.0',
-  projects: [
-    { projectKey: 'PROJ', issueCount: 50 },
-  ],
+  projects: [{ projectKey: 'PROJ', issueCount: 50 }],
 };
 ```
 
@@ -214,46 +222,47 @@ const config = {
   version: '1.0',
   projects: [
     {
-      projectKey: 'DEMO',                // Custom project key
+      projectKey: 'DEMO', // Custom project key
       projectName: 'Demo Project',
-      projectType: 'company-managed',    // or 'team-managed'
-      seed: 12345,                       // Reproducible data generation
-      startIssueNumber: 1,               // Starting issue number
+      projectType: 'company-managed', // or 'team-managed'
+      seed: 12345, // Reproducible data generation
+      startIssueNumber: 1, // Starting issue number
       startDate: '2024-01-01T00:00:00.000Z', // Full ISO 8601 datetime
       endDate: '2024-12-31T23:59:59.999Z',
 
       // Status distribution (probabilities, 0-1)
       statusDistribution: {
-        toDo: 0.3,       // 30% To Do
+        toDo: 0.3, // 30% To Do
         inProgress: 0.5, // 50% In Progress
-        done: 0.2,       // 20% Done
+        done: 0.2, // 20% Done
       },
 
       // Epic and issue type configuration
       issueTypes: {
         epic: {
-          count: 10,                 // Number of epics
-          childrenPerEpic: 30,       // Children per epic
-          assignProbability: 0.9,    // 90% chance of assignee
-          labelProbability: 0.8,     // 80% chance of labels
-          childDistribution: {       // Child type distribution
-            story: 0.5,  // 50% stories
-            task: 0.3,   // 30% tasks
-            bug: 0.2,    // 20% bugs
+          count: 10, // Number of epics
+          childrenPerEpic: 30, // Children per epic
+          assignProbability: 0.9, // 90% chance of assignee
+          labelProbability: 0.8, // 80% chance of labels
+          childDistribution: {
+            // Child type distribution
+            story: 0.5, // 50% stories
+            task: 0.3, // 30% tasks
+            bug: 0.2, // 20% bugs
           },
         },
         story: {
-          standaloneCount: 25,       // Stories not in epics
+          standaloneCount: 25, // Stories not in epics
           assignProbability: 0.85,
           labelProbability: 0.75,
         },
         task: {
-          standaloneCount: 15,       // Tasks not in epics
+          standaloneCount: 15, // Tasks not in epics
           assignProbability: 0.8,
           labelProbability: 0.7,
         },
         bug: {
-          standaloneCount: 10,       // Bugs not in epics
+          standaloneCount: 10, // Bugs not in epics
           assignProbability: 0.95,
           labelProbability: 0.9,
         },
@@ -261,38 +270,48 @@ const config = {
 
       // Sprint configuration
       sprints: {
-        startNumber: 1,              // Starting sprint number
-        duration: 14,                // Sprint duration in days
-        assignProbability: 0.7,      // 70% of issues in sprints
+        startNumber: 1, // Starting sprint number
+        duration: 14, // Sprint duration in days
+        assignProbability: 0.7, // 70% of issues in sprints
       },
 
       // Version/Release configuration
       versions: {
-        startNumber: 1,              // Starting version number
-        count: 6,                    // Number of versions
-        assignProbability: 0.5,      // 50% of issues have fix versions
+        startNumber: 1, // Starting version number
+        count: 6, // Number of versions
+        assignProbability: 0.5, // 50% of issues have fix versions
       },
 
       // Worklog configuration
       worklogs: {
-        probability: 0.75,           // 75% of issues have worklogs
-        hoursMin: 1,                 // Min hours per worklog
-        hoursMax: 8,                 // Max hours per worklog
-        countMin: 2,                 // Min worklogs per issue
-        countMax: 10,                // Max worklogs per issue
+        probability: 0.75, // 75% of issues have worklogs
+        hoursMin: 1, // Min hours per worklog
+        hoursMax: 8, // Max hours per worklog
+        countMin: 2, // Min worklogs per issue
+        countMax: 10, // Max worklogs per issue
       },
 
       // Data customization
       data: {
-        assignees: [                 // Custom user email list
+        assignees: [
+          // Custom user email list
           'john.doe@example.com',
           'jane.smith@example.com',
         ],
-        priorities: [                // Filter available priorities
-          'Highest', 'High', 'Medium', 'Low', 'Lowest'
+        priorities: [
+          // Filter available priorities
+          'Highest',
+          'High',
+          'Medium',
+          'Low',
+          'Lowest',
         ],
-        labels: [                    // Available labels
-          'frontend', 'backend', 'api', 'documentation'
+        labels: [
+          // Available labels
+          'frontend',
+          'backend',
+          'api',
+          'documentation',
         ],
       },
     },
@@ -350,22 +369,28 @@ hierarchy is never broken by dropping or orphaning issues. Otherwise, when
    `childrenPerEpic` as needed.
 
 #### Project Types
+
 - **Company-managed**: Traditional Jira projects with parent field for epic relationships
 - **Team-managed**: Next-Gen projects using custom ParentKey field
 
 #### Sprint Generation
+
 Sprints are automatically generated based on your date range and sprint duration:
+
 ```
 Number of Sprints = (End Date - Start Date) / Sprint Duration
 ```
 
 Sprints have realistic states:
+
 - **Future**: Starts after current date
 - **Active**: Currently running (1 sprint max)
 - **Closed**: Completed sprints
 
 #### Probability-Based Generation
+
 Many fields use probability (0-1) to control how often they appear:
+
 - `assignProbability`: Chance an issue has an assignee
 - `labelProbability`: Chance an issue has labels
 - `sprints.assignProbability`: Chance an issue is in a sprint
@@ -373,8 +398,10 @@ Many fields use probability (0-1) to control how often they appear:
 - `worklogs.probability`: Chance an issue has worklogs
 
 #### Data Seeding
+
 Use the per-project `seed` field for reproducible data generation (there is no top-level
 `seed` — it would be ignored):
+
 ```typescript
 const config = {
   version: '1.0',
@@ -407,6 +434,7 @@ try {
 ```
 
 For detailed configuration documentation, see:
+
 - [Example Configurations](./examples/configs/README.md) - Ready-to-use examples
 - [`packages/core/src/config/schema.ts`](./packages/core/src/config/schema.ts) - The Zod
   schema (single source of truth)
@@ -422,6 +450,7 @@ npm run dev
 ```
 
 The UI provides:
+
 - 🎨 **Visual config editor** with real-time validation
 - 📊 **Live preview** showing what will be generated
 - 💾 **Export/Import** configurations as JSON
@@ -454,6 +483,7 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 > your own handlers.
 
 ### Users & Permissions
+
 - `GET /rest/api/2/myself` - Get current user
 - `GET /rest/api/2/user` - Get user by accountId
 - `GET /rest/api/2/user/search` - Search users
@@ -462,23 +492,27 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 - `GET /rest/api/2/mypermissions` - Get current user's permissions
 
 ### User Properties
+
 - `GET /rest/api/2/user/properties/{propertyKey}` - Get user property
 - `PUT /rest/api/2/user/properties/{propertyKey}` - Set user property
 - `DELETE /rest/api/2/user/properties/{propertyKey}` - Delete user property
 
 ### Projects
+
 - `GET /rest/api/2/project` - Get all projects
 - `GET /rest/api/2/project/search` - Search projects
 - `GET /rest/api/2/project/{projectIdOrKey}` - Get project by ID or key
 - `GET /rest/api/2/project/{projectIdOrKey}/statuses` - Get project statuses
 
 ### Project Properties
+
 - `GET /rest/api/2/project/{projectIdOrKey}/properties` - List project property keys
 - `GET /rest/api/2/project/{projectIdOrKey}/properties/{propertyKey}` - Get project property
 - `PUT /rest/api/2/project/{projectIdOrKey}/properties/{propertyKey}` - Set project property
 - `DELETE /rest/api/2/project/{projectIdOrKey}/properties/{propertyKey}` - Delete project property
 
 ### Issues
+
 - `GET /rest/api/2/issue/{issueIdOrKey}` - Get issue (`expand` is accepted but ignored — all
   fields are already embedded in the stored issue; `changelog`/`transitions` expansions are not implemented)
 - `POST /rest/api/2/issue` - Create issue
@@ -487,10 +521,12 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 - `GET /rest/api/2/issue/picker` - Issue picker suggestions
 
 ### Issue Properties
+
 - `PUT /rest/api/2/issue/{issueIdOrKey}/properties/{propertyKey}` - Set issue property
 - `POST /rest/api/2/issue/properties/multi` - Get properties for multiple issues
 
 ### Comments
+
 - `GET /rest/api/2/issue/{issueIdOrKey}/comment` - Get all comments
 - `POST /rest/api/2/issue/{issueIdOrKey}/comment` - Add comment
 - `GET /rest/api/2/issue/{issueIdOrKey}/comment/{id}` - Get comment
@@ -498,21 +534,25 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 - `DELETE /rest/api/2/issue/{issueIdOrKey}/comment/{id}` - Delete comment
 
 ### Transitions
+
 - `GET /rest/api/2/issue/{issueIdOrKey}/transitions` - Get available transitions
 - `POST /rest/api/2/issue/{issueIdOrKey}/transitions` - Perform transition
 
 ### Issue Links
+
 - `GET /rest/api/2/issueLinkType` - Get all issue link types
 - `GET /rest/api/2/issueLink/{linkId}` - Get issue link
 - `POST /rest/api/2/issueLink` - Create issue link
 - `DELETE /rest/api/2/issueLink/{linkId}` - Delete issue link
 
 ### Attachments
+
 - `GET /rest/api/2/attachment/{id}` - Get attachment metadata
 - `POST /rest/api/2/issue/{issueIdOrKey}/attachments` - Add attachments
 - `DELETE /rest/api/2/attachment/{id}` - Delete attachment
 
 ### Components
+
 - `GET /rest/api/2/component` - Get all components (simple list)
 - `GET /rest/api/2/component/page` - Get component page
 - `GET /rest/api/2/component/{id}` - Get component
@@ -522,6 +562,7 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 - `GET /rest/api/2/project/{projectIdOrKey}/components` - Get project components
 
 ### Versions
+
 - `GET /rest/api/2/project/{projectIdOrKey}/versions` - Get project versions
 - `GET /rest/api/2/version/{id}` - Get version
 - `POST /rest/api/2/version` - Create version
@@ -530,6 +571,7 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 - `POST /rest/api/2/version/{id}/removeAndSwap` - Remove version and swap references
 
 ### Search & JQL
+
 - `GET /rest/api/2/search` - Search with JQL (GET)
 - `POST /rest/api/2/search/jql` - Search with JQL (POST)
 - `POST /rest/api/2/search/approximate-count` - Approximate match count
@@ -537,6 +579,7 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 - `GET /rest/api/2/jql/autocompletedata/suggestions` - JQL autocomplete suggestions
 
 ### Worklogs
+
 - `GET /rest/api/2/issue/{issueIdOrKey}/worklog` - Get worklogs
 - `POST /rest/api/2/issue/{issueIdOrKey}/worklog` - Add worklog
 - `PUT /rest/api/2/issue/{issueIdOrKey}/worklog/{worklogId}` - Update worklog
@@ -546,6 +589,7 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 - `GET /rest/api/2/worklog/deleted` - Get deleted worklog IDs
 
 ### Metadata
+
 - `GET /rest/api/2/issuetype` - Get all issue types
 - `GET /rest/api/2/issuetype/page` - Issue types (paged)
 - `GET /rest/api/2/issuetype/project` - Issue types for a project
@@ -560,6 +604,7 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 - `GET /rest/api/2/issue/{issueIdOrKey}/editmeta` - Edit-issue metadata
 
 ### Filters
+
 - `GET /rest/api/2/filter/{filterId}` - Get filter
 - `GET /rest/api/2/filter/search` - Search filters
 
@@ -622,10 +667,10 @@ console.log(`Created issue: ${key}`);
 ```typescript
 const response = await fetch(
   'https://your-domain.atlassian.net/rest/api/2/search?' +
-  new URLSearchParams({
-    jql: 'project = PROJ AND status = "In Progress"',
-    maxResults: '50',
-  })
+    new URLSearchParams({
+      jql: 'project = PROJ AND status = "In Progress"',
+      maxResults: '50',
+    })
 );
 
 const { issues, total } = await response.json();
@@ -650,7 +695,7 @@ const user = dataStore.getUser(accountId);
 // Search and query
 const results = dataStore.searchIssues({
   projectKey: 'PROJ',
-  status: 'In Progress'
+  status: 'In Progress',
 });
 ```
 
@@ -766,6 +811,7 @@ MIT
 ## Roadmap
 
 ### Iteration 1
+
 - ✅ Core data generation
 - ✅ Basic API endpoints (44 endpoints)
 - ✅ Basic JQL support
@@ -774,6 +820,7 @@ MIT
 - ✅ Next.js configuration UI
 
 ### Iteration 2
+
 - ✅ Comments - Full CRUD operations
 - ✅ Issue transitions & workflows
 - ✅ Attachments metadata support
@@ -783,6 +830,7 @@ MIT
 - ✅ 70+ API endpoints total
 
 ### Iteration 3 (Current)
+
 - ✅ Configuration extension system
 - ✅ Epic hierarchy with parent-child relationships
 - ✅ Sprint generation and lifecycle management
@@ -794,6 +842,7 @@ MIT
 - ✅ Enhanced TypeScript types and validation
 
 ### Future Iterations
+
 - 🔄 Advanced JQL support (complex queries, functions)
 - 🔄 Custom fields configuration
 - 🔄 Subtasks support

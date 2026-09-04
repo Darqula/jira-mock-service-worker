@@ -108,7 +108,8 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
 
   // Aggregate user emails from all projects
   const customAssignees = aggregateAssignees(validConfig);
-  const userCount = customAssignees.length > 0 ? customAssignees.length : faker.number.int({ min: 10, max: 20 });
+  const userCount =
+    customAssignees.length > 0 ? customAssignees.length : faker.number.int({ min: 10, max: 20 });
   const users = userGenerator.generateUsers(userCount, context);
   users.forEach((user) => dataStore.addUser(user));
 
@@ -173,8 +174,7 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
     // Target issue count: explicit issueCount wins, otherwise derived from the
     // issue types configuration (epic-based). Values below the epic count are
     // clamped up by the generator (all epics are always generated).
-    const issueCount =
-      mergedProjectConfig.issueCount ?? calculateIssueCount(mergedProjectConfig);
+    const issueCount = mergedProjectConfig.issueCount ?? calculateIssueCount(mergedProjectConfig);
 
     const issues = issueGenerator.generateIssues(
       project,
@@ -208,12 +208,7 @@ export function generateMockData(config: unknown): GenerateMockDataResult {
   // Generate issue links (after all issues are created)
   const allIssues = dataStore.getAllIssues();
   allIssues.forEach((issue) => {
-    const links = issueLinkGenerator.generateIssueLinks(
-      issue,
-      allIssues,
-      issueLinkTypes,
-      context
-    );
+    const links = issueLinkGenerator.generateIssueLinks(issue, allIssues, issueLinkTypes, context);
     links.forEach((link) => dataStore.addIssueLink(link));
   });
 

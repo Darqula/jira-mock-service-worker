@@ -190,7 +190,7 @@ export function calculateIssueCount(config: ProjectConfig): number {
   const bugCount = issueTypes.bug?.standaloneCount ?? 0;
 
   // Total = epics + (children per epic * number of epics) + standalone stories + standalone tasks + standalone bugs
-  return epicCount + (childrenPerEpic * epicCount) + storyCount + taskCount + bugCount;
+  return epicCount + childrenPerEpic * epicCount + storyCount + taskCount + bugCount;
 }
 
 /**

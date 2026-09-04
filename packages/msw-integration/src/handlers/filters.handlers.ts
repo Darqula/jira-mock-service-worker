@@ -56,10 +56,7 @@ export function createFiltersHandlers(dataStore: DataStore, baseUrl: string) {
       const filter = mockFilters.find((f) => f.id === filterId);
 
       if (!filter) {
-        return HttpResponse.json(
-          { errorMessages: ['Filter not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Filter not found'] }, { status: 404 });
       }
 
       return HttpResponse.json(filter);

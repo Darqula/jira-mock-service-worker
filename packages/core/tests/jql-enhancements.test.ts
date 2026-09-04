@@ -1,7 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { QueryEngine } from '../src/store/query-engine.js';
 import { DataStore } from '../src/store/data-store.js';
-import type { IssueBean, User, Project, Status, Priority, IssueType } from '../src/types/jira-schemas.js';
+import type {
+  IssueBean,
+  User,
+  Project,
+  Status,
+  Priority,
+  IssueType,
+} from '../src/types/jira-schemas.js';
 
 describe('JQL Enhancements', () => {
   let dataStore: DataStore;

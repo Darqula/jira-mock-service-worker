@@ -4,22 +4,22 @@ import type { DataStore } from '@jira-mock/core';
 export function createIssuePropertiesHandlers(dataStore: DataStore, baseUrl: string) {
   return [
     // PUT /rest/api/2/issue/:issueIdOrKey/properties/:propertyKey - Set issue property
-    http.put(`${baseUrl}/rest/api/2/issue/:issueIdOrKey/properties/:propertyKey`, async ({ params, request }) => {
-      const { issueIdOrKey, propertyKey } = params;
+    http.put(
+      `${baseUrl}/rest/api/2/issue/:issueIdOrKey/properties/:propertyKey`,
+      async ({ params, request }) => {
+        const { issueIdOrKey, propertyKey } = params;
 
-      const issue = dataStore.getIssue(issueIdOrKey as string);
-      if (!issue) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue not found'] },
-          { status: 404 }
-        );
+        const issue = dataStore.getIssue(issueIdOrKey as string);
+        if (!issue) {
+          return HttpResponse.json({ errorMessages: ['Issue not found'] }, { status: 404 });
+        }
+
+        const value = await request.json();
+        dataStore.setIssueProperty(issue.id, propertyKey as string, value);
+
+        return HttpResponse.json(null, { status: 201 });
       }
-
-      const value = await request.json();
-      dataStore.setIssueProperty(issue.id, propertyKey as string, value);
-
-      return HttpResponse.json(null, { status: 201 });
-    }),
+    ),
 
     // POST /rest/api/2/issue/properties/multi - Get properties for multiple issues
     http.post(`${baseUrl}/rest/api/2/issue/properties/multi`, async ({ request }) => {
@@ -38,9 +38,8 @@ export function createIssuePropertiesHandlers(dataStore: DataStore, baseUrl: str
       const result: any = {};
 
       // Convert propertyKeys to Set for O(1) lookup
-      const propertyKeySet = body.propertyKeys && body.propertyKeys.length > 0
-        ? new Set(body.propertyKeys)
-        : null;
+      const propertyKeySet =
+        body.propertyKeys && body.propertyKeys.length > 0 ? new Set(body.propertyKeys) : null;
 
       body.issueIds.forEach((issueId) => {
         const issue = dataStore.getIssue(issueId);

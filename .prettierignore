@@ -1,0 +1,10 @@
+package-lock.json
+dist/
+.next/
+coverage/
+node_modules/
+public/mockServiceWorker.js
+**/mockServiceWorker.js
+*.min.*
+
+jira_cloud_swagger.json

@@ -4,7 +4,7 @@ This checklist provides a step-by-step task list for removing `globalDefaults` a
 
 ## Phase 1: Core Package (`packages/core`)
 
-###  1.1 Type Definitions
+### 1.1 Type Definitions
 
 **File:** `packages/core/src/config/types.ts`
 
@@ -15,6 +15,7 @@ This checklist provides a step-by-step task list for removing `globalDefaults` a
 - [ ] Run TypeScript compiler to check for type errors
 
 **Verification:**
+
 ```bash
 cd packages/core
 npm run build
@@ -30,6 +31,7 @@ npm run build
 - [ ] Run schema validation tests
 
 **Verification:**
+
 ```bash
 npm test -- config.test
 ```
@@ -49,6 +51,7 @@ npm test -- config.test
 - [ ] Remove `globalDefaults` parameter from `getConfigValue()` if present
 
 **Code changes:**
+
 ```typescript
 // Update function signature (line ~170)
 export function mergeProjectWithDefaults(
@@ -76,6 +79,7 @@ export function getConfigValue<T>(
 ```
 
 **Verification:**
+
 ```bash
 npm run build
 npm test -- defaults
@@ -98,6 +102,7 @@ npm test -- defaults
 - [ ] Verify no other references to `validConfig.globalDefaults`
 
 **Code changes:**
+
 ```typescript
 // Remove (line ~63):
 // const globalSeed = validConfig.globalDefaults?.seed || Date.now();
@@ -118,6 +123,7 @@ const projectContext: GenerationContext = {
 ```
 
 **Verification:**
+
 ```bash
 npm run build
 npm test -- data-generation
@@ -134,6 +140,7 @@ npm test -- data-generation
 - [ ] Check warning generation doesn't reference `globalDefaults`
 
 **Verification:**
+
 ```bash
 grep -n "globalDefaults" packages/core/src/config/validator.ts
 npm test -- validator
@@ -148,6 +155,7 @@ npm test -- validator
 - [ ] Update comments if needed
 
 **Verification:**
+
 ```bash
 npm run build
 ```
@@ -188,6 +196,7 @@ npm run build
   ```
 
 **Verification:**
+
 ```bash
 cd packages/config-ui
 npm run build
@@ -201,6 +210,7 @@ npm run dev  # Visual check
 This is the MOST COMPLEX change. The ProjectsManager must now contain all configuration sections.
 
 - [ ] **Add imports for all section components:**
+
   ```typescript
   import { StatusSection } from './StatusSection';
   import { IssueTypesSection } from './IssueTypesSection';
@@ -211,6 +221,7 @@ This is the MOST COMPLEX change. The ProjectsManager must now contain all config
   ```
 
 - [ ] **Add Tabs component import (or Accordion):**
+
   ```typescript
   import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
   ```
@@ -235,80 +246,58 @@ This is the MOST COMPLEX change. The ProjectsManager must now contain all config
   - [ ] Or remove entirely since config is now in same card
 
 **New structure:**
+
 ```tsx
-{expandedProjects.has(index) && (
-  <CardContent className="space-y-4 pt-0">
-    {/* Basic Fields Grid */}
-    <div className="grid grid-cols-2 gap-4">
-      {/* ... existing fields ... */}
-    </div>
+{
+  expandedProjects.has(index) && (
+    <CardContent className="space-y-4 pt-0">
+      {/* Basic Fields Grid */}
+      <div className="grid grid-cols-2 gap-4">{/* ... existing fields ... */}</div>
 
-    {/* Configuration Sections */}
-    <div className="pt-4 border-t">
-      <Tabs defaultValue="status" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="status">Status</TabsTrigger>
-          <TabsTrigger value="types">Types</TabsTrigger>
-          <TabsTrigger value="sprints">Sprints</TabsTrigger>
-          <TabsTrigger value="versions">Versions</TabsTrigger>
-          <TabsTrigger value="worklogs">Worklogs</TabsTrigger>
-          <TabsTrigger value="data">Data</TabsTrigger>
-        </TabsList>
+      {/* Configuration Sections */}
+      <div className="pt-4 border-t">
+        <Tabs defaultValue="status" className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="status">Status</TabsTrigger>
+            <TabsTrigger value="types">Types</TabsTrigger>
+            <TabsTrigger value="sprints">Sprints</TabsTrigger>
+            <TabsTrigger value="versions">Versions</TabsTrigger>
+            <TabsTrigger value="worklogs">Worklogs</TabsTrigger>
+            <TabsTrigger value="data">Data</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="status">
-          <StatusSection
-            config={config}
-            onChange={onChange}
-            projectIndex={index}
-          />
-        </TabsContent>
+          <TabsContent value="status">
+            <StatusSection config={config} onChange={onChange} projectIndex={index} />
+          </TabsContent>
 
-        <TabsContent value="types">
-          <IssueTypesSection
-            config={config}
-            onChange={onChange}
-            projectIndex={index}
-          />
-        </TabsContent>
+          <TabsContent value="types">
+            <IssueTypesSection config={config} onChange={onChange} projectIndex={index} />
+          </TabsContent>
 
-        <TabsContent value="sprints">
-          <SprintsSection
-            config={config}
-            onChange={onChange}
-            projectIndex={index}
-          />
-        </TabsContent>
+          <TabsContent value="sprints">
+            <SprintsSection config={config} onChange={onChange} projectIndex={index} />
+          </TabsContent>
 
-        <TabsContent value="versions">
-          <VersionsSection
-            config={config}
-            onChange={onChange}
-            projectIndex={index}
-          />
-        </TabsContent>
+          <TabsContent value="versions">
+            <VersionsSection config={config} onChange={onChange} projectIndex={index} />
+          </TabsContent>
 
-        <TabsContent value="worklogs">
-          <WorklogsSection
-            config={config}
-            onChange={onChange}
-            projectIndex={index}
-          />
-        </TabsContent>
+          <TabsContent value="worklogs">
+            <WorklogsSection config={config} onChange={onChange} projectIndex={index} />
+          </TabsContent>
 
-        <TabsContent value="data">
-          <DataSection
-            config={config}
-            onChange={onChange}
-            projectIndex={index}
-          />
-        </TabsContent>
-      </Tabs>
-    </div>
-  </CardContent>
-)}
+          <TabsContent value="data">
+            <DataSection config={config} onChange={onChange} projectIndex={index} />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </CardContent>
+  );
+}
 ```
 
 **Verification:**
+
 ```bash
 npm run build
 npm run dev  # Visual check
@@ -323,20 +312,23 @@ All 6 section components must be updated with the same pattern.
 **File:** `packages/config-ui/src/components/ConfigEditor/StatusSection.tsx`
 
 - [ ] **Update interface:**
+
   ```typescript
   interface StatusSectionProps {
     config: JiraMockConfig;
     onChange: (config: JiraMockConfig) => void;
-    projectIndex: number;  // NEW
+    projectIndex: number; // NEW
   }
   ```
 
 - [ ] **Update component signature:**
+
   ```typescript
-  export function StatusSection({ config, onChange, projectIndex }: StatusSectionProps)
+  export function StatusSection({ config, onChange, projectIndex }: StatusSectionProps);
   ```
 
 - [ ] **Update value source:**
+
   ```typescript
   // OLD: const currentValue = config.globalDefaults?.statusDistribution
   // NEW:
@@ -344,6 +336,7 @@ All 6 section components must be updated with the same pattern.
   ```
 
 - [ ] **Update onChange handler:**
+
   ```typescript
   const updateValue = (field: keyof StatusDistribution, value: number) => {
     const newProjects = [...config.projects];
@@ -365,6 +358,7 @@ All 6 section components must be updated with the same pattern.
 - [ ] Keep only the form fields
 
 **Verification:**
+
 ```bash
 npm run build
 npm test -- StatusSection
@@ -380,6 +374,7 @@ npm test -- StatusSection
 - [ ] Same pattern as StatusSection
 
 **Verification:**
+
 ```bash
 npm run build
 npm test -- IssueTypesSection
@@ -395,6 +390,7 @@ npm test -- IssueTypesSection
 - [ ] Same pattern as StatusSection
 
 **Verification:**
+
 ```bash
 npm run build
 ```
@@ -409,6 +405,7 @@ npm run build
 - [ ] Same pattern as StatusSection
 
 **Verification:**
+
 ```bash
 npm run build
 ```
@@ -423,6 +420,7 @@ npm run build
 - [ ] Same pattern as StatusSection
 
 **Verification:**
+
 ```bash
 npm run build
 ```
@@ -437,6 +435,7 @@ npm run build
 - [ ] Same pattern as StatusSection
 
 **Verification:**
+
 ```bash
 npm run build
 npm test -- DataSection
@@ -462,6 +461,7 @@ Update each config file to remove `globalDefaults` and move settings to project 
 - [ ] Test config validates
 
 **Verification:**
+
 ```bash
 cd examples/configs
 node -e "console.log(JSON.parse(require('fs').readFileSync('multi-project.json', 'utf8')))"
@@ -516,6 +516,7 @@ node -e "console.log(JSON.parse(require('fs').readFileSync('multi-project.json',
 - [ ] Verify app runs correctly with new config
 
 **Verification:**
+
 ```bash
 cd examples/nextjs-openapi-tester
 npm run dev
@@ -562,11 +563,13 @@ npm run dev
   it('should use per-project config when specified', () => {
     const config: JiraMockConfig = {
       version: '1.0',
-      projects: [{
-        projectKey: 'TEST',
-        issueCount: 10,
-        statusDistribution: { toDo: 1.0, inProgress: 0, done: 0 },
-      }],
+      projects: [
+        {
+          projectKey: 'TEST',
+          issueCount: 10,
+          statusDistribution: { toDo: 1.0, inProgress: 0, done: 0 },
+        },
+      ],
     };
     const { dataStore } = generateMockData(config);
     // Verify all issues are "To Do" status
@@ -591,8 +594,8 @@ npm run dev
       ],
     };
     const { dataStore } = generateMockData(config);
-    const proj1Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'PROJ1');
-    const proj2Issues = dataStore.getAllIssues().filter(i => i.fields.project.key === 'PROJ2');
+    const proj1Issues = dataStore.getAllIssues().filter((i) => i.fields.project.key === 'PROJ1');
+    const proj2Issues = dataStore.getAllIssues().filter((i) => i.fields.project.key === 'PROJ2');
     // Verify PROJ1 issues are "To Do"
     // Verify PROJ2 issues are "Done"
   });
@@ -602,6 +605,7 @@ npm run dev
   - [ ] Ensure test still passes
 
 **Verification:**
+
 ```bash
 npm test -- data-generation
 ```
@@ -626,12 +630,14 @@ npm test -- data-generation
   it('should accept configuration with per-project settings', () => {
     const config = {
       version: '1.0',
-      projects: [{
-        projectKey: 'TEST',
-        issueCount: 10,
-        seed: 123,
-        statusDistribution: { toDo: 0.5, inProgress: 0.3, done: 0.2 },
-      }],
+      projects: [
+        {
+          projectKey: 'TEST',
+          issueCount: 10,
+          seed: 123,
+          statusDistribution: { toDo: 0.5, inProgress: 0.3, done: 0.2 },
+        },
+      ],
     };
     expect(() => validateConfig(config)).not.toThrow();
   });
@@ -639,6 +645,7 @@ npm test -- data-generation
 - [ ] Update any existing tests that use `globalDefaults`
 
 **Verification:**
+
 ```bash
 npm test -- config
 ```
@@ -652,6 +659,7 @@ npm test -- config
 - [ ] Verify all generator tests still pass
 
 **Verification:**
+
 ```bash
 grep -r "globalDefaults" packages/core/tests/generators/
 npm test -- generators
@@ -670,6 +678,7 @@ npm test -- generators
 - [ ] Verify all remaining tests pass
 
 **Verification:**
+
 ```bash
 cd packages/config-ui
 npm test -- ConfigEditor.integration
@@ -685,6 +694,7 @@ npm test -- ConfigEditor.integration
 - [ ] Verify existing tests still pass
 
 **Verification:**
+
 ```bash
 npm test -- ProjectsManager
 ```
@@ -692,6 +702,7 @@ npm test -- ProjectsManager
 #### Section tests
 
 **Files:**
+
 - `__tests__/StatusSection.test.tsx`
 - `__tests__/DataSection.test.tsx`
 - `__tests__/IssueTypesSection.test.tsx`
@@ -720,6 +731,7 @@ npm test -- ProjectsManager
   ```
 
 **Verification:**
+
 ```bash
 npm test -- StatusSection
 npm test -- DataSection
@@ -743,6 +755,7 @@ npm test -- IssueTypesSection
 - [ ] Verify tests still pass
 
 **Verification:**
+
 ```bash
 cd packages/msw-integration
 npm test
@@ -757,6 +770,7 @@ npm test
 - [ ] Verify tests still pass
 
 **Verification:**
+
 ```bash
 cd examples/vitest-example
 npm test

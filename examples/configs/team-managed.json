@@ -66,7 +66,17 @@
           "diana.qa@team.com"
         ],
         "priorities": ["Highest", "High", "Medium", "Low", "Lowest"],
-        "labels": ["ui", "ux", "backend", "api", "database", "testing", "design", "feature", "bugfix"]
+        "labels": [
+          "ui",
+          "ux",
+          "backend",
+          "api",
+          "database",
+          "testing",
+          "design",
+          "feature",
+          "bugfix"
+        ]
       }
     }
   ]

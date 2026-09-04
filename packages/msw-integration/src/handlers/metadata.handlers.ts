@@ -62,10 +62,7 @@ export function createMetadataHandlers(
 
       const project = dataStore.getProject(projectId);
       if (!project) {
-        return HttpResponse.json(
-          { errorMessages: ['Project not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Project not found'] }, { status: 404 });
       }
 
       // Every mock project shares one global issue type scheme, so the
@@ -102,10 +99,7 @@ export function createMetadataHandlers(
     http.get(`${baseUrl}/rest/api/2/resolution/:id`, ({ params }) => {
       const resolution = resolutions.find((r) => r.id === params.id);
       if (!resolution) {
-        return HttpResponse.json(
-          { errorMessages: ['Resolution not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Resolution not found'] }, { status: 404 });
       }
       return HttpResponse.json(resolution);
     }),
@@ -200,10 +194,7 @@ export function createMetadataHandlers(
 
       const project = dataStore.getProject(projectIdOrKey as string);
       if (!project) {
-        return HttpResponse.json(
-          { errorMessages: ['Project not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Project not found'] }, { status: 404 });
       }
 
       const issueTypes = dataStore.getAllIssueTypes();
@@ -233,43 +224,40 @@ export function createMetadataHandlers(
     }),
 
     // GET /rest/api/2/issue/createmeta/:projectIdOrKey/issuetypes/:issueTypeId - Get create metadata for specific issue type
-    http.get(`${baseUrl}/rest/api/2/issue/createmeta/:projectIdOrKey/issuetypes/:issueTypeId`, ({ params }) => {
-      const { projectIdOrKey, issueTypeId } = params;
+    http.get(
+      `${baseUrl}/rest/api/2/issue/createmeta/:projectIdOrKey/issuetypes/:issueTypeId`,
+      ({ params }) => {
+        const { projectIdOrKey, issueTypeId } = params;
 
-      const project = dataStore.getProject(projectIdOrKey as string);
-      if (!project) {
-        return HttpResponse.json(
-          { errorMessages: ['Project not found'] },
-          { status: 404 }
+        const project = dataStore.getProject(projectIdOrKey as string);
+        if (!project) {
+          return HttpResponse.json({ errorMessages: ['Project not found'] }, { status: 404 });
+        }
+
+        const issueType = dataStore.getAllIssueTypes().find((it) => it.id === issueTypeId);
+        if (!issueType) {
+          return HttpResponse.json({ errorMessages: ['Issue type not found'] }, { status: 404 });
+        }
+
+        const priorities = dataStore.getAllPriorities();
+        const users = dataStore.getAllUsers();
+        const components = dataStore.getComponentsByProject(project.id);
+        const versions = dataStore.getVersionsByProject(project.id);
+        const context = createGenerationContext(generationSeed);
+
+        const metaIssueType = createMetaGenerator.generateIssueTypeFields(
+          issueType,
+          project,
+          priorities,
+          users,
+          components,
+          versions,
+          context
         );
+
+        return HttpResponse.json(metaIssueType);
       }
-
-      const issueType = dataStore.getAllIssueTypes().find((it) => it.id === issueTypeId);
-      if (!issueType) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue type not found'] },
-          { status: 404 }
-        );
-      }
-
-      const priorities = dataStore.getAllPriorities();
-      const users = dataStore.getAllUsers();
-      const components = dataStore.getComponentsByProject(project.id);
-      const versions = dataStore.getVersionsByProject(project.id);
-      const context = createGenerationContext(generationSeed);
-
-      const metaIssueType = createMetaGenerator.generateIssueTypeFields(
-        issueType,
-        project,
-        priorities,
-        users,
-        components,
-        versions,
-        context
-      );
-
-      return HttpResponse.json(metaIssueType);
-    }),
+    ),
 
     // GET /rest/api/2/issue/:issueIdOrKey/editmeta - Get edit metadata
     http.get(`${baseUrl}/rest/api/2/issue/:issueIdOrKey/editmeta`, ({ params }) => {
@@ -277,10 +265,7 @@ export function createMetadataHandlers(
 
       const issue = dataStore.getIssue(issueIdOrKey as string);
       if (!issue) {
-        return HttpResponse.json(
-          { errorMessages: ['Issue not found'] },
-          { status: 404 }
-        );
+        return HttpResponse.json({ errorMessages: ['Issue not found'] }, { status: 404 });
       }
 
       const priorities = dataStore.getAllPriorities();

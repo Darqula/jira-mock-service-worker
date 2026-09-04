@@ -1,16 +1,13 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-export interface SliderProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+export interface SliderProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
   formatValue?: (value: number) => string;
 }
 
 const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
   ({ className, formatValue, value, onChange, ...props }, ref) => {
-    const displayValue = formatValue
-      ? formatValue(Number(value || 0))
-      : value;
+    const displayValue = formatValue ? formatValue(Number(value || 0)) : value;
 
     return (
       <div className="flex items-center gap-3">
@@ -27,9 +24,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
           onChange={onChange}
           {...props}
         />
-        <span className="min-w-[60px] text-sm font-medium text-right">
-          {displayValue}
-        </span>
+        <span className="min-w-[60px] text-sm font-medium text-right">{displayValue}</span>
       </div>
     );
   }

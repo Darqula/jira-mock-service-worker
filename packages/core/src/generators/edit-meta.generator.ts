@@ -126,11 +126,27 @@ export class EditMetaGenerator {
         key: 'resolution',
         operations: ['set'],
         allowedValues: [
-          { id: '1', name: 'Fixed', description: 'A fix for this issue is checked into the tree and tested.' },
-          { id: '2', name: 'Won\'t Fix', description: 'The problem described is an issue which will never be fixed.' },
-          { id: '3', name: 'Duplicate', description: 'The problem is a duplicate of an existing issue.' },
+          {
+            id: '1',
+            name: 'Fixed',
+            description: 'A fix for this issue is checked into the tree and tested.',
+          },
+          {
+            id: '2',
+            name: "Won't Fix",
+            description: 'The problem described is an issue which will never be fixed.',
+          },
+          {
+            id: '3',
+            name: 'Duplicate',
+            description: 'The problem is a duplicate of an existing issue.',
+          },
           { id: '4', name: 'Incomplete', description: 'The problem is not completely described.' },
-          { id: '5', name: 'Cannot Reproduce', description: 'All attempts at reproducing this issue failed.' },
+          {
+            id: '5',
+            name: 'Cannot Reproduce',
+            description: 'All attempts at reproducing this issue failed.',
+          },
         ],
       };
     }

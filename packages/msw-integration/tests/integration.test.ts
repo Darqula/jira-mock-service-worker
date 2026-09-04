@@ -80,9 +80,7 @@ describe('MSW Integration', () => {
     const projects = dataStore.getAllProjects();
     const projectKey = projects[0].key;
 
-    const response = await fetch(
-      `${baseUrl}/rest/api/2/search?jql=project=${projectKey}`
-    );
+    const response = await fetch(`${baseUrl}/rest/api/2/search?jql=project=${projectKey}`);
     expect(response.status).toBe(200);
 
     const result = await response.json();
@@ -176,9 +174,7 @@ describe('MSW Integration', () => {
     const issues = dataStore.getAllIssues();
     const issue = issues[0];
 
-    const response = await fetch(
-      `${baseUrl}/rest/api/2/issue/${issue.key}/worklog`
-    );
+    const response = await fetch(`${baseUrl}/rest/api/2/issue/${issue.key}/worklog`);
     expect(response.status).toBe(200);
 
     const result = await response.json();
@@ -189,9 +185,7 @@ describe('MSW Integration', () => {
   it('should return identical transitions for repeated GETs', async () => {
     const issueKey = dataStore.getAllIssues()[0].key;
 
-    const first = await (
-      await fetch(`${baseUrl}/rest/api/2/issue/${issueKey}/transitions`)
-    ).json();
+    const first = await (await fetch(`${baseUrl}/rest/api/2/issue/${issueKey}/transitions`)).json();
     const second = await (
       await fetch(`${baseUrl}/rest/api/2/issue/${issueKey}/transitions`)
     ).json();
@@ -256,9 +250,7 @@ describe('MSW Integration', () => {
     expect(resolutions[0].id).toBeDefined();
     expect(resolutions[0].name).toBeDefined();
 
-    const singleResponse = await fetch(
-      `${baseUrl}/rest/api/2/resolution/${resolutions[0].id}`
-    );
+    const singleResponse = await fetch(`${baseUrl}/rest/api/2/resolution/${resolutions[0].id}`);
     expect(singleResponse.status).toBe(200);
     expect((await singleResponse.json()).id).toBe(resolutions[0].id);
 
@@ -271,10 +263,10 @@ describe('MSW Integration', () => {
     const form = new FormData();
     form.append('file', new File(['hello world'], 'report.txt', { type: 'text/plain' }));
 
-    const response = await fetch(
-      `${baseUrl}/rest/api/2/issue/${issueKey}/attachments`,
-      { method: 'POST', body: form }
-    );
+    const response = await fetch(`${baseUrl}/rest/api/2/issue/${issueKey}/attachments`, {
+      method: 'POST',
+      body: form,
+    });
     expect(response.status).toBe(200);
 
     const result = await response.json();
