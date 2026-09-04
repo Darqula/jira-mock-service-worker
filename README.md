@@ -803,7 +803,7 @@ npm run test:watch --workspace @jira-mock/msw-integration
 
 ## Contributing
 
-Contributions are welcome! Please see our contributing guidelines (coming soon).
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
