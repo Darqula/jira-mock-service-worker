@@ -39,3 +39,6 @@ yarn-error.log*
 # Temporary files
 *.tmp
 .cache/
+
+# Working documents (not part of the public repo)
+PUBLIC_READINESS_PLAN.md

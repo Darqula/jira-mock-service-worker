@@ -25,7 +25,7 @@ describe('OpenAPI Schema Validation', () => {
   const { server, dataStore } = setupJiraMockServer({ config, baseUrl });
 
   // Initialize OpenAPI validator
-  const specPath = join(process.cwd(), '../../jira_cloud_swagger.json');
+  const specPath = join(process.cwd(), '../../docs/jira_cloud_swagger.json');
   const validator = new OpenAPIValidator(specPath);
 
   beforeAll(() => {

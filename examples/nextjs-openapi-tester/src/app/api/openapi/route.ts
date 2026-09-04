@@ -76,8 +76,8 @@ function filterOpenApiSpec(spec: any, mockedEndpoints: MockedEndpoint[]): any {
 
 export async function GET() {
   try {
-    // Read OpenAPI spec from project root
-    const specPath = join(process.cwd(), '../../jira_cloud_swagger.json');
+    // Read OpenAPI spec from the repo's docs/ directory
+    const specPath = join(process.cwd(), '../../docs/jira_cloud_swagger.json');
     const spec = readFileSync(specPath, 'utf-8');
     const openApiSpec = JSON.parse(spec);
 

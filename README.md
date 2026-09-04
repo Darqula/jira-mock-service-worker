@@ -703,6 +703,7 @@ const results = dataStore.searchIssues({
 
 ```
 jira-mock-service-worker/
+├── docs/                   # Vendored reference assets (Jira Cloud OpenAPI spec)
 ├── packages/
 │   ├── core/                 # Core data generation library
 │   │   ├── src/
