@@ -4,7 +4,7 @@ A comprehensive Mock Service Worker (MSW) integration for mocking Jira Cloud API
 
 ## Features
 
-- 🎯 **77 Jira Cloud API endpoints** mocked and ready to use
+- 🎯 **80 Jira Cloud API endpoints** mocked and ready to use
 - 🎲 **Realistic data generation** using faker.js with deterministic seeding
 - 🔍 **JQL query support** with advanced search, autocomplete, and match checking
 - 📦 **Full CRUD operations** for issues, projects, comments, worklogs, and more
@@ -474,7 +474,7 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 
 ## Supported Endpoints
 
-77 handlers are registered; all paths use the `/rest/api/2/` prefix.
+80 handlers are registered; all paths use the `/rest/api/2/` prefix.
 
 > **API version support:** only `/rest/api/2/` paths are mocked. Requests to the
 > Jira Cloud `/rest/api/3/` prefix are **not intercepted** and fall through to the
@@ -573,6 +573,7 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 ### Search & JQL
 
 - `GET /rest/api/2/search` - Search with JQL (GET)
+- `POST /rest/api/2/search` - Search with JQL (POST body, same semantics as GET)
 - `POST /rest/api/2/search/jql` - Search with JQL (POST)
 - `POST /rest/api/2/search/approximate-count` - Approximate match count
 - `POST /rest/api/2/jql/match` - Check whether issues match JQL
@@ -595,6 +596,8 @@ Open [http://localhost:3000](http://localhost:3000) to use the configuration UI.
 - `GET /rest/api/2/issuetype/project` - Issue types for a project
 - `GET /rest/api/2/field` - Get all fields
 - `GET /rest/api/2/priority` - Get all priorities
+- `GET /rest/api/2/resolution` - Get all resolutions
+- `GET /rest/api/2/resolution/{id}` - Get resolution by ID
 - `GET /rest/api/2/status` - Get all statuses
 - `GET /rest/api/2/statuscategory` - Get all status categories
 - `GET /rest/api/2/label` - Get all labels
@@ -814,7 +817,7 @@ MIT
 ### Iteration 1
 
 - ✅ Core data generation
-- ✅ Basic API endpoints (44 endpoints)
+- ✅ Basic API endpoints
 - ✅ Basic JQL support
 - ✅ CRUD operations
 - ✅ Comprehensive tests
@@ -828,7 +831,7 @@ MIT
 - ✅ Issue links & link types
 - ✅ Components CRUD operations
 - ✅ Versions CRUD operations
-- ✅ 70+ API endpoints total
+- ✅ Broadened endpoint coverage
 
 ### Iteration 3 (Current)
 
@@ -841,6 +844,7 @@ MIT
 - ✅ Configurable worklogs, versions, and assignees
 - ✅ Example configurations library
 - ✅ Enhanced TypeScript types and validation
+- ✅ 80 Jira Cloud API endpoints mocked (full list: [Supported Endpoints](#supported-endpoints))
 
 ### Future Iterations
 
