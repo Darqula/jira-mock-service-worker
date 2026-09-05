@@ -8,7 +8,7 @@
     "examples/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build --workspace @jira-mock/core && npm run build --workspace @jira-mock/msw-integration && npm run build --workspace @jira-mock/config-ui && npm run build --workspace nextjs-openapi-tester",
     "test": "npm run test --workspaces --if-present",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
