@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@jira-mock/core": "1.0.0",
@@ -18,6 +19,7 @@
     "swagger-ui-react": "^5.17.14"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "^20.10.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",

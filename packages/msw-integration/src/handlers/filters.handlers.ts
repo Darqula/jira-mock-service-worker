@@ -47,22 +47,9 @@ export function createFiltersHandlers(dataStore: DataStore, baseUrl: string) {
   };
 
   return [
-    // GET /rest/api/2/filter/:filterId - Get filter by ID
-    http.get(`${baseUrl}/rest/api/2/filter/:filterId`, ({ params }) => {
-      const { filterId } = params;
-      const currentUser = dataStore.getCurrentUser();
-
-      const mockFilters = getMockFilters(currentUser);
-      const filter = mockFilters.find((f) => f.id === filterId);
-
-      if (!filter) {
-        return HttpResponse.json({ errorMessages: ['Filter not found'] }, { status: 404 });
-      }
-
-      return HttpResponse.json(filter);
-    }),
-
     // GET /rest/api/2/filter/search - Search for filters
+    // Must be registered before /rest/api/2/filter/:filterId so MSW resolves
+    // /filter/search to this handler instead of a filter with id "search".
     http.get(`${baseUrl}/rest/api/2/filter/search`, ({ request }) => {
       const url = new URL(request.url);
       const startAt = parseInt(url.searchParams.get('startAt') || '0', 10);
@@ -82,6 +69,21 @@ export function createFiltersHandlers(dataStore: DataStore, baseUrl: string) {
         isLast: startAt + paginatedFilters.length >= total,
         values: paginatedFilters,
       });
+    }),
+
+    // GET /rest/api/2/filter/:filterId - Get filter by ID
+    http.get(`${baseUrl}/rest/api/2/filter/:filterId`, ({ params }) => {
+      const { filterId } = params;
+      const currentUser = dataStore.getCurrentUser();
+
+      const mockFilters = getMockFilters(currentUser);
+      const filter = mockFilters.find((f) => f.id === filterId);
+
+      if (!filter) {
+        return HttpResponse.json({ errorMessages: ['Filter not found'] }, { status: 404 });
+      }
+
+      return HttpResponse.json(filter);
     }),
   ];
 }

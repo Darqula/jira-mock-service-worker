@@ -12,6 +12,8 @@ out/
 
 # Testing
 coverage/
+test-results/
+playwright-report/
 
 # Environment variables
 .env

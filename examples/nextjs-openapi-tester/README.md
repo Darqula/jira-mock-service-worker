@@ -65,6 +65,15 @@ Open [http://localhost:3000](http://localhost:3000) to view the app.
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 - `npm run typecheck` - Run TypeScript type checking
+- `npm run test:e2e` - Run Playwright E2E tests (starts the production server automatically; run `npm run build` first)
+
+### Playwright E2E tests
+
+`tests/e2e/msw.spec.ts` verifies the real browser behavior that Node-based tests cannot reach:
+
+- the MSW service worker activates and exposes `window.jiraMock`
+- browser `fetch` calls to the mocked Jira origin are intercepted and answered by MSW
+- Swagger UI executes a request and renders the mocked response
 
 ## How It Works
 

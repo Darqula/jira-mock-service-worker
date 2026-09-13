@@ -258,6 +258,25 @@ describe('MSW Integration', () => {
     expect(missingResponse.status).toBe(404);
   });
 
+  it('should search filters and get a filter by id', async () => {
+    // /filter/search must not be captured by /filter/:filterId (route order)
+    const searchResponse = await fetch(`${baseUrl}/rest/api/2/filter/search?maxResults=2`);
+    expect(searchResponse.status).toBe(200);
+
+    const searchResult = await searchResponse.json();
+    expect(searchResult.maxResults).toBe(2);
+    expect(searchResult.total).toBeGreaterThan(0);
+    expect(Array.isArray(searchResult.values)).toBe(true);
+    expect(searchResult.values.length).toBeGreaterThan(0);
+    expect(searchResult.values[0].id).toBeDefined();
+    expect(searchResult.values[0].jql).toBeDefined();
+
+    const filterId = searchResult.values[0].id;
+    const byIdResponse = await fetch(`${baseUrl}/rest/api/2/filter/${filterId}`);
+    expect(byIdResponse.status).toBe(200);
+    expect((await byIdResponse.json()).id).toBe(filterId);
+  });
+
   it('should echo uploaded file metadata when posting attachments', async () => {
     const issueKey = dataStore.getAllIssues()[0].key;
     const form = new FormData();
