@@ -242,7 +242,6 @@ export {
   validateConfigWithWarnings,
   isValidConfig,
   getConfigErrors,
-  getHumanReadableErrors,
   ConfigValidationError,
 } from './config/validator.js';
 

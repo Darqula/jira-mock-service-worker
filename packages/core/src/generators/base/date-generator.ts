@@ -20,21 +20,6 @@ export class DateGenerator {
     return this.faker.date.between({ from, to });
   }
 
-  // Generate a recent date (within last 30 days)
-  recent(days: number = 30, refDate?: Date): Date {
-    return this.faker.date.recent({ days, refDate: refDate || this.baseDate });
-  }
-
-  // Generate a future date (for due dates, etc.)
-  future(years: number = 1, refDate?: Date): Date {
-    return this.faker.date.future({ years, refDate: refDate || this.baseDate });
-  }
-
-  // Generate project created date (1-3 years ago)
-  projectCreated(): Date {
-    return this.past(3);
-  }
-
   // Generate issue created date (within project timeframe)
   issueCreated(projectCreatedDate: Date, endDate?: Date): Date {
     return this.between(projectCreatedDate, endDate || this.baseDate);
@@ -49,15 +34,5 @@ export class DateGenerator {
   // Generate worklog date (after issue created)
   worklogDate(issueCreatedDate: Date): Date {
     return this.between(issueCreatedDate, this.baseDate);
-  }
-
-  // Format date as ISO string (Jira format)
-  toISOString(date: Date): string {
-    return date.toISOString();
-  }
-
-  // Format date as Jira date string (YYYY-MM-DD)
-  toJiraDateString(date: Date): string {
-    return date.toISOString().split('T')[0];
   }
 }

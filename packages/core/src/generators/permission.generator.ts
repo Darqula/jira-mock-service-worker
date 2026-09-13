@@ -221,29 +221,4 @@ export class PermissionGenerator {
 
     return permissions;
   }
-
-  getPermission(key: string, havePermission: boolean, context: GenerationContext): Permission {
-    const perm = PermissionGenerator.ALL_PERMISSIONS.find((p) => p.key === key);
-
-    if (perm) {
-      return {
-        id: context.idGenerator.next('permission'),
-        key: perm.key,
-        name: perm.name,
-        type: perm.type,
-        description: perm.description,
-        havePermission,
-      };
-    }
-
-    // Unknown permission
-    return {
-      id: context.idGenerator.next('permission'),
-      key,
-      name: key,
-      type: 'PROJECT',
-      description: `Permission for ${key}`,
-      havePermission: false,
-    };
-  }
 }

@@ -5,15 +5,9 @@ import type { JiraMockConfig, ProjectConfigWithKey } from '../config/types.js';
 import type {
   User,
   Project,
-  IssueBean,
   IssueType,
   Priority,
   Status,
-  StatusCategory,
-  Component,
-  Version,
-  Worklog,
-  Field,
 } from './jira-schemas.js';
 import type { Sprint } from '../generators/sprint.generator.js';
 
@@ -40,23 +34,4 @@ export interface IssueContext extends ProjectContext {
   priorities: Priority[];
   statuses: Status[];
   sprints?: Sprint[];
-}
-
-export interface DataStore {
-  users: User[];
-  projects: Project[];
-  issues: IssueBean[];
-  issueTypes: IssueType[];
-  priorities: Priority[];
-  statuses: Status[];
-  statusCategories: StatusCategory[];
-  components: Component[];
-  versions: Version[];
-  worklogs: Worklog[];
-  fields: Field[];
-}
-
-export interface Generator<T> {
-  generate(context: GenerationContext): T;
-  generateMany?(count: number, context: GenerationContext): T[];
 }

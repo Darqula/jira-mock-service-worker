@@ -51,11 +51,4 @@ export class IssueTypeGenerator {
       };
     });
   }
-
-  getRandomIssueType(issueTypes: IssueType[], context: GenerationContext): IssueType {
-    // Filter out subtasks for normal issues
-    const normalTypes = issueTypes.filter((t) => !t.subtask);
-    const index = context.faker.number.int({ min: 0, max: normalTypes.length - 1 });
-    return normalTypes[index];
-  }
 }

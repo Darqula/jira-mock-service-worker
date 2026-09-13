@@ -7,9 +7,3 @@ export function createFaker(seed?: number): Faker {
   }
   return fakerInstance;
 }
-
-export function createSeededFaker(seed: number): Faker {
-  const fakerInstance = faker;
-  fakerInstance.seed(seed);
-  return fakerInstance;
-}

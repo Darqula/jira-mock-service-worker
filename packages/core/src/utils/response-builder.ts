@@ -1,19 +1,3 @@
-import type { IssueBean } from '../types/jira-schemas.js';
-
-export interface ExpandOptions {
-  expand?: string;
-}
-
-export function buildIssueResponse(issue: IssueBean, _options: ExpandOptions = {}): IssueBean {
-  // For now, return the issue as-is
-  // In the future, we can handle expand parameters to include/exclude fields
-  return issue;
-}
-
-export function buildSelfUrl(baseUrl: string, path: string): string {
-  return `${baseUrl}${path}`;
-}
-
 export const DEFAULT_BASE_URL = 'https://your-domain.atlassian.net';
 
 export function generateSelfUrls(baseUrl: string = DEFAULT_BASE_URL) {

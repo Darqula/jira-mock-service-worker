@@ -92,20 +92,4 @@ export class UserGenerator {
       '32x32': urls.avatar('xsmall'),
     };
   }
-
-  getRandomUser(users: User[], context: GenerationContext): User {
-    const index = context.faker.number.int({ min: 0, max: users.length - 1 });
-    return users[index];
-  }
-
-  getRandomUserOrUndefined(
-    users: User[],
-    context: GenerationContext,
-    probability: number = 0.7
-  ): User | undefined {
-    if (context.faker.number.float() < probability) {
-      return this.getRandomUser(users, context);
-    }
-    return undefined;
-  }
 }
