@@ -4,12 +4,12 @@ A Next.js application for testing Jira API requests through an interactive OpenA
 
 ## Features
 
-- 🔧 **Interactive OpenAPI UI**: Test Jira API endpoints directly in the browser
-- 🎲 **Configurable Mock Data**: Use `jira-mock-config.json` to customize mock data generation
-- 🔄 **MSW Integration**: Browser-based request interception with Mock Service Worker
-- 📝 **Filtered API Display**: Shows only MSW-mocked endpoints from the full Jira Cloud API
-- 🎯 **Deterministic Testing**: Seeded data generation for reproducible tests
-- 🔌 **Maintainable**: Easy to add new endpoints via `mocked-endpoints.json`
+- **Interactive OpenAPI UI**: Test Jira API endpoints directly in the browser
+- **Configurable Mock Data**: Use `jira-mock-config.json` to customize mock data generation
+- **MSW Integration**: Browser-based request interception with Mock Service Worker
+- **Filtered API Display**: Shows only MSW-mocked endpoints from the full Jira Cloud API
+- **Deterministic Testing**: Seeded data generation for reproducible tests
+- **Extensible**: Add new endpoints via `mocked-endpoints.json`
 
 ## Getting Started
 
@@ -141,7 +141,7 @@ Add the new endpoint to `mocked-endpoints.json`:
 npm run dev
 ```
 
-The new endpoint will now appear in the OpenAPI UI!
+The new endpoint will now appear in the OpenAPI UI.
 
 ## Configuration Files
 

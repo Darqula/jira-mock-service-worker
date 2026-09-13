@@ -1,7 +1,7 @@
 {
   "name": "jira-mock-service-worker",
   "version": "1.0.0",
-  "description": "Mock Service Worker integration for Jira Cloud API testing and performance benchmarks",
+  "description": "Mock Service Worker integration for Jira Cloud API testing",
   "private": true,
   "workspaces": [
     "packages/*",

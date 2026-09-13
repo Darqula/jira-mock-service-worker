@@ -1,26 +1,25 @@
 # Jira Mock Service Worker
 
-A comprehensive Mock Service Worker (MSW) integration for mocking Jira Cloud API endpoints. Perfect for automated testing and performance benchmarks.
+A Mock Service Worker (MSW) integration for mocking Jira Cloud API endpoints, intended for automated testing.
 
 ## Features
 
-- 🎯 **80 Jira Cloud API endpoints** mocked and ready to use
-- 🎲 **Realistic data generation** using faker.js with deterministic seeding
-- 🔍 **JQL query support** with advanced search, autocomplete, and match checking
-- 📦 **Full CRUD operations** for issues, projects, comments, worklogs, and more
-- 💬 **Comments & Attachments** - Full support for issue discussions and file attachments
-- 🔗 **Issue Links & Transitions** - Complete workflow and relationship management
-- 📋 **Components & Versions** - Project organization, release tracking, and version swapping
-- 🏃 **Sprints & Agile** - Sprint generation with realistic lifecycle states
-- 🎯 **Epic Hierarchy** - Epics with children (stories/tasks/bugs) and configurable distribution
-- 📊 **Flexible Configuration** - Extensive customization of data generation
-- 🔐 **User Properties & Permissions** - User preferences and role-based access control
-- 🏷️ **Entity Properties** - Custom properties for users, projects, and issues
-- 📊 **Field Metadata** - Complete create/edit metadata for dynamic form generation
-- 🧪 **100% TypeScript** with strict type safety
-- ✅ **Thoroughly tested** with comprehensive test coverage
-- 🚀 **Easy setup** - less than 5 lines of code
-- 🌐 **Works everywhere** - Node.js and browser support
+- **80 Jira Cloud API endpoints** mocked (full list in [Supported Endpoints](#supported-endpoints))
+- **Deterministic data generation** using faker.js with seeding
+- **JQL query support** with autocomplete and match checking
+- **CRUD operations** for issues, projects, comments, worklogs, and more
+- **Comments & Attachments** - issue discussions and file attachments
+- **Issue Links & Transitions** - workflow and relationship management
+- **Components & Versions** - project organization, release tracking, and version swapping
+- **Sprints & Agile** - sprint generation with lifecycle states (future/active/closed)
+- **Epic Hierarchy** - epics with children (stories/tasks/bugs) and configurable distribution
+- **Per-project configuration** - customization of data generation
+- **User Properties & Permissions** - user preferences and role-based access control
+- **Entity Properties** - custom properties for users, projects, and issues
+- **Field Metadata** - create/edit metadata for form generation
+- **TypeScript** throughout
+- **Tested** with unit, integration, OpenAPI validation, and browser E2E tests
+- **Runs in** Node.js and the browser
 
 ## Installation
 
@@ -331,7 +330,7 @@ See the `examples/configs/` directory for ready-to-use configuration examples:
 - **small-project.json** - Small team project with customization (~58 issues)
 - **team-managed.json** - Team-managed (Next-Gen) project example (~123 issues)
 - **large-project.json** - Large enterprise project (~1,200 issues)
-- **full-featured.json** - Comprehensive feature showcase (~360 issues)
+- **full-featured.json** - Feature showcase covering most configuration options (~360 issues)
 - **multi-project.json** - Three projects with mixed settings (~2,075 issues total; the
   two projects without an `issueTypes` block use the built-in epic defaults)
 
@@ -441,7 +440,7 @@ For detailed configuration documentation, see:
 
 ## Configuration UI
 
-A beautiful Next.js web interface is available for creating and managing configurations:
+A Next.js web interface is available for creating and managing configurations:
 
 ```bash
 cd packages/config-ui
@@ -451,13 +450,13 @@ npm run dev
 
 The UI provides:
 
-- 🎨 **Visual config editor** with real-time validation
-- 📊 **Live preview** showing what will be generated
-- 💾 **Export/Import** configurations as JSON
-- 📋 **LocalStorage persistence** for your settings
-- 🌙 **Dark mode** support
-- 📱 **Responsive design** for mobile and desktop
-- ⚙️ **Editors for every configuration section:**
+- **Visual config editor** with real-time validation
+- **Live preview** showing what will be generated
+- **Export/Import** configurations as JSON
+- **LocalStorage persistence** for your settings
+- **Dark mode** support
+- **Responsive design** for mobile and desktop
+- **Editors for every configuration section:**
   - Projects (add/remove/clone, key, name, type, seed, start issue number)
   - Status distribution sliders
   - Issue types: epic hierarchy and standalone counts
@@ -816,51 +815,47 @@ MIT
 
 ### Iteration 1
 
-- ✅ Core data generation
-- ✅ Basic API endpoints
-- ✅ Basic JQL support
-- ✅ CRUD operations
-- ✅ Comprehensive tests
-- ✅ Next.js configuration UI
+- Core data generation
+- Basic API endpoints
+- Basic JQL support
+- CRUD operations
+- Test suite
+- Next.js configuration UI
 
 ### Iteration 2
 
-- ✅ Comments - Full CRUD operations
-- ✅ Issue transitions & workflows
-- ✅ Attachments metadata support
-- ✅ Issue links & link types
-- ✅ Components CRUD operations
-- ✅ Versions CRUD operations
-- ✅ Broadened endpoint coverage
+- Comments - Full CRUD operations
+- Issue transitions & workflows
+- Attachments metadata support
+- Issue links & link types
+- Components CRUD operations
+- Versions CRUD operations
+- Broadened endpoint coverage
 
 ### Iteration 3 (Current)
 
-- ✅ Configuration extension system
-- ✅ Epic hierarchy with parent-child relationships
-- ✅ Sprint generation and lifecycle management
-- ✅ Team-managed vs Company-managed projects
-- ✅ Probability-based data generation
-- ✅ Status distribution control
-- ✅ Configurable worklogs, versions, and assignees
-- ✅ Example configurations library
-- ✅ Enhanced TypeScript types and validation
-- ✅ 80 Jira Cloud API endpoints mocked (full list: [Supported Endpoints](#supported-endpoints))
+- Configuration extension system
+- Epic hierarchy with parent-child relationships
+- Sprint generation and lifecycle management
+- Team-managed vs Company-managed projects
+- Probability-based data generation
+- Status distribution control
+- Configurable worklogs, versions, and assignees
+- Example configurations library
+- Enhanced TypeScript types and validation
+- 80 Jira Cloud API endpoints mocked (full list: [Supported Endpoints](#supported-endpoints))
 
 ### Future Iterations
 
-- 🔄 Advanced JQL support (complex queries, functions)
-- 🔄 Custom fields configuration
-- 🔄 Subtasks support
-- 🔄 Agile board endpoints
-- 🔄 Webhooks simulation
-- 🔄 Real-time updates
-- 🔄 Advanced workflow schemes
-- 🔄 Configuration UI enhancements (visual editors for all new features)
+- Advanced JQL support (complex queries, functions)
+- Custom fields configuration
+- Subtasks support
+- Agile board endpoints
+- Webhooks simulation
+- Real-time updates
+- Advanced workflow schemes
+- Configuration UI enhancements (visual editors for all new features)
 
 ## Support
 
 For issues and questions, please open an issue on GitHub.
-
----
-
-Made with ❤️ for better Jira testing
