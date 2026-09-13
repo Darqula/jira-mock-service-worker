@@ -769,8 +769,8 @@ The MSW layer provides HTTP handlers:
 
 ### Prerequisites
 
-- Node.js 18+
-- npm 9+
+- Node.js 20.19+
+- npm 10+
 
 ### Setup
 
@@ -803,58 +803,9 @@ npm run test:coverage --workspace @jira-mock/core
 npm run test:watch --workspace @jira-mock/msw-integration
 ```
 
-## Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md).
-
 ## License
 
 MIT
-
-## Roadmap
-
-### Iteration 1
-
-- Core data generation
-- Basic API endpoints
-- Basic JQL support
-- CRUD operations
-- Test suite
-- Next.js configuration UI
-
-### Iteration 2
-
-- Comments - Full CRUD operations
-- Issue transitions & workflows
-- Attachments metadata support
-- Issue links & link types
-- Components CRUD operations
-- Versions CRUD operations
-- Broadened endpoint coverage
-
-### Iteration 3 (Current)
-
-- Configuration extension system
-- Epic hierarchy with parent-child relationships
-- Sprint generation and lifecycle management
-- Team-managed vs Company-managed projects
-- Probability-based data generation
-- Status distribution control
-- Configurable worklogs, versions, and assignees
-- Example configurations library
-- Enhanced TypeScript types and validation
-- 80 Jira Cloud API endpoints mocked (full list: [Supported Endpoints](#supported-endpoints))
-
-### Future Iterations
-
-- Advanced JQL support (complex queries, functions)
-- Custom fields configuration
-- Subtasks support
-- Agile board endpoints
-- Webhooks simulation
-- Real-time updates
-- Advanced workflow schemes
-- Configuration UI enhancements (visual editors for all new features)
 
 ## Support
 
