@@ -84,7 +84,6 @@ export default function Home() {
           defaultModelsExpandDepth={1}
           defaultModelExpandDepth={1}
           docExpansion="list"
-          {...({ validatorUrl: null } as any)}
         />
       )}
     </div>

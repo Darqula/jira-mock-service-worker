@@ -102,38 +102,80 @@ export const DEFAULT_PROJECT_CONFIG: Required<Omit<ProjectConfig, 'seed' | 'issu
   startIssueNumber: 1,
   startDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString(), // 6 months ago
   endDate: new Date().toISOString(),
+  projectType: 'company-managed',
 };
+
+/**
+ * Type guard for plain JSON-like objects (excludes arrays and null)
+ */
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Deep merge core. Recursively merges `source` into `target` and returns
+ * the merged result. Operates on `unknown` values so it can merge any
+ * nested object shape while remaining type-safe.
+ *
+ * Legacy semantics (preserved from the original implementation):
+ * - A `null` source value never overwrites an existing object in the
+ *   target (an artifact of `typeof null === 'object'` in the old code,
+ *   which routed the pair into the recursive branch where the null was
+ *   simply ignored). Non-object source values (primitives, arrays) do
+ *   overwrite the target as before.
+ * - Values taken from the source are always copied, never referenced,
+ *   so the merged result can be mutated without affecting the caller's
+ *   input objects.
+ */
+function deepMergeValues(target: unknown, source: unknown): unknown {
+  // Legacy behavior: a null/undefined source leaves an existing object
+  // untouched (returned as a copy); against non-object targets the value
+  // itself is used.
+  if (source === null || source === undefined) {
+    return isPlainObject(target) ? { ...target } : source;
+  }
+
+  if (!isPlainObject(source)) {
+    return source;
+  }
+
+  // Legacy behavior: merging an object into a missing/null target yields
+  // a shallow copy of the source.
+  if (!isPlainObject(target)) {
+    return { ...source };
+  }
+
+  const result: Record<string, unknown> = { ...target };
+
+  for (const [key, sourceValue] of Object.entries(source)) {
+    if (sourceValue === undefined) {
+      continue;
+    }
+
+    const targetValue = result[key];
+
+    if (isPlainObject(sourceValue) && isPlainObject(targetValue)) {
+      // Recursively merge nested objects
+      result[key] = deepMergeValues(targetValue, sourceValue);
+    } else if (sourceValue === null && isPlainObject(targetValue)) {
+      // Legacy behavior: a null source value never overwrites an existing
+      // object - keep a copy of the target value
+      result[key] = { ...targetValue };
+    } else {
+      // Override with source value
+      result[key] = sourceValue;
+    }
+  }
+
+  return result;
+}
 
 /**
  * Deep merge helper function
  * Merges source into target, recursively merging nested objects
  */
-function deepMerge<T extends Record<string, any>>(target: T, source: Partial<T>): T {
-  const result = { ...target } as any;
-
-  for (const key in source) {
-    if (Object.prototype.hasOwnProperty.call(source, key)) {
-      const sourceValue = source[key];
-      const targetValue = result[key];
-
-      if (
-        sourceValue !== undefined &&
-        targetValue !== undefined &&
-        typeof sourceValue === 'object' &&
-        typeof targetValue === 'object' &&
-        !Array.isArray(sourceValue) &&
-        !Array.isArray(targetValue)
-      ) {
-        // Recursively merge nested objects
-        result[key] = deepMerge(targetValue, sourceValue);
-      } else if (sourceValue !== undefined) {
-        // Override with source value
-        result[key] = sourceValue;
-      }
-    }
-  }
-
-  return result as T;
+function deepMerge<T extends object>(target: T, source: Partial<T>): T {
+  return deepMergeValues(target, source) as T;
 }
 
 /**

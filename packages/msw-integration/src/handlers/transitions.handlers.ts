@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import type { DataStore, DoTransitionInput } from '@jira-mock/core';
+import type { DataStore, DoTransitionInput, IssueFields } from '@jira-mock/core';
 import { TransitionGenerator } from '@jira-mock/core';
 import { createGenerationContext } from '../utils/generation-context.js';
 
@@ -87,7 +87,7 @@ export function createTransitionsHandlers(
         }
 
         // Perform the transition
-        const updates: any = {
+        const updates: { fields: Partial<IssueFields> } = {
           fields: {
             ...issue.fields,
             status: transition.to,

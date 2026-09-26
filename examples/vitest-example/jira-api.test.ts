@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import { setupJiraMockServer } from '@jira-mock/msw-integration/node';
+import type { SearchResults } from '@jira-mock/core';
 
 describe('Jira API Integration Example', () => {
   const baseUrl = 'https://your-domain.atlassian.net';
@@ -77,11 +78,11 @@ describe('Jira API Integration Example', () => {
       const project = dataStore.getAllProjects()[0];
 
       const response = await fetch(`${baseUrl}/rest/api/2/search?jql=project=${project.key}`);
-      const result = await response.json();
+      const result = (await response.json()) as SearchResults;
 
       // issueCount is honored exactly: 10 issues per project
       expect(result.total).toBe(10);
-      result.issues.forEach((issue: any) => {
+      result.issues.forEach((issue) => {
         expect(issue.fields.project.key).toBe(project.key);
       });
     });
@@ -131,9 +132,9 @@ describe('Jira API Integration Example', () => {
   describe('JQL Search', () => {
     it('should search by status', async () => {
       const response = await fetch(`${baseUrl}/rest/api/2/search?jql=status="To Do"`);
-      const result = await response.json();
+      const result = (await response.json()) as SearchResults;
 
-      result.issues.forEach((issue: any) => {
+      result.issues.forEach((issue) => {
         expect(issue.fields.status.name).toBe('To Do');
       });
     });
@@ -142,9 +143,9 @@ describe('Jira API Integration Example', () => {
       const currentUser = dataStore.getCurrentUser();
 
       const response = await fetch(`${baseUrl}/rest/api/2/search?jql=assignee=currentUser()`);
-      const result = await response.json();
+      const result = (await response.json()) as SearchResults;
 
-      result.issues.forEach((issue: any) => {
+      result.issues.forEach((issue) => {
         expect(issue.fields.assignee?.accountId).toBe(currentUser?.accountId);
       });
     });

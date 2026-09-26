@@ -12,13 +12,23 @@ interface MockedEndpointsConfig {
   endpoints: MockedEndpoint[];
 }
 
+/** Structural subset of an OpenAPI 3 document that this route touches. */
+interface OpenApiSpecLike {
+  info?: { description?: string; [key: string]: unknown };
+  paths?: Record<string, Record<string, unknown>>;
+  [key: string]: unknown;
+}
+
 /**
  * Filters the OpenAPI spec to only include mocked endpoints.
  * This ensures the OpenAPI UI only shows endpoints that are actually handled by MSW.
  */
-function filterOpenApiSpec(spec: any, mockedEndpoints: MockedEndpoint[]): any {
-  const filteredSpec = { ...spec };
-  const filteredPaths: any = {};
+function filterOpenApiSpec(
+  spec: OpenApiSpecLike,
+  mockedEndpoints: MockedEndpoint[]
+): OpenApiSpecLike {
+  const filteredSpec: OpenApiSpecLike = { ...spec };
+  const filteredPaths: Record<string, Record<string, unknown>> = {};
 
   // Create a map of normalized paths to their allowed methods
   const endpointMap = new Map<string, Set<string>>();
@@ -35,9 +45,9 @@ function filterOpenApiSpec(spec: any, mockedEndpoints: MockedEndpoint[]): any {
 
     if (allowedMethods) {
       // This path is mocked - filter to only include mocked methods
-      const filteredPathItem: any = {};
+      const filteredPathItem: Record<string, unknown> = {};
 
-      for (const [method, operation] of Object.entries(pathItem as any)) {
+      for (const [method, operation] of Object.entries(pathItem)) {
         // Copy non-HTTP method properties (like parameters, servers, etc.)
         if (
           !['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace'].includes(
@@ -79,7 +89,7 @@ export async function GET() {
     // Read OpenAPI spec from the repo's docs/ directory
     const specPath = join(process.cwd(), '../../docs/jira_cloud_swagger.json');
     const spec = readFileSync(specPath, 'utf-8');
-    const openApiSpec = JSON.parse(spec);
+    const openApiSpec = JSON.parse(spec) as OpenApiSpecLike;
 
     // Read mocked endpoints configuration
     const mockedEndpointsPath = join(process.cwd(), 'mocked-endpoints.json');

@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import type { DataStore, CreateIssueInput, UpdateIssueInput } from '@jira-mock/core';
+import type { DataStore, CreateIssueInput, UpdateIssueInput, IssueFields } from '@jira-mock/core';
 
 export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
   // High-water marks (Jira never reuses an issue number/id after a deletion).
@@ -220,7 +220,7 @@ export function createIssuesHandlers(dataStore: DataStore, baseUrl: string) {
       }
 
       // Update fields
-      const updates: any = {};
+      const updates: { fields?: Partial<IssueFields> } = {};
 
       if (body.fields) {
         const fields = body.fields;

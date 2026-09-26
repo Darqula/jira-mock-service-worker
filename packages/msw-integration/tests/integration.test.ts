@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import { setupJiraMockServer } from '../src/setup/node.js';
-import type { JiraMockConfig } from '@jira-mock/core';
+import type { JiraMockConfig, SearchResults } from '@jira-mock/core';
 
 describe('MSW Integration', () => {
   const config: JiraMockConfig = {
@@ -83,9 +83,9 @@ describe('MSW Integration', () => {
     const response = await fetch(`${baseUrl}/rest/api/2/search?jql=project=${projectKey}`);
     expect(response.status).toBe(200);
 
-    const result = await response.json();
+    const result = (await response.json()) as SearchResults;
     expect(result.issues.length).toBeGreaterThan(0);
-    result.issues.forEach((issue: any) => {
+    result.issues.forEach((issue) => {
       expect(issue.fields.project.key).toBe(projectKey);
     });
   });
@@ -234,10 +234,10 @@ describe('MSW Integration', () => {
     });
     expect(response.status).toBe(200);
 
-    const result = await response.json();
+    const result = (await response.json()) as SearchResults;
     expect(result.total).toBeGreaterThan(0);
     expect(result.issues).toHaveLength(3);
-    result.issues.forEach((issue: any) => {
+    result.issues.forEach((issue) => {
       expect(issue.fields.project.key).toBe(projectKey);
     });
   });

@@ -1,6 +1,19 @@
 import { setupJiraMockWorker } from '@jira-mock/msw-integration/browser';
 import type { JiraMockConfig } from '@jira-mock/core';
 
+type JiraMockWorkerBundle = ReturnType<typeof setupJiraMockWorker>;
+
+declare global {
+  interface Window {
+    jiraMock?: {
+      worker: JiraMockWorkerBundle['worker'];
+      dataStore: JiraMockWorkerBundle['dataStore'];
+      queryEngine: JiraMockWorkerBundle['queryEngine'];
+      config: JiraMockConfig;
+    };
+  }
+}
+
 // Load config from public directory
 let config: JiraMockConfig;
 
@@ -39,7 +52,7 @@ export async function initMocks() {
   try {
     const response = await fetch('/api/config');
     if (response.ok) {
-      config = await response.json();
+      config = (await response.json()) as JiraMockConfig;
     }
   } catch (error) {
     console.warn('Failed to fetch config, using defaults:', error);
@@ -61,7 +74,7 @@ export async function initMocks() {
 
   // Expose to window for debugging
   if (typeof window !== 'undefined') {
-    (window as any).jiraMock = {
+    window.jiraMock = {
       worker,
       dataStore,
       queryEngine,

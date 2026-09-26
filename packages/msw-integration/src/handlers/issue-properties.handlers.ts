@@ -35,7 +35,7 @@ export function createIssuePropertiesHandlers(dataStore: DataStore, baseUrl: str
         );
       }
 
-      const result: any = {};
+      const result: Record<string, unknown> = {};
 
       // Convert propertyKeys to Set for O(1) lookup
       const propertyKeySet =
@@ -55,7 +55,7 @@ export function createIssuePropertiesHandlers(dataStore: DataStore, baseUrl: str
           if (properties.length > 0) {
             result[issue.id] = {
               self: `${baseUrl}/rest/api/2/issue/${issue.key}/properties`,
-              properties: properties.reduce((acc: any, prop) => {
+              properties: properties.reduce<Record<string, unknown>>((acc, prop) => {
                 acc[prop.key] = prop.value;
                 return acc;
               }, {}),

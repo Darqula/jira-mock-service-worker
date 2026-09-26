@@ -22,12 +22,13 @@ describe('SprintGenerator', () => {
       dateGenerator: new DateGenerator(faker),
       seed: 12345,
       currentProject: {
+        projectKey: 'TEST',
         sprints: {
           startNumber: 1,
           duration: 14,
           assignProbability: 0.7,
         },
-      } as any,
+      },
     };
   });
 

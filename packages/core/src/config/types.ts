@@ -154,6 +154,8 @@ export interface ProjectConfig {
   startDate?: string;
   /** End date for issue generation (ISO 8601). Default: today */
   endDate?: string;
+  /** Project type. Default: "company-managed" */
+  projectType?: ProjectType;
 }
 
 /**
@@ -166,8 +168,6 @@ export interface ProjectConfigWithKey extends ProjectConfig {
   projectKey: string;
   /** Project name - Optional display name */
   projectName?: string;
-  /** Project type. Default: "company-managed" */
-  projectType?: ProjectType;
 }
 
 /**

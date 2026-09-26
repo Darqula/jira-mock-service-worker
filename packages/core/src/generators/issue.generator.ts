@@ -10,7 +10,7 @@ import type {
   Version,
 } from '../types/jira-schemas.js';
 import type { IssueContext } from '../types/generator.types.js';
-import type { IssueTypesConfig } from '../config/types.js';
+import type { IssueTypesConfig, ProjectConfig } from '../config/types.js';
 import { generateSelfUrls } from '../utils/response-builder.js';
 import { getBuiltInDefaults } from '../config/defaults.js';
 import { shouldApply, weightedPick, normalizeDistribution } from './utils/probability.js';
@@ -708,7 +708,7 @@ export class IssueGenerator {
     }
 
     // Add parent relationship
-    if ((projectConfig as any).projectType === 'team-managed') {
+    if (projectConfig.projectType === 'team-managed') {
       // Team-managed projects use custom field
       fields.customFieldValues = fields.customFieldValues || [];
       fields.customFieldValues.push({
@@ -862,7 +862,7 @@ export class IssueGenerator {
    */
   private getIssueTypeConfig(
     issueTypeName: string,
-    projectConfig: any
+    projectConfig: ProjectConfig
   ): {
     assignProbability: number;
     labelProbability: number;

@@ -143,17 +143,17 @@ export class QueryEngine {
     jql: string,
     fieldName: string,
     filters: IssueFilters,
-    singleKey: string,
-    multiKey?: string,
-    excludeKey?: string,
-    excludeMultiKey?: string
+    singleKey: 'issueType' | 'status' | 'priority' | 'resolution',
+    multiKey?: 'issueTypes' | 'statuses' | 'priorities' | 'resolutions',
+    excludeKey?: 'issueTypeExclude' | 'statusExclude' | 'priorityExclude',
+    excludeMultiKey?: 'issueTypesExclude' | 'statusesExclude' | 'prioritiesExclude'
   ): void {
     // Check for NOT IN operator
     if (excludeMultiKey) {
       const notInMatch = jql.match(new RegExp(`${fieldName}\\s+not\\s+in\\s*\\(([^)]+)\\)`, 'i'));
       if (notInMatch) {
         const values = notInMatch[1].split(',').map((v) => this.cleanValue(v));
-        (filters as any)[excludeMultiKey] = values;
+        filters[excludeMultiKey] = values;
         return;
       }
     }
@@ -163,7 +163,7 @@ export class QueryEngine {
       const inMatch = jql.match(new RegExp(`${fieldName}\\s+in\\s*\\(([^)]+)\\)`, 'i'));
       if (inMatch) {
         const values = inMatch[1].split(',').map((v) => this.cleanValue(v));
-        (filters as any)[multiKey] = values;
+        filters[multiKey] = values;
         return;
       }
     }
@@ -175,13 +175,13 @@ export class QueryEngine {
         new RegExp(`${fieldName}\\s*!=\\s*["']([^"']+)["']`, 'i')
       );
       if (notEqualsQuotedMatch) {
-        (filters as any)[excludeKey] = notEqualsQuotedMatch[1];
+        filters[excludeKey] = notEqualsQuotedMatch[1];
         return;
       }
       // Try unquoted
       const notEqualsMatch = jql.match(new RegExp(`${fieldName}\\s*!=\\s*([^\\s,]+)`, 'i'));
       if (notEqualsMatch) {
-        (filters as any)[excludeKey] = notEqualsMatch[1];
+        filters[excludeKey] = notEqualsMatch[1];
         return;
       }
     }
@@ -190,14 +190,14 @@ export class QueryEngine {
     // Try quoted first (to handle values with spaces)
     const quotedMatch = jql.match(new RegExp(`${fieldName}\\s*=\\s*["']([^"']+)["']`, 'i'));
     if (quotedMatch) {
-      (filters as any)[singleKey] = quotedMatch[1];
+      filters[singleKey] = quotedMatch[1];
       return;
     }
 
     // Try unquoted
     const unquotedMatch = jql.match(new RegExp(`${fieldName}\\s*=\\s*([^\\s,]+)`, 'i'));
     if (unquotedMatch) {
-      (filters as any)[singleKey] = unquotedMatch[1];
+      filters[singleKey] = unquotedMatch[1];
     }
   }
 
@@ -212,7 +212,7 @@ export class QueryEngine {
       const values = notInMatch[1]
         .split(',')
         .map((v) => this.processUserValue(v.trim().replace(/["']/g, '')));
-      (filters as any)[`${fieldName}sExclude`] = values;
+      filters[`${fieldName}sExclude`] = values;
       return;
     }
 
@@ -222,7 +222,7 @@ export class QueryEngine {
       const values = inMatch[1]
         .split(',')
         .map((v) => this.processUserValue(v.trim().replace(/["']/g, '')));
-      (filters as any)[`${fieldName}s`] = values;
+      filters[`${fieldName}s`] = values;
       return;
     }
 
@@ -232,7 +232,7 @@ export class QueryEngine {
     );
     if (notEqualsMatch) {
       const value = this.processUserValue(notEqualsMatch[1]);
-      (filters as any)[`${fieldName}Exclude`] = value;
+      filters[`${fieldName}Exclude`] = value;
       return;
     }
 
@@ -242,7 +242,7 @@ export class QueryEngine {
     );
     if (equalsMatch) {
       const value = this.processUserValue(equalsMatch[1]);
-      (filters as any)[fieldName] = value;
+      filters[fieldName] = value;
     }
   }
 
@@ -382,14 +382,14 @@ export class QueryEngine {
     jql: string,
     fieldName: string,
     filters: IssueFilters,
-    afterKey: string,
-    beforeKey: string,
-    equalsKey?: string
+    afterKey: 'createdAfter' | 'updatedAfter' | 'resolvedAfter' | 'dueAfter',
+    beforeKey: 'createdBefore' | 'updatedBefore' | 'resolvedBefore' | 'dueBefore',
+    equalsKey?: 'createdEquals' | 'updatedEquals'
   ): void {
     // >= operator (after or equals)
     const gteMatch = jql.match(new RegExp(`${fieldName}\\s*>=\\s*([^\\s,)]+(?:\\(\\))?)`, 'i'));
     if (gteMatch) {
-      (filters as any)[afterKey] = parseDateValue(gteMatch[1]);
+      filters[afterKey] = parseDateValue(gteMatch[1]);
       return;
     }
 
@@ -398,14 +398,14 @@ export class QueryEngine {
     if (gtMatch) {
       const date = new Date(parseDateValue(gtMatch[1]));
       date.setMilliseconds(date.getMilliseconds() + 1);
-      (filters as any)[afterKey] = date.toISOString();
+      filters[afterKey] = date.toISOString();
       return;
     }
 
     // <= operator (before or equals)
     const lteMatch = jql.match(new RegExp(`${fieldName}\\s*<=\\s*([^\\s,)]+(?:\\(\\))?)`, 'i'));
     if (lteMatch) {
-      (filters as any)[beforeKey] = parseDateValue(lteMatch[1]);
+      filters[beforeKey] = parseDateValue(lteMatch[1]);
       return;
     }
 
@@ -414,7 +414,7 @@ export class QueryEngine {
     if (ltMatch) {
       const date = new Date(parseDateValue(ltMatch[1]));
       date.setMilliseconds(date.getMilliseconds() - 1);
-      (filters as any)[beforeKey] = date.toISOString();
+      filters[beforeKey] = date.toISOString();
       return;
     }
 
@@ -422,7 +422,7 @@ export class QueryEngine {
     if (equalsKey) {
       const eqMatch = jql.match(new RegExp(`${fieldName}\\s*=\\s*([^\\s,)]+(?:\\(\\))?)`, 'i'));
       if (eqMatch) {
-        (filters as any)[equalsKey] = parseDateValue(eqMatch[1]);
+        filters[equalsKey] = parseDateValue(eqMatch[1]);
       }
     }
   }

@@ -129,7 +129,7 @@ export function createSearchHandlers(queryEngine: QueryEngine, baseUrl: string) 
         maxResults: 1000,
       });
 
-      const matchingIssueIds = new Set(results.issues.map((issue: any) => issue.id));
+      const matchingIssueIds = new Set(results.issues.map((issue) => issue.id));
 
       // Build result map
       const matches: Record<string, boolean> = {};
@@ -149,7 +149,7 @@ export function createSearchHandlers(queryEngine: QueryEngine, baseUrl: string) 
       const fieldValue = url.searchParams.get('fieldValue') || '';
 
       // Return basic autocomplete suggestions based on field name
-      const suggestions: any[] = [];
+      const suggestions: Array<{ value: string; displayName: string }> = [];
 
       if (fieldName.toLowerCase() === 'status') {
         suggestions.push(

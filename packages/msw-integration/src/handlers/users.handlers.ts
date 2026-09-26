@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import type { DataStore } from '@jira-mock/core';
+import type { DataStore, Permission } from '@jira-mock/core';
 import { PermissionGenerator } from '@jira-mock/core';
 import { createGenerationContext } from '../utils/generation-context.js';
 
@@ -100,7 +100,7 @@ export function createUsersHandlers(
       }
 
       // Convert to the expected format
-      const permissionsMap: Record<string, any> = {};
+      const permissionsMap: Record<string, Permission> = {};
       permissions.forEach((perm) => {
         permissionsMap[perm.key] = {
           id: perm.id,

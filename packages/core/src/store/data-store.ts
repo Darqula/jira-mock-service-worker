@@ -2,6 +2,7 @@ import type {
   User,
   Project,
   IssueBean,
+  IssueFields,
   IssueType,
   Priority,
   Status,
@@ -192,7 +193,10 @@ export class DataStore {
     return this.issues.get(idOrKey) || this.issuesByKey.get(idOrKey);
   }
 
-  updateIssue(idOrKey: string, updates: Partial<IssueBean>): IssueBean | undefined {
+  updateIssue(
+    idOrKey: string,
+    updates: Partial<Omit<IssueBean, 'fields'>> & { fields?: Partial<IssueFields> }
+  ): IssueBean | undefined {
     const issue = this.getIssue(idOrKey);
     if (!issue) {
       return undefined;
@@ -416,24 +420,22 @@ export class DataStore {
 
     // Resolution filters
     if (filters.resolution) {
-      results = results.filter(
-        (issue) => (issue.fields as any).resolution?.name === filters.resolution
-      );
+      results = results.filter((issue) => issue.fields.resolution?.name === filters.resolution);
     }
 
     if (filters.resolutions && filters.resolutions.length > 0) {
       results = results.filter((issue) => {
-        const resolution = (issue.fields as any).resolution;
-        return resolution && filters.resolutions!.includes(resolution.name);
+        const resolution = issue.fields.resolution;
+        return !!resolution && filters.resolutions!.includes(resolution.name);
       });
     }
 
     if (filters.resolutionIsEmpty) {
-      results = results.filter((issue) => !(issue.fields as any).resolution);
+      results = results.filter((issue) => !issue.fields.resolution);
     }
 
     if (filters.resolutionIsNotEmpty) {
-      results = results.filter((issue) => !!(issue.fields as any).resolution);
+      results = results.filter((issue) => !!issue.fields.resolution);
     }
 
     // Text search filters
@@ -512,135 +514,115 @@ export class DataStore {
     if (filters.resolvedAfter) {
       const afterDate = new Date(filters.resolvedAfter).getTime();
       results = results.filter((issue) => {
-        const resolved = (issue.fields as any).resolutiondate;
-        return resolved && new Date(resolved).getTime() >= afterDate;
+        const resolved = issue.fields.resolutiondate;
+        return !!resolved && new Date(resolved).getTime() >= afterDate;
       });
     }
 
     if (filters.resolvedBefore) {
       const beforeDate = new Date(filters.resolvedBefore).getTime();
       results = results.filter((issue) => {
-        const resolved = (issue.fields as any).resolutiondate;
-        return resolved && new Date(resolved).getTime() <= beforeDate;
+        const resolved = issue.fields.resolutiondate;
+        return !!resolved && new Date(resolved).getTime() <= beforeDate;
       });
     }
 
     if (filters.dueAfter) {
       const afterDate = new Date(filters.dueAfter).getTime();
       results = results.filter((issue) => {
-        const due = (issue.fields as any).duedate;
-        return due && new Date(due).getTime() >= afterDate;
+        const due = issue.fields.duedate;
+        return !!due && new Date(due).getTime() >= afterDate;
       });
     }
 
     if (filters.dueBefore) {
       const beforeDate = new Date(filters.dueBefore).getTime();
       results = results.filter((issue) => {
-        const due = (issue.fields as any).duedate;
-        return due && new Date(due).getTime() <= beforeDate;
+        const due = issue.fields.duedate;
+        return !!due && new Date(due).getTime() <= beforeDate;
       });
     }
 
     // Component filters
     if (filters.component) {
-      results = results.filter((issue) => {
-        const components = (issue.fields as any).components;
-        return components && components.some((c: any) => c.name === filters.component);
-      });
+      results = results.filter((issue) =>
+        (issue.fields.components ?? []).some((c) => c.name === filters.component)
+      );
     }
 
     if (filters.components && filters.components.length > 0) {
-      results = results.filter((issue) => {
-        const components = (issue.fields as any).components;
-        return components && components.some((c: any) => filters.components!.includes(c.name));
-      });
+      results = results.filter((issue) =>
+        (issue.fields.components ?? []).some((c) => filters.components!.includes(c.name))
+      );
     }
 
     if (filters.componentIsEmpty) {
-      results = results.filter((issue) => {
-        const components = (issue.fields as any).components;
-        return !components || components.length === 0;
-      });
+      results = results.filter(
+        (issue) => !issue.fields.components || issue.fields.components.length === 0
+      );
     }
 
     if (filters.componentIsNotEmpty) {
-      results = results.filter((issue) => {
-        const components = (issue.fields as any).components;
-        return components && components.length > 0;
-      });
+      results = results.filter(
+        (issue) => !!issue.fields.components && issue.fields.components.length > 0
+      );
     }
 
     // Fix version filters
     if (filters.fixVersion) {
-      results = results.filter((issue) => {
-        const fixVersions = (issue.fields as any).fixVersions;
-        return fixVersions && fixVersions.some((v: any) => v.name === filters.fixVersion);
-      });
+      results = results.filter((issue) =>
+        (issue.fields.fixVersions ?? []).some((v) => v.name === filters.fixVersion)
+      );
     }
 
     if (filters.fixVersions && filters.fixVersions.length > 0) {
-      results = results.filter((issue) => {
-        const fixVersions = (issue.fields as any).fixVersions;
-        return fixVersions && fixVersions.some((v: any) => filters.fixVersions!.includes(v.name));
-      });
+      results = results.filter((issue) =>
+        (issue.fields.fixVersions ?? []).some((v) => filters.fixVersions!.includes(v.name))
+      );
     }
 
     if (filters.fixVersionIsEmpty) {
-      results = results.filter((issue) => {
-        const fixVersions = (issue.fields as any).fixVersions;
-        return !fixVersions || fixVersions.length === 0;
-      });
+      results = results.filter(
+        (issue) => !issue.fields.fixVersions || issue.fields.fixVersions.length === 0
+      );
     }
 
     if (filters.fixVersionIsNotEmpty) {
-      results = results.filter((issue) => {
-        const fixVersions = (issue.fields as any).fixVersions;
-        return fixVersions && fixVersions.length > 0;
-      });
+      results = results.filter(
+        (issue) => !!issue.fields.fixVersions && issue.fields.fixVersions.length > 0
+      );
     }
 
     // Affected version filters
     if (filters.affectedVersion) {
-      results = results.filter((issue) => {
-        const versions = (issue.fields as any).versions;
-        return versions && versions.some((v: any) => v.name === filters.affectedVersion);
-      });
+      results = results.filter((issue) =>
+        (issue.fields.versions ?? []).some((v) => v.name === filters.affectedVersion)
+      );
     }
 
     if (filters.affectedVersions && filters.affectedVersions.length > 0) {
-      results = results.filter((issue) => {
-        const versions = (issue.fields as any).versions;
-        return versions && versions.some((v: any) => filters.affectedVersions!.includes(v.name));
-      });
+      results = results.filter((issue) =>
+        (issue.fields.versions ?? []).some((v) => filters.affectedVersions!.includes(v.name))
+      );
     }
 
     // Sprint filters
     if (filters.sprint) {
-      results = results.filter((issue) => {
-        const sprint = (issue.fields as any).sprint;
-        return sprint && sprint.name === filters.sprint;
-      });
+      results = results.filter((issue) => issue.fields.sprint?.name === filters.sprint);
     }
 
     if (filters.sprints && filters.sprints.length > 0) {
-      results = results.filter((issue) => {
-        const sprint = (issue.fields as any).sprint;
-        return sprint && filters.sprints!.includes(sprint.name);
-      });
+      results = results.filter((issue) =>
+        !!issue.fields.sprint && filters.sprints!.includes(issue.fields.sprint.name)
+      );
     }
 
     if (filters.sprintIsEmpty) {
-      results = results.filter((issue) => {
-        const sprint = (issue.fields as any).sprint;
-        return !sprint;
-      });
+      results = results.filter((issue) => !issue.fields.sprint);
     }
 
     if (filters.sprintIsNotEmpty) {
-      results = results.filter((issue) => {
-        const sprint = (issue.fields as any).sprint;
-        return !!sprint;
-      });
+      results = results.filter((issue) => !!issue.fields.sprint);
     }
 
     // Apply sorting
@@ -649,7 +631,17 @@ export class DataStore {
         const aValue = this.getFieldValue(a, options.orderBy!);
         const bValue = this.getFieldValue(b, options.orderBy!);
         const direction = options.orderDirection === 'desc' ? -1 : 1;
-        return aValue > bValue ? direction : -direction;
+        // Numeric values compare numerically, everything else (strings,
+        // dates) compares lexically - matching the original any-based sort
+        const cmp =
+          typeof aValue === 'number' && typeof bValue === 'number'
+            ? aValue - bValue
+            : aValue < bValue
+              ? -1
+              : aValue > bValue
+                ? 1
+                : 0;
+        return cmp * direction;
       });
     }
 
@@ -668,11 +660,19 @@ export class DataStore {
     };
   }
 
-  private getFieldValue(issue: IssueBean, field: string): any {
+  /**
+   * Returns the sortable value for the given field name.
+   * Strings (dates, names) and numbers are returned as-is; missing or
+   * non-primitive fields fall back to an empty string.
+   */
+  private getFieldValue(issue: IssueBean, field: string): string | number {
     if (field === 'created') return issue.fields.created;
     if (field === 'updated') return issue.fields.updated;
     if (field === 'key') return issue.key;
-    return issue.fields[field];
+    const value = issue.fields[field];
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return value;
+    return '';
   }
 
   // Issue Types
@@ -985,7 +985,7 @@ export class DataStore {
     return userProps?.get(key);
   }
 
-  setUserProperty(accountId: string, key: string, value: any): void {
+  setUserProperty(accountId: string, key: string, value: unknown): void {
     if (!this.userProperties.has(accountId)) {
       this.userProperties.set(accountId, new Map());
     }
@@ -1011,7 +1011,7 @@ export class DataStore {
     return projectProps?.get(key);
   }
 
-  setProjectProperty(projectId: string, key: string, value: any): void {
+  setProjectProperty(projectId: string, key: string, value: unknown): void {
     if (!this.projectProperties.has(projectId)) {
       this.projectProperties.set(projectId, new Map());
     }
@@ -1037,7 +1037,7 @@ export class DataStore {
     return issueProps?.get(key);
   }
 
-  setIssueProperty(issueId: string, key: string, value: any): void {
+  setIssueProperty(issueId: string, key: string, value: unknown): void {
     if (!this.issueProperties.has(issueId)) {
       this.issueProperties.set(issueId, new Map());
     }

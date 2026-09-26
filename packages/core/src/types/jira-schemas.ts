@@ -41,6 +41,18 @@ export interface IssueBean {
   fields: IssueFields;
 }
 
+export interface Resolution {
+  self?: string;
+  id?: string;
+  description?: string;
+  name: string;
+}
+
+export interface CustomFieldValue {
+  fieldName: string;
+  value: unknown;
+}
+
 export interface IssueFields {
   summary: string;
   description?: string;
@@ -53,6 +65,8 @@ export interface IssueFields {
   created: string;
   updated: string;
   resolutiondate?: string;
+  duedate?: string;
+  resolution?: Resolution | null;
   labels?: string[];
   components?: Component[];
   versions?: Version[];
@@ -62,11 +76,18 @@ export interface IssueFields {
   attachment?: Attachment[];
   issuelinks?: IssueLink[];
   sprint?: {
-    id: string;
+    id?: string;
     name: string;
-    state: string;
-  };
-  [key: string]: any;
+    state?: string;
+  } | null;
+  parent?: LinkedIssue;
+  customFieldValues?: CustomFieldValue[];
+  /**
+   * Catch-all for arbitrary Jira fields supplied by clients
+   * (e.g. `customfield_10010`). Reads yield `unknown` and must be
+   * narrowed before use, which keeps custom-field access type-safe.
+   */
+  [key: string]: unknown;
 }
 
 export interface IssueType {
@@ -285,7 +306,8 @@ export interface CreateIssueInput {
     labels?: string[];
     components?: Array<{ id?: string; name?: string }>;
     versions?: Array<{ id?: string; name?: string }>;
-    [key: string]: any;
+    /** Arbitrary custom fields supplied by clients (e.g. customfield_10010) */
+    [key: string]: unknown;
   };
 }
 
@@ -302,7 +324,8 @@ export interface UpdateIssueInput {
       name?: string;
     };
     labels?: string[];
-    [key: string]: any;
+    /** Arbitrary custom fields supplied by clients (e.g. customfield_10010) */
+    [key: string]: unknown;
   };
 }
 
@@ -370,7 +393,7 @@ export interface DoTransitionInput {
   transition: {
     id: string;
   };
-  fields?: Record<string, any>;
+  fields?: Record<string, unknown>;
 }
 
 // Issue Links
@@ -446,22 +469,22 @@ export interface CreateAttachmentResponse {
 // Properties
 export interface UserProperty {
   key: string;
-  value: any;
+  value: unknown;
 }
 
 export interface ProjectProperty {
   key: string;
-  value: any;
+  value: unknown;
 }
 
 export interface IssueProperty {
   key: string;
-  value: any;
+  value: unknown;
 }
 
 export interface EntityProperty {
   key: string;
-  value: any;
+  value: unknown;
 }
 
 // Permissions
@@ -487,8 +510,8 @@ export interface FieldMeta {
   autoCompleteUrl?: string;
   hasDefaultValue?: boolean;
   operations: string[];
-  allowedValues?: any[];
-  defaultValue?: any;
+  allowedValues?: unknown[];
+  defaultValue?: unknown;
 }
 
 export interface CreateMetaIssueType {

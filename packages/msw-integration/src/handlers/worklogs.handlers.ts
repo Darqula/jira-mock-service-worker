@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import type { DataStore, CreateWorklogInput } from '@jira-mock/core';
+import type { DataStore, CreateWorklogInput, Worklog } from '@jira-mock/core';
 
 export function createWorklogsHandlers(dataStore: DataStore, baseUrl: string) {
   return [
@@ -90,7 +90,7 @@ export function createWorklogsHandlers(dataStore: DataStore, baseUrl: string) {
           return HttpResponse.json({ errorMessages: ['User not authenticated'] }, { status: 401 });
         }
 
-        const updates: any = {
+        const updates: Partial<Worklog> = {
           updated: new Date().toISOString(),
           updateAuthor: currentUser,
         };

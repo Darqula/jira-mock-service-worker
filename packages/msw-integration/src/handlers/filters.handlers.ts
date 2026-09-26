@@ -1,9 +1,9 @@
 import { http, HttpResponse } from 'msw';
-import type { DataStore } from '@jira-mock/core';
+import type { DataStore, Filter, User } from '@jira-mock/core';
 
 export function createFiltersHandlers(dataStore: DataStore, baseUrl: string) {
   // Helper to get mock filters
-  const getMockFilters = (currentUser: any) => {
+  const getMockFilters = (currentUser: User | null): Filter[] => {
     return currentUser
       ? [
           {

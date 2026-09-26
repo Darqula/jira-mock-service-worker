@@ -8,6 +8,8 @@ import type {
   Status,
   Priority,
   IssueType,
+  Component,
+  Version,
 } from '../src/types/jira-schemas.js';
 
 describe('JQL Enhancements', () => {
@@ -306,10 +308,10 @@ describe('JQL Enhancements', () => {
 
     it('should filter by resolution IS NOT EMPTY', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).resolution = { name: 'Fixed' };
+      issue1.fields.resolution = { name: 'Fixed' };
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).resolution = null;
+      issue2.fields.resolution = null;
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -421,10 +423,10 @@ describe('JQL Enhancements', () => {
 
     it('should filter by due < date', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).duedate = '2024-01-15';
+      issue1.fields.duedate = '2024-01-15';
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).duedate = '2024-02-01';
+      issue2.fields.duedate = '2024-02-01';
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -455,13 +457,13 @@ describe('JQL Enhancements', () => {
   describe('Resolution Field', () => {
     it('should filter by resolution = Fixed', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).resolution = { name: 'Fixed' };
+      issue1.fields.resolution = { name: 'Fixed' };
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).resolution = { name: "Won't Fix" };
+      issue2.fields.resolution = { name: "Won't Fix" };
 
       const issue3 = createTestIssue('TEST-3', testProject);
-      (issue3.fields as any).resolution = null;
+      issue3.fields.resolution = null;
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -475,13 +477,13 @@ describe('JQL Enhancements', () => {
 
     it('should filter by resolution IN (Fixed, Done)', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).resolution = { name: 'Fixed' };
+      issue1.fields.resolution = { name: 'Fixed' };
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).resolution = { name: 'Done' };
+      issue2.fields.resolution = { name: 'Done' };
 
       const issue3 = createTestIssue('TEST-3', testProject);
-      (issue3.fields as any).resolution = { name: "Won't Fix" };
+      issue3.fields.resolution = { name: "Won't Fix" };
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -563,13 +565,13 @@ describe('JQL Enhancements', () => {
   describe('Component Field', () => {
     it('should filter by component = value', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).components = [{ name: 'API' }, { name: 'Backend' }];
+      issue1.fields.components = [testComponent('API'), testComponent('Backend')];
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).components = [{ name: 'Frontend' }];
+      issue2.fields.components = [testComponent('Frontend')];
 
       const issue3 = createTestIssue('TEST-3', testProject);
-      (issue3.fields as any).components = [];
+      issue3.fields.components = [];
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -583,13 +585,13 @@ describe('JQL Enhancements', () => {
 
     it('should filter by component IN (...)', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).components = [{ name: 'API' }];
+      issue1.fields.components = [testComponent('API')];
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).components = [{ name: 'Frontend' }];
+      issue2.fields.components = [testComponent('Frontend')];
 
       const issue3 = createTestIssue('TEST-3', testProject);
-      (issue3.fields as any).components = [{ name: 'Database' }];
+      issue3.fields.components = [testComponent('Database')];
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -603,10 +605,10 @@ describe('JQL Enhancements', () => {
 
     it('should filter by component IS EMPTY', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).components = [];
+      issue1.fields.components = [];
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).components = [{ name: 'API' }];
+      issue2.fields.components = [testComponent('API')];
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -621,10 +623,10 @@ describe('JQL Enhancements', () => {
   describe('Version Fields', () => {
     it('should filter by fixVersion = value', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).fixVersions = [{ name: '1.0.0' }, { name: '1.0.1' }];
+      issue1.fields.fixVersions = [testVersion('1.0.0'), testVersion('1.0.1')];
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).fixVersions = [{ name: '2.0.0' }];
+      issue2.fields.fixVersions = [testVersion('2.0.0')];
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -637,13 +639,13 @@ describe('JQL Enhancements', () => {
 
     it('should filter by fixVersion IN (...)', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).fixVersions = [{ name: '1.0.0' }];
+      issue1.fields.fixVersions = [testVersion('1.0.0')];
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).fixVersions = [{ name: '2.0.0' }];
+      issue2.fields.fixVersions = [testVersion('2.0.0')];
 
       const issue3 = createTestIssue('TEST-3', testProject);
-      (issue3.fields as any).fixVersions = [{ name: '3.0.0' }];
+      issue3.fields.fixVersions = [testVersion('3.0.0')];
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -657,10 +659,10 @@ describe('JQL Enhancements', () => {
 
     it('should filter by affectedVersion = value', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).versions = [{ name: '0.9.0' }];
+      issue1.fields.versions = [testVersion('0.9.0')];
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).versions = [{ name: '1.0.0' }];
+      issue2.fields.versions = [testVersion('1.0.0')];
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -673,10 +675,10 @@ describe('JQL Enhancements', () => {
 
     it('should filter by fixVersion IS EMPTY', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).fixVersions = [];
+      issue1.fields.fixVersions = [];
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).fixVersions = [{ name: '1.0.0' }];
+      issue2.fields.fixVersions = [testVersion('1.0.0')];
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -691,13 +693,13 @@ describe('JQL Enhancements', () => {
   describe('Sprint Field', () => {
     it('should filter by sprint = value', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).sprint = { name: 'Sprint 1', state: 'active' };
+      issue1.fields.sprint = { name: 'Sprint 1', state: 'active' };
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).sprint = { name: 'Sprint 2', state: 'active' };
+      issue2.fields.sprint = { name: 'Sprint 2', state: 'active' };
 
       const issue3 = createTestIssue('TEST-3', testProject);
-      (issue3.fields as any).sprint = null;
+      issue3.fields.sprint = null;
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -711,13 +713,13 @@ describe('JQL Enhancements', () => {
 
     it('should filter by sprint IN (...)', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).sprint = { name: 'Sprint 1' };
+      issue1.fields.sprint = { name: 'Sprint 1' };
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).sprint = { name: 'Sprint 2' };
+      issue2.fields.sprint = { name: 'Sprint 2' };
 
       const issue3 = createTestIssue('TEST-3', testProject);
-      (issue3.fields as any).sprint = { name: 'Sprint 3' };
+      issue3.fields.sprint = { name: 'Sprint 3' };
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -731,10 +733,10 @@ describe('JQL Enhancements', () => {
 
     it('should filter by sprint IS EMPTY', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).sprint = null;
+      issue1.fields.sprint = null;
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).sprint = { name: 'Sprint 1' };
+      issue2.fields.sprint = { name: 'Sprint 1' };
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -747,10 +749,10 @@ describe('JQL Enhancements', () => {
 
     it('should filter by sprint IS NOT EMPTY', () => {
       const issue1 = createTestIssue('TEST-1', testProject);
-      (issue1.fields as any).sprint = { name: 'Sprint 1' };
+      issue1.fields.sprint = { name: 'Sprint 1' };
 
       const issue2 = createTestIssue('TEST-2', testProject);
-      (issue2.fields as any).sprint = null;
+      issue2.fields.sprint = null;
 
       dataStore.addIssue(issue1);
       dataStore.addIssue(issue2);
@@ -762,6 +764,26 @@ describe('JQL Enhancements', () => {
     });
   });
 });
+
+// Helpers to build fully-typed Component/Version objects for tests
+function testComponent(name: string): Component {
+  return {
+    self: `https://test.atlassian.net/rest/api/2/component/${name}`,
+    id: name,
+    name,
+  };
+}
+
+function testVersion(name: string): Version {
+  return {
+    self: `https://test.atlassian.net/rest/api/2/version/${name}`,
+    id: name,
+    name,
+    archived: false,
+    released: false,
+    projectId: 1,
+  };
+}
 
 // Helper function to create test issues
 function createTestIssue(key: string, project: Project): IssueBean {
