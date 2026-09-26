@@ -765,7 +765,7 @@ describe('JQL Enhancements', () => {
   });
 });
 
-// Helpers to build fully-typed Component/Version objects for tests
+// Fully-typed test fixtures
 function testComponent(name: string): Component {
   return {
     self: `https://test.atlassian.net/rest/api/2/component/${name}`,

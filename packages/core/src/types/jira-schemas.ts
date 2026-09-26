@@ -82,11 +82,7 @@ export interface IssueFields {
   } | null;
   parent?: LinkedIssue;
   customFieldValues?: CustomFieldValue[];
-  /**
-   * Catch-all for arbitrary Jira fields supplied by clients
-   * (e.g. `customfield_10010`). Reads yield `unknown` and must be
-   * narrowed before use, which keeps custom-field access type-safe.
-   */
+  /** Catch-all for client-supplied custom fields (e.g. customfield_10010) */
   [key: string]: unknown;
 }
 
@@ -306,7 +302,7 @@ export interface CreateIssueInput {
     labels?: string[];
     components?: Array<{ id?: string; name?: string }>;
     versions?: Array<{ id?: string; name?: string }>;
-    /** Arbitrary custom fields supplied by clients (e.g. customfield_10010) */
+    /** Catch-all for client-supplied custom fields */
     [key: string]: unknown;
   };
 }
@@ -324,7 +320,7 @@ export interface UpdateIssueInput {
       name?: string;
     };
     labels?: string[];
-    /** Arbitrary custom fields supplied by clients (e.g. customfield_10010) */
+    /** Catch-all for client-supplied custom fields */
     [key: string]: unknown;
   };
 }

@@ -631,8 +631,7 @@ export class DataStore {
         const aValue = this.getFieldValue(a, options.orderBy!);
         const bValue = this.getFieldValue(b, options.orderBy!);
         const direction = options.orderDirection === 'desc' ? -1 : 1;
-        // Numeric values compare numerically, everything else (strings,
-        // dates) compares lexically - matching the original any-based sort
+        // Numbers compare numerically, everything else lexically
         const cmp =
           typeof aValue === 'number' && typeof bValue === 'number'
             ? aValue - bValue
@@ -660,11 +659,7 @@ export class DataStore {
     };
   }
 
-  /**
-   * Returns the sortable value for the given field name.
-   * Strings (dates, names) and numbers are returned as-is; missing or
-   * non-primitive fields fall back to an empty string.
-   */
+  /** Sortable value for a field: strings/numbers as-is, otherwise ''. */
   private getFieldValue(issue: IssueBean, field: string): string | number {
     if (field === 'created') return issue.fields.created;
     if (field === 'updated') return issue.fields.updated;

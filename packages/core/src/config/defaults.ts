@@ -113,24 +113,12 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 }
 
 /**
- * Deep merge core. Recursively merges `source` into `target` and returns
- * the merged result. Operates on `unknown` values so it can merge any
- * nested object shape while remaining type-safe.
- *
- * Legacy semantics (preserved from the original implementation):
- * - A `null` source value never overwrites an existing object in the
- *   target (an artifact of `typeof null === 'object'` in the old code,
- *   which routed the pair into the recursive branch where the null was
- *   simply ignored). Non-object source values (primitives, arrays) do
- *   overwrite the target as before.
- * - Values taken from the source are always copied, never referenced,
- *   so the merged result can be mutated without affecting the caller's
- *   input objects.
+ * Deep merge core. Recursively merges `source` into `target`, returning a
+ * new object. Preserves legacy semantics: a `null` source value never
+ * overwrites an existing object, and source values are copied, never
+ * referenced.
  */
 function deepMergeValues(target: unknown, source: unknown): unknown {
-  // Legacy behavior: a null/undefined source leaves an existing object
-  // untouched (returned as a copy); against non-object targets the value
-  // itself is used.
   if (source === null || source === undefined) {
     return isPlainObject(target) ? { ...target } : source;
   }
@@ -139,8 +127,6 @@ function deepMergeValues(target: unknown, source: unknown): unknown {
     return source;
   }
 
-  // Legacy behavior: merging an object into a missing/null target yields
-  // a shallow copy of the source.
   if (!isPlainObject(target)) {
     return { ...source };
   }
@@ -155,14 +141,10 @@ function deepMergeValues(target: unknown, source: unknown): unknown {
     const targetValue = result[key];
 
     if (isPlainObject(sourceValue) && isPlainObject(targetValue)) {
-      // Recursively merge nested objects
       result[key] = deepMergeValues(targetValue, sourceValue);
     } else if (sourceValue === null && isPlainObject(targetValue)) {
-      // Legacy behavior: a null source value never overwrites an existing
-      // object - keep a copy of the target value
       result[key] = { ...targetValue };
     } else {
-      // Override with source value
       result[key] = sourceValue;
     }
   }
@@ -171,8 +153,7 @@ function deepMergeValues(target: unknown, source: unknown): unknown {
 }
 
 /**
- * Deep merge helper function
- * Merges source into target, recursively merging nested objects
+ * Deep merges `source` into `target`, recursively merging nested objects
  */
 function deepMerge<T extends object>(target: T, source: Partial<T>): T {
   return deepMergeValues(target, source) as T;
