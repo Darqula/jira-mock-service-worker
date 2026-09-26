@@ -8,7 +8,8 @@
     // declarations (tsconfig.base keeps noEmit:true for typecheck-only users).
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "types": ["node"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests"],

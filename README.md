@@ -769,7 +769,7 @@ The MSW layer provides HTTP handlers:
 
 ### Prerequisites
 
-- Node.js 20.19+
+- Node.js 22.12+
 - npm 10+
 
 ### Setup
