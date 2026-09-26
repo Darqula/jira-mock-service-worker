@@ -2,6 +2,68 @@ import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
 import { setupJiraMockServer } from '../src/setup/node.js';
 import type { JiraMockConfig } from '@jira-mock/core';
 
+// @types/node >= 26 types `Response.json()` as `Promise<unknown>`. The mock
+// server returns dynamic JSON, so each test narrows the payload to the
+// minimal shape its assertions rely on.
+async function parseJson(response: Response): Promise<unknown> {
+  return response.json();
+}
+
+interface JiraUser {
+  accountId: string;
+  displayName: string;
+}
+
+interface JiraProject {
+  key: string;
+  name: string;
+}
+
+interface JiraIssue {
+  key: string;
+  id?: string;
+  fields: {
+    summary?: string;
+    project?: { key: string };
+  };
+}
+
+interface CreatedIssue {
+  key: string;
+  id: string;
+}
+
+interface NamedEntry {
+  id?: string;
+  name: string;
+}
+
+interface WorklogResponse {
+  worklogs: unknown[];
+}
+
+interface SearchResult {
+  total: number;
+  issues: JiraIssue[];
+}
+
+interface Resolution {
+  id: string;
+  name: string;
+}
+
+interface FilterSearchResult {
+  maxResults: number;
+  total: number;
+  values: Array<{ id: string; jql: string }>;
+}
+
+interface Attachment {
+  filename: string;
+  size: number;
+  mimeType: string;
+}
+
 describe('MSW Integration', () => {
   const config: JiraMockConfig = {
     version: '1.0',
@@ -38,7 +100,7 @@ describe('MSW Integration', () => {
     const response = await fetch(`${baseUrl}/rest/api/2/myself`);
     expect(response.status).toBe(200);
 
-    const user = await response.json();
+    const user = (await parseJson(response)) as JiraUser;
     expect(user.accountId).toBeDefined();
     expect(user.displayName).toBeDefined();
   });
@@ -47,7 +109,7 @@ describe('MSW Integration', () => {
     const response = await fetch(`${baseUrl}/rest/api/2/project`);
     expect(response.status).toBe(200);
 
-    const projects = await response.json();
+    const projects = (await parseJson(response)) as JiraProject[];
     expect(Array.isArray(projects)).toBe(true);
     expect(projects).toHaveLength(2);
   });
@@ -59,7 +121,7 @@ describe('MSW Integration', () => {
     const response = await fetch(`${baseUrl}/rest/api/2/project/${projectKey}`);
     expect(response.status).toBe(200);
 
-    const project = await response.json();
+    const project = (await parseJson(response)) as JiraProject;
     expect(project.key).toBe(projectKey);
     expect(project.name).toBeDefined();
   });
@@ -71,7 +133,7 @@ describe('MSW Integration', () => {
     const response = await fetch(`${baseUrl}/rest/api/2/issue/${issueKey}`);
     expect(response.status).toBe(200);
 
-    const issue = await response.json();
+    const issue = (await parseJson(response)) as JiraIssue;
     expect(issue.key).toBe(issueKey);
     expect(issue.fields.summary).toBeDefined();
   });
@@ -83,10 +145,10 @@ describe('MSW Integration', () => {
     const response = await fetch(`${baseUrl}/rest/api/2/search?jql=project=${projectKey}`);
     expect(response.status).toBe(200);
 
-    const result = await response.json();
+    const result = (await parseJson(response)) as SearchResult;
     expect(result.issues.length).toBeGreaterThan(0);
-    result.issues.forEach((issue: any) => {
-      expect(issue.fields.project.key).toBe(projectKey);
+    result.issues.forEach((issue) => {
+      expect(issue.fields.project?.key).toBe(projectKey);
     });
   });
 
@@ -111,7 +173,7 @@ describe('MSW Integration', () => {
 
     expect(response.status).toBe(201);
 
-    const result = await response.json();
+    const result = (await parseJson(response)) as CreatedIssue;
     expect(result.key).toBeDefined();
     expect(result.id).toBeDefined();
   });
@@ -156,7 +218,7 @@ describe('MSW Integration', () => {
     const response = await fetch(`${baseUrl}/rest/api/2/issuetype`);
     expect(response.status).toBe(200);
 
-    const issueTypes = await response.json();
+    const issueTypes = (await parseJson(response)) as NamedEntry[];
     expect(issueTypes.length).toBeGreaterThan(0);
     expect(issueTypes[0].name).toBeDefined();
   });
@@ -165,7 +227,7 @@ describe('MSW Integration', () => {
     const response = await fetch(`${baseUrl}/rest/api/2/priority`);
     expect(response.status).toBe(200);
 
-    const priorities = await response.json();
+    const priorities = (await parseJson(response)) as NamedEntry[];
     expect(priorities.length).toBeGreaterThan(0);
     expect(priorities[0].name).toBeDefined();
   });
@@ -177,7 +239,7 @@ describe('MSW Integration', () => {
     const response = await fetch(`${baseUrl}/rest/api/2/issue/${issue.key}/worklog`);
     expect(response.status).toBe(200);
 
-    const result = await response.json();
+    const result = (await parseJson(response)) as WorklogResponse;
     expect(result.worklogs).toBeDefined();
     expect(Array.isArray(result.worklogs)).toBe(true);
   });
@@ -185,10 +247,10 @@ describe('MSW Integration', () => {
   it('should return identical transitions for repeated GETs', async () => {
     const issueKey = dataStore.getAllIssues()[0].key;
 
-    const first = await (await fetch(`${baseUrl}/rest/api/2/issue/${issueKey}/transitions`)).json();
-    const second = await (
+    const first = await parseJson(await fetch(`${baseUrl}/rest/api/2/issue/${issueKey}/transitions`));
+    const second = await parseJson(
       await fetch(`${baseUrl}/rest/api/2/issue/${issueKey}/transitions`)
-    ).json();
+    );
 
     expect(second).toEqual(first);
   });
@@ -212,9 +274,9 @@ describe('MSW Integration', () => {
         }),
       });
 
-    const first = await (await create()).json();
+    const first = (await parseJson(await create())) as CreatedIssue;
     await fetch(`${baseUrl}/rest/api/2/issue/${first.key}`, { method: 'DELETE' });
-    const second = await (await create()).json();
+    const second = (await parseJson(await create())) as CreatedIssue;
 
     expect(second.key).not.toBe(first.key);
     expect(second.id).not.toBe(first.id);
@@ -234,25 +296,25 @@ describe('MSW Integration', () => {
     });
     expect(response.status).toBe(200);
 
-    const result = await response.json();
+    const result = (await parseJson(response)) as SearchResult;
     expect(result.total).toBeGreaterThan(0);
     expect(result.issues).toHaveLength(3);
-    result.issues.forEach((issue: any) => {
-      expect(issue.fields.project.key).toBe(projectKey);
+    result.issues.forEach((issue) => {
+      expect(issue.fields.project?.key).toBe(projectKey);
     });
   });
 
   it('should list and fetch resolutions', async () => {
     const listResponse = await fetch(`${baseUrl}/rest/api/2/resolution`);
     expect(listResponse.status).toBe(200);
-    const resolutions = await listResponse.json();
+    const resolutions = (await parseJson(listResponse)) as Resolution[];
     expect(resolutions.length).toBeGreaterThan(0);
     expect(resolutions[0].id).toBeDefined();
     expect(resolutions[0].name).toBeDefined();
 
     const singleResponse = await fetch(`${baseUrl}/rest/api/2/resolution/${resolutions[0].id}`);
     expect(singleResponse.status).toBe(200);
-    expect((await singleResponse.json()).id).toBe(resolutions[0].id);
+    expect(((await parseJson(singleResponse)) as Resolution).id).toBe(resolutions[0].id);
 
     const missingResponse = await fetch(`${baseUrl}/rest/api/2/resolution/999999`);
     expect(missingResponse.status).toBe(404);
@@ -263,7 +325,7 @@ describe('MSW Integration', () => {
     const searchResponse = await fetch(`${baseUrl}/rest/api/2/filter/search?maxResults=2`);
     expect(searchResponse.status).toBe(200);
 
-    const searchResult = await searchResponse.json();
+    const searchResult = (await parseJson(searchResponse)) as FilterSearchResult;
     expect(searchResult.maxResults).toBe(2);
     expect(searchResult.total).toBeGreaterThan(0);
     expect(Array.isArray(searchResult.values)).toBe(true);
@@ -274,7 +336,7 @@ describe('MSW Integration', () => {
     const filterId = searchResult.values[0].id;
     const byIdResponse = await fetch(`${baseUrl}/rest/api/2/filter/${filterId}`);
     expect(byIdResponse.status).toBe(200);
-    expect((await byIdResponse.json()).id).toBe(filterId);
+    expect(((await parseJson(byIdResponse)) as { id: string }).id).toBe(filterId);
   });
 
   it('should echo uploaded file metadata when posting attachments', async () => {
@@ -288,7 +350,7 @@ describe('MSW Integration', () => {
     });
     expect(response.status).toBe(200);
 
-    const result = await response.json();
+    const result = (await parseJson(response)) as Attachment[];
     expect(result).toHaveLength(1);
     expect(result[0].filename).toBe('report.txt');
     expect(result[0].size).toBe(11);
