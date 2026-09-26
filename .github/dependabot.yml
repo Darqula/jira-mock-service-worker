@@ -8,6 +8,12 @@ updates:
     groups:
       dev-dependencies:
         dependency-type: development
+    ignore:
+      # TypeScript 6.1+ / 7.x breaks npm install: @typescript-eslint 8.x
+      # peer-requires typescript <6.1.0 (ERESOLVE). Remove this rule once
+      # typescript-eslint publishes support for newer TypeScript majors.
+      - dependency-name: typescript
+        versions: [">=6.1.0"]
 
   - package-ecosystem: github-actions
     directory: "/"
