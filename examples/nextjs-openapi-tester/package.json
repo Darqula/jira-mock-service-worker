@@ -16,7 +16,7 @@
     "next": "^15.5.25",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "swagger-ui-react": "^5.17.14"
+    "swagger-ui-react": "^5.33.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
