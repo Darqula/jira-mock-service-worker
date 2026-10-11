@@ -19,8 +19,8 @@
     "swagger-ui-react": "^5.17.14"
   },
   "devDependencies": {
-    "@playwright/test": "^1.63.0",
-    "@types/node": "^26.6.1",
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^26.6.4",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@types/swagger-ui-react": "^5.18.0",
